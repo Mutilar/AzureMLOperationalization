@@ -1,5 +1,5 @@
-def test_silly(self):
+def test_silly():
     assert True
 
-def test_silly_2(self):
+def test_silly_2():
     assert False
