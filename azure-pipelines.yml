@@ -12,8 +12,16 @@ pool:
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+- task: AzureFunctionApp@1
+  inputs:
+    azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
+    appType: 'functionAppLinux'
+    appName: 'brhung-deployment-test'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
