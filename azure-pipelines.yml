@@ -7,24 +7,18 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-16.04'
 
 steps:
-# FORCE FUNCTION-COMPATIBLE PYTHON VERSION
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.6.8'
-    addToPath: true
-    architecture: 'x64'
-# UNIT-TESTING VIA CONDA ENVIRONMENT
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+- bash: conda create --yes --quiet --name myEnvironment
+  displayName: Create Anaconda environment
 - bash: |
     source activate myEnvironment
-    pytest --junitxml=junit/unit-test.xml
+    pip install pytest pytest-azurepipelines
+    pytest
   displayName: pytest
-- task: PublishTestResults@2
-  inputs:
-    testResultsFiles: 'junit/*.xml'
-  condition: succeededOrFailed()
 # BUNDLE FUNCTION
 - task: ArchiveFiles@2
   inputs:
