@@ -20,7 +20,7 @@ steps:
 - task: PythonScript@0
   inputs:
     scriptSource: 'filePath'
-    scriptPath: 'tests/unit_testing.py'
+    scriptPath: '$(System.DefaultWorkingDirectory)/Build/tests/unit_testing.py'
 # BUNDLE FUNCTION
 - task: ArchiveFiles@2
   inputs:
