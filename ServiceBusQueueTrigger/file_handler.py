@@ -164,7 +164,8 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
 def fetch_repository(params):
 
     # Wipes snapshot directory, clearing out old files
-    shutil.rmtree(os.getcwd() + "/snapshot/")
+    if os.path.exists(os.getcwd() + "/snapshot/"):
+        shutil.rmtree(os.getcwd() + "/snapshot/")
 
     # Recreates snapshot folder
     os.makedirs(os.getcwd() + "/snapshot/")
