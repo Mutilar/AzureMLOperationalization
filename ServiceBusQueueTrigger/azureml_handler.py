@@ -62,7 +62,7 @@ def submit_run(params, exp, notebook_name):
     # Dispatching job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
-            source_directory="snapshot/",
+            source_directory="snapshot/inputs/" + notebook_name,
             notebook="inputs/" + notebook_name,
             output_notebook="outputs/output.ipynb",
             run_config=fetch_run_configuration(params["run_configuration"]),

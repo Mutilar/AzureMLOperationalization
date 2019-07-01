@@ -17,3 +17,8 @@ for
     }
   ]
 }
+
+
+
+
+enable function ==> function -> "configuration" (application settings) -> new application setting
