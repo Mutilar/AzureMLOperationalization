@@ -16,7 +16,7 @@ steps:
   displayName: Create Anaconda environment
 - bash: |
     source activate myEnvironment
-    pip install pytest pytest-azurepipelines
+    pip install -r requirements.txt
     pytest
   displayName: pytest
 # BUNDLE FUNCTION
