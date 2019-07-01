@@ -16,11 +16,15 @@ steps:
     versionSpec: '3.6.8'
     addToPath: true
     architecture: 'x64'
-# UNIT-TESTING
-- task: PythonScript@0
+# UNIT-TESTING VIA CONDA ENVIRONMENT
+- bash: |
+    source activate myEnvironment
+    pytest --junitxml=junit/unit-test.xml
+  displayName: pytest
+- task: PublishTestResults@2
   inputs:
-    scriptSource: 'filePath'
-    scriptPath: '$(System.DefaultWorkingDirectory)/Build/tests/unit_testing.py'
+    testResultsFiles: 'junit/*.xml'
+  condition: succeededOrFailed()
 # BUNDLE FUNCTION
 - task: ArchiveFiles@2
   inputs:
