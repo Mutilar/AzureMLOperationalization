@@ -7,11 +7,19 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-16.04'
 
 steps:
-- script: echo $(System.DefaultWorkingDirectory)!
-  displayName: 'Run a one-line script'
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+- bash: conda create --yes --quiet --name myEnvironment
+  displayName: Create Anaconda environment
+- bash: |
+    source activate myEnvironment
+    pip install pytest pytest-azurepipelines
+    pytest
+  displayName: pytest
+# BUNDLE FUNCTION
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/Build/'
@@ -19,9 +27,10 @@ steps:
     archiveType: 'zip'
     archiveFile: '$(System.DefaultWorkingDirectory)/output.zip'
     replaceExistingArchive: true
+# DEPLOY FUNCTION
 - task: AzureFunctionApp@1
   inputs:
     azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
     appType: 'functionAppLinux'
     appName: 'brhung-deployment-test'
-    package: '$(System.DefaultWorkingDirectory)/*.zip'
+    package: '$(System.DefaultWorkingDirectory)/output.zip'
