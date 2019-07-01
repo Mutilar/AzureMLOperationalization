@@ -17,10 +17,10 @@ steps:
     addToPath: true
     architecture: 'x64'
 # UNIT-TESTING
-- task: PowerShell@2
+- task: PythonScript@0
   inputs:
-    targetType: 'inline'
-    script: 'pytest'
+    scriptSource: 'filePath'
+    scriptPath: 'tests/unit_testing.py'
 # BUNDLE FUNCTION
 - task: ArchiveFiles@2
   inputs:
