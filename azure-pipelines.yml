@@ -25,6 +25,7 @@ steps:
   displayName: Install Dependencies
 
 - bash: |
+    source worker_venv/bin/activate
     pytest
   displayName: Run Unit tests
 
