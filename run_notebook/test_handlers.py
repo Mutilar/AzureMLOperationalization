@@ -4,13 +4,6 @@
 from . import file_handler as fh
 
 
-def test_parse_and_validate_parameters():
-
-    params_input = "./run_notebook/tests/params/hello-world.json"
-
-    assert fh.parse_and_validate_parameters(fh.get_file_str(params_input)) is not None
-
-
 def test_inject_pip_dependency():
 
     conda_input = "./run_notebook/tests/conda-files/inputs/hello-world.yml"

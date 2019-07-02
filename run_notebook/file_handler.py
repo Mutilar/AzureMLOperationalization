@@ -23,18 +23,6 @@ def set_file_str(file_location, output):
         file.write(output)
 
 
-def parse_and_validate_parameters(msg):
-
-    # Cleans and formats string to be parsed into JSON 
-    msg_str = msg.replace("\'", "\"")
-
-    try:
-        msg_json = json.loads(msg_str)
-        # TODO: Check to make sure all fields required are present...
-    except Exception as e:
-        return None
-
-
 def add_service_bus_dependency(conda_file):
 
     conda_file_location = f'./snapshot/inputs/{conda_file}'
