@@ -24,6 +24,11 @@ steps:
     pip3.6 install -r requirements.txt
   displayName: Install Dependencies
 
+- bash: |
+    pytest
+  displayName: Run Unit tests
+
+
 # BUNDLE FUNCTION
 - task: ArchiveFiles@2
   inputs:
