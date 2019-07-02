@@ -3,7 +3,6 @@ from azureml.core import Workspace, Experiment, ScriptRunConfig #, TODO Run?
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import RunConfiguration, DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 from azureml.contrib.notebook import NotebookRunConfig
-import os 
 
 
 def fetch_experiment(params):
@@ -63,7 +62,7 @@ def submit_run(params, exp, notebook_name):
     # Dispatching job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
-            source_directory=os.path.dirname("snapshot/inputs/" + notebook_name),
+            source_directory="snapshot/", # os.path.dirname("snapshot/inputs/" + notebook_name),
             notebook="inputs/" + notebook_name,
             output_notebook="outputs/output.ipynb",
             run_config=fetch_run_configuration(params["run_configuration"]),

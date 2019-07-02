@@ -27,9 +27,6 @@ def parse_and_validate_parameters(msg):
 #TODO: UNIT TEST...?
 def add_service_bus_dependency(params):
 
-    # If integration into the Workspace Event Notifcation is done, this is obviously not necessary
-    # as the whole try-catching solution would become irrelevant
-
     conda_file_location = f'./snapshot/inputs/{params["run_configuration"]["conda_file"]}'
 
     # Open the Conda file
@@ -46,20 +43,15 @@ def add_service_bus_dependency(params):
 #TODO: UNIT TEST
 def add_notebook_callback(params, notebook_name, count, replace_placeholders = True):
 
-    # If integration into the Workspace Event Notifcation is done, this is obviously not necessary
-    # as the whole try-catching solution would become irrelevant
-
-    queue_params = params.get('wrap_up').get('queue')
-    config_params = params.get('run_configuration')
-
     notebook_file_location = f'./snapshot/inputs/{notebook_name}'
 
-    with open(notebook_file_location, 'r') as file:
+    # Open the notebook
+    with open(notebook_file_location, "r") as file:
         file_str = file.read()
     
     # String per line in the notebook 
-    lines = file_str.split('\n')
-    output = ''
+    lines = file_str.split("\n")
+    output = ""
 
     # Flow control variables
     found_code_cell = False
@@ -70,7 +62,7 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
     num_code_cells = 0
     cur_code_cell = 0
 
-    # Counting number of relevant cells
+    # Counting number of code cells
     for i in range(0, len(lines)):
         if lines[i] == '   "cell_type": "code",':
             num_code_cells += 1
@@ -83,42 +75,43 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
 
             # If the code block ends
             if lines[i] == '   ]':
+
                 found_code_source = False
 
                 # Add except statement, sending error message if errored
-                output += '    "except Exception as e:\\n",' + '\n'
-                output += '    "    if HAS_ERRORED is False:\\n",' + '\n'
-                output += '    "        _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",' + '\n'
-                output += '    "        _msg = Message(_params.replace(\\"default_error_message\\", str(e).replace(\\"!SINGLEQUOTE\\",\\"\\")))\\n",' + '\n'
-                output += '    "        _queue_client.send(_msg)\\n",' + '\n'
-                output += '    "        HAS_ERRORED = True\\n",' + '\n'   
-                output += '    "        raise Exception(e)\\n"' + '\n'
+                output += '    "except Exception as e:\\n",\n'
+                output += '    "    if HAS_ERRORED is False:\\n",\n'
+                output += '    "        _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",\n'
+                output += '    "        _msg = Message(_params.replace(\\"default_error_message\\", str(e).replace(\\"\'\\",\\"\\")))\\n",\n'
+                output += '    "        _queue_client.send(_msg)\\n",\n'
+                output += '    "        HAS_ERRORED = True\\n",\n'   
+                output += '    "        raise Exception(e)\\n"\n'
 
                 # If this is the final code block, send success message if never errored
                 if cur_code_cell == num_code_cells:
-                    output = output[:(len(output)-1)]
-                    output += ',' + '\n'
-                    output += '    "if HAS_ERRORED is False:\\n",' + '\n'
-                    output += '    "    _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",' + '\n'
-                    output += '    "    _msg = Message(_params.replace(\\"default_error_message\\",\\"Ran successfully\\"))\\n",' + '\n'
-                    output += '    "    _queue_client.send(_msg)\\n"' + '\n'
+                    output = output[:(len(output)-1)] + ',\n'
+                    output += '    "if HAS_ERRORED is False:\\n",\n'
+                    output += '    "    _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",\n'
+                    output += '    "    _msg = Message(_params.replace(\\"default_error_message\\",\\"Ran successfully\\"))\\n",\n'
+                    output += '    "    _queue_client.send(_msg)\\n"\n'
 
         # If just started a new code block
         elif found_code_source_beginning is True:
+
             found_code_source = True
             found_code_source_beginning = False
             cur_code_cell += 1
 
             # If first block, add global boolean
             if cur_code_cell == 1:
-                output += '    "from azure.servicebus import QueueClient, Message\\n",' + '\n'
-                output += '    "_connection_string = \\"!CONNECTION_STRING\\"\\n",' + '\n'
-                output += '    "_queue_name = \\"!NAME\\"\\n",' + '\n'
-                output += '    "_params = !SINGLEQUOTE!PARAMS!SINGLEQUOTE\\n",' + '\n'
-                output += '    "HAS_ERRORED = False\\n",' + '\n' 
+                output += '    "from azure.servicebus import QueueClient, Message\\n",\n'
+                output += '    "_connection_string = \\"!CONNECTION_STRING\\"\\n",\n'
+                output += '    "_queue_name = \\"!NAME\\"\\n",\n'
+                output += '    "_params = \'!PARAMS\'\\n",\n'
+                output += '    "HAS_ERRORED = False\\n",\n' 
 
             # Inject try statement
-            output += '    "try:\\n",' + '\n'    
+            output += '    "try:\\n",\n'    
 
         # If inside code block header
         elif found_code_cell is True:
@@ -150,12 +143,14 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
             # Leave the line untouched if it isn't inside a code block
             output += lines[i] + '\n'
 
-    output = output.replace("!CONNECTION_STRING", queue_params.get('connection_string'))
-    output = output.replace("!NAME", queue_params.get('name'))
+    # Injects Service Bus Queue parameters
+    output = output.replace("!CONNECTION_STRING", params["wrap_up"]["queue"]["connection_string"])
+    output = output.replace("!NAME", params["wrap_up"]["queue"]["name"])
+    
+    # Injects parameters, updating relevant fields
     output = output.replace("!PARAMS", f'{params}'.replace('\'','\\"').replace('!START','!UPDATE').replace('default_run_id',f'{count}'))
-    output = output.replace("!SINGLEQUOTE", '\'')
-
-    # Write the file out again
+    
+    # Writes changes to file
     with open(notebook_file_location, 'w') as file:
         file.write(output)
 
