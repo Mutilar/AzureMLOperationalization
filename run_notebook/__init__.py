@@ -71,7 +71,7 @@ def update_build_pipeline(params):
 def main(msg: func.ServiceBusMessage):
 
     # Converts bytes into JSON and ensures all relevant fields are present
-    params = file_handler.parse_and_validate_parameters(msg)
+    params = file_handler.parse_and_validate_parameters(msg.get_body().decode("utf-8"))
 
     if params is None:
         raise Exception ("Parameters not valid")

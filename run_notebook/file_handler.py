@@ -26,7 +26,7 @@ def set_file_str(file_location, output):
 def parse_and_validate_parameters(msg):
 
     # Cleans and formats string to be parsed into JSON 
-    msg_str = str(msg.get_body().decode("utf-8")).replace("\'", "\"")
+    msg_str = msg.replace("\'", "\"")
 
     try:
         msg_json = json.loads(msg_str)
