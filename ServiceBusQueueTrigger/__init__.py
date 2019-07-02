@@ -21,8 +21,8 @@ PIPELINE_FAILED = "Failed"
 def start_build_pipeline(params):
 
     # Downloads repository to snapshot and injects SB dependency
-    file_handler.fetch_repository(params)
-    file_handler.add_service_bus_dependency(params)
+    file_handler.fetch_repository(params["run_configuration"]["repository"])
+    file_handler.add_service_bus_dependency(params["run_configuration"]["conda_file"])
 
     # Fetches Experiment to submit run on
     exp = azureml_handler.fetch_experiment(params)
