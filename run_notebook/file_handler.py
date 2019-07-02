@@ -40,13 +40,20 @@ def add_service_bus_dependency(conda_file):
     conda_file_location = f'./snapshot/inputs/{conda_file}'
 
     # Open the Conda file
-    file_str = get_file_str(conda_file_location)
+    conda_str = get_file_str(conda_file_location)
 
     # Inject the azure servicebus pip dependency for callbacks
-    file_str = file_str.replace('- pip:\n','- pip:\n  - azure-servicebus\n')
+    conda_str = inject_pip_dependency(conda_str, 'azure-servicebus')
 
     # Writes changes to file
-    set_file_str(conda_file_location, file_str)
+    set_file_str(conda_file_location, conda_str)
+
+
+def inject_pip_dependency(file_str, dependency):
+    return file_str.replace(
+        '- pip:\n',
+        f'- pip:\n  - {dependency}\n'
+    )
 
 
 def add_notebook_callback(params, notebook_location, run_id):
