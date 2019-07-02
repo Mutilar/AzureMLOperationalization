@@ -8,7 +8,7 @@ from azureml.contrib.notebook import NotebookRunConfig
 def fetch_experiment(params):
     az_params = params["azure_resources"]
 
-    # Getting Service Principal connection
+    # Gets Service Principal connection
     sp_params = az_params["service_principal"]
     perform_interactive_login(
         username=sp_params["username"],
@@ -17,7 +17,7 @@ def fetch_experiment(params):
         service_principal=True
     )
 
-    # Getting Workspace
+    # Gets Workspace
     ws_params = az_params["workspace"]
     ws = Workspace.get(
         name=ws_params["name"],
@@ -25,14 +25,15 @@ def fetch_experiment(params):
         resource_group=ws_params["resource_group"]
     )
 
-    # Getting Experiment from Workspace
-    # While Experiment name could be arbitrary, we use it to connect DevOps builds to Experiments in Azure ML Compute for those builds
+    # Gets Experiment from Workspace
+    #   While the Experiment name could be arbitrary, 
+    #   we use it to connect DevOps builds to Experiments in Azure ML Compute
     exp = Experiment(
         workspace=ws,
         name=params["build_id"]
     )
 
-    # Returning experiment
+    # Returns experiment
     return exp
 
 
@@ -59,7 +60,7 @@ def fetch_run_configuration(rc_params):
 
 def submit_run(params, exp, notebook_name):
 
-    # Dispatching job with associated parameters to Azure ML Compute
+    # Dispatchs job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
             source_directory="snapshot/", # os.path.dirname("snapshot/inputs/" + notebook_name),
@@ -69,5 +70,5 @@ def submit_run(params, exp, notebook_name):
         )
     )
     
-    # Returning reference to run
+    # Returns reference to run
     return run

@@ -1,9 +1,7 @@
-
-
+from ..run_notebook import file_handler as fh
 
 # File Handler Unit Tests
 # -----------------------
-from .. import file_handler as fh
 
 def test_parse_and_validate_parameters():
 
@@ -26,40 +24,3 @@ def test_add_notebook_callback():
     notebook_output = f'./notebooks/outputs/hello-world.ipynb'
 
     assert fh.add_notebook_callback(fh.get_file_str(notebook_input)) == fh.get_file_str(notebook_output)
-
-
-# Request Handler Unit Tests
-# --------------------------
-from .. import request_handler
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# AzureML Handler Unit Tests
-# --------------------------
-from .. import azureml_handler
-
-
-def test_silly():
-    assert True
-
-def test_silly_2():
-    assert True
-
-
-
-
