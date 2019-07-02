@@ -11,67 +11,88 @@ import io
 import zipfile
         
 
-#TODO: UNIT TEST
+
+def get_file_str(file_location):
+    with open(file_location, "r") as file:
+        return file.read()
+    return None
+
+
+def set_file_str(file_location, output):
+    with open(file_location, "w") as file:
+        file.write(output)
+
+
 def parse_and_validate_parameters(msg):
 
     # Cleans and formats string to be parsed into JSON 
-    msg_str = str(msg.get_body().decode("utf-8")).replace('\'', '"')
+    msg_str = str(msg.get_body().decode("utf-8")).replace("\'", "\"")
 
-    # try:
-    return json.loads(msg_str)
-    # except Exception as e:
-    #     return None
-    # Check to make sure all fields required are present...
-    # not sure cleanest approach for this
+    try:
+        msg_json = json.loads(msg_str)
+        # TODO: Check to make sure all fields required are present...
+    except Exception as e:
+        return None
 
-#TODO: UNIT TEST...?
-def add_service_bus_dependency(params):
 
-    conda_file_location = f'./snapshot/inputs/{params["run_configuration"]["conda_file"]}'
+def add_service_bus_dependency(conda_file):
+
+    conda_file_location = f'./snapshot/inputs/{conda_file}'
 
     # Open the Conda file
-    with open(conda_file_location, "r") as file:
-        file_str = file.read()
+    file_str = get_file_str(conda_file_location)
 
     # Inject the azure servicebus pip dependency for callbacks
     file_str = file_str.replace('- pip:\n','- pip:\n  - azure-servicebus\n')
 
     # Writes changes to file
-    with open(conda_file_location, "w") as file:
-        file.write(file_str)
+    set_file_str(conda_file_location, file_str)
 
-#TODO: UNIT TEST
-def add_notebook_callback(params, notebook_name, count, replace_placeholders = True):
 
-    notebook_file_location = f'./snapshot/inputs/{notebook_name}'
+def add_notebook_callback(params, notebook_location, run_id):
 
-    # Open the notebook
-    with open(notebook_file_location, "r") as file:
-        file_str = file.read()
+    notebook_file_location = f'./snapshot/inputs/{notebook_location}'
+
+    # Opens the notebook
+    notebook_str = get_file_str(notebook_file_location)
+
+    # Injects try-catches
+    output = inject_notebook_try_catches(notebook_str)
+
+    # Injects params
+    output = inject_notebook_params(notebook_str, params, run_id)
+
     
-    # String per line in the notebook 
-    lines = file_str.split("\n")
+    # Writes changes to file
+    set_file_str(conda_file_location, output)
+
+        
+def inject_notebook_try_catches(notebook_str):
+
     output = ""
+
+    # String per line in the notebook 
+    lines = notebook_str.split("\n")
 
     # Flow control variables
     found_code_cell = False
     found_code_source_beginning = False
     found_code_source = False
 
-    # Tracking what code cell is currently being editted
+    # Tracks what code cell is currently being editted
     num_code_cells = 0
     cur_code_cell = 0
 
-    # Counting number of code cells
+    # Counts number of code cells
     for i in range(0, len(lines)):
         if lines[i] == '   "cell_type": "code",':
             num_code_cells += 1
     
-    # Iterate across notebook adding trys, catches, service bus messages
+    # Iterates across notebook adding trys, catches, service bus messages
     for i in range(0, len(lines)):
 
         # If currently inside a code block
-        if found_code_source is True:  
+        if found_code_source:  
 
             # If the code block ends
             if lines[i] == '   ]':
@@ -96,7 +117,7 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
                     output += '    "    _queue_client.send(_msg)\\n"\n'
 
         # If just started a new code block
-        elif found_code_source_beginning is True:
+        elif found_code_source_beginning:
 
             found_code_source = True
             found_code_source_beginning = False
@@ -114,7 +135,7 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
             output += '    "try:\\n",\n'    
 
         # If inside code block header
-        elif found_code_cell is True:
+        elif found_code_cell:
 
             # Found the code block source
             if lines[i] == '   "source": [':
@@ -126,7 +147,7 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
             found_code_cell = True
 
         # Push line to output, with some manipulation to add spacing for try-catch blocks, and adding commas/return lines when necessary
-        if found_code_source is True:
+        if found_code_source:
             split_index = 5
 
             # If next line is the end of a code block, add a \n and , to end of line
@@ -138,25 +159,47 @@ def add_notebook_callback(params, notebook_name, count, replace_placeholders = T
             # Add spacing to any pre-existing code
             else:
                 output += lines[i][:split_index] + '    ' + lines[i][split_index:] + '\n'
+
         else:
 
             # Leave the line untouched if it isn't inside a code block
             output += lines[i] + '\n'
+    
+    return output
 
+
+def inject_notebook_params(notebook_str, params, run_id): 
+    
     # Injects Service Bus Queue parameters
-    output = output.replace("!CONNECTION_STRING", params["wrap_up"]["queue"]["connection_string"])
-    output = output.replace("!NAME", params["wrap_up"]["queue"]["name"])
+    output = output.replace(
+        "!CONNECTION_STRING",
+        params["wrap_up"]["queue"]["connection_string"]
+    )
+    output = output.replace(
+        "!NAME",
+        params["wrap_up"]["queue"]["name"]
+    )
     
-    # Injects parameters, updating relevant fields
-    output = output.replace("!PARAMS", f'{params}'.replace('\'','\\"').replace('!START','!UPDATE').replace('default_run_id',f'{count}'))
-    
-    # Writes changes to file
-    with open(notebook_file_location, 'w') as file:
-        file.write(output)
+    # Updates params fields for callback
+    callback_params = str(params).replace(
+        "\'",
+        "\\\""
+    ).replace(
+        "!START",
+        "!UPDATE"
+    ).replace(
+        "default_run_id",
+        str(run_id)
+    )
 
+    # Injects parameters, updating relevant fields
+    output = output.replace(
+        "!PARAMS",
+        callback_params
+    )
 
 #TODO: UNIT TEST
-def fetch_repository(params):
+def fetch_repository(repository):
 
     # Wipes snapshot directory, clearing out old files
     if os.path.exists(os.getcwd() + "/snapshot/"):
@@ -176,7 +219,7 @@ def fetch_repository(params):
     repo_zip = zipfile.ZipFile(
         io.BytesIO(
             requests.get(
-                params["run_configuration"]["repository"]
+                repository
             ).content
         )
     )
@@ -195,3 +238,5 @@ def fetch_repository(params):
 
     # Returns to main directory
     os.chdir("..")
+
+
