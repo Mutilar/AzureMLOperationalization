@@ -56,7 +56,6 @@ def add_notebook_callback(params, notebook_location, run_id):
 
     # Injects params
     output = inject_notebook_params(notebook_str, params, run_id)
-
     
     # Writes changes to file
     set_file_str(conda_file_location, output)
@@ -166,11 +165,10 @@ def inject_notebook_try_catches(notebook_str):
 def inject_notebook_params(notebook_str, params, run_id): 
     
     # Injects Service Bus Queue parameters
-    output = output.replace(
+    output = notebook_str.replace(
         "!CONNECTION_STRING",
         params["wrap_up"]["queue"]["connection_string"]
-    )
-    output = output.replace(
+    ).replace(
         "!NAME",
         params["wrap_up"]["queue"]["name"]
     )
