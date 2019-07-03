@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
@@ -48,58 +43,58 @@ steps:
     package: '$(System.DefaultWorkingDirectory)/output.zip'
 
 # E2E Testing
-- task: PublishToAzureServiceBus@1
-  inputs:
-    azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
-    messageBody: >
-      {
-      "name": "brhung-testing",
-      "job": "!START",
-      "auth_token": "$(system.AccessToken)",
-      "build_id": "$(Build.BuildId)",
-      "run_condition": "all_pass",
-      "run_configuration": {
-          "repository": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
-          "conda_file": "environment.yml",
-          "compute_target": "brhung-cpu",
-          "notebooks": [                
-              "notebooks/00_quick_start/fastai_movielens.ipynb",
-              "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb",
-              "notebooks/00_quick_start/ncf_movielens.ipynb",
-              "notebooks/00_quick_start/rlrmc_movielens.ipynb",
-              "notebooks/00_quick_start/sar_movielens.ipynb"
-          ]
-      },
-      "azure_resources": {
-          "organization": "t-brhung",
-          "project": "brhung-test-pipeline",
-          "run_id": "default_run_id",
-          "service_principal": {
-              "username": "$(sp.client)",
-              "tenant": "$(sp.tenant)",
-              "password": "$(sp.password)"
-          },
-          "workspace": {
-              "name": "brhung-ml",
-              "subscription_id": "$(ws.subscription)",
-              "resource_group": "brhung-testing"
-          }
-      },
-      "wrap_up": {
-          "queue": {
-              "connection_string": "$(sb.connection)",
-              "name": "$(sb.name)"
-          },
-          "call_back": {
-              "error_message": "default_error_message",
-              "plan_url": "$(system.CollectionUri)",
-              "project_id": "$(system.TeamProjectId)", 
-              "hub_name": "$(system.HostType)",
-              "plan_id": "$(system.PlanId)",
-              "job_id": "$(system.JobId)",
-              "timeline_id": "$(system.TimelineId)",
-              "task_id": "$(system.TaskInstanceId)"
-          }
-        }
-      }
-    waitForCompletion: true # Allows for POST callback to close pipeline
+# - task: PublishToAzureServiceBus@1
+#   inputs:
+#     azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
+#     messageBody: >
+#       {
+#       "name": "brhung-testing",
+#       "job": "!START",
+#       "auth_token": "$(system.AccessToken)",
+#       "build_id": "$(Build.BuildId)",
+#       "run_condition": "all_pass",
+#       "run_configuration": {
+#           "repository": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
+#           "conda_file": "environment.yml",
+#           "compute_target": "brhung-cpu",
+#           "notebooks": [                
+#               "notebooks/00_quick_start/fastai_movielens.ipynb",
+#               "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb",
+#               "notebooks/00_quick_start/ncf_movielens.ipynb",
+#               "notebooks/00_quick_start/rlrmc_movielens.ipynb",
+#               "notebooks/00_quick_start/sar_movielens.ipynb"
+#           ]
+#       },
+#       "azure_resources": {
+#           "organization": "t-brhung",
+#           "project": "brhung-test-pipeline",
+#           "run_id": "default_run_id",
+#           "service_principal": {
+#               "username": "$(sp.client)",
+#               "tenant": "$(sp.tenant)",
+#               "password": "$(sp.password)"
+#           },
+#           "workspace": {
+#               "name": "brhung-ml",
+#               "subscription_id": "$(ws.subscription)",
+#               "resource_group": "brhung-testing"
+#           }
+#       },
+#       "wrap_up": {
+#           "queue": {
+#               "connection_string": "$(sb.connection)",
+#               "name": "$(sb.name)"
+#           },
+#           "call_back": {
+#               "error_message": "default_error_message",
+#               "plan_url": "$(system.CollectionUri)",
+#               "project_id": "$(system.TeamProjectId)", 
+#               "hub_name": "$(system.HostType)",
+#               "plan_id": "$(system.PlanId)",
+#               "job_id": "$(system.JobId)",
+#               "timeline_id": "$(system.TimelineId)",
+#               "task_id": "$(system.TaskInstanceId)"
+#           }
+#         }
+#       }
+#     waitForCompletion: true # Allows for POST callback to close pipeline
