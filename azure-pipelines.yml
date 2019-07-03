@@ -50,7 +50,7 @@ steps:
 # E2E Testing
 - task: PublishToAzureServiceBus@1
   inputs:
-    azureSubscription: 'test' # Defined in DevOps Project Settings -> Service Connections
+    azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
     messageBody: >
       {
       "name": "brhung-testing",
