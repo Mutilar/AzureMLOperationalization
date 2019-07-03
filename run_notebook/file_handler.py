@@ -52,13 +52,13 @@ def add_notebook_callback(params, notebook_location, run_id):
     notebook_str = get_file_str(notebook_file_location)
 
     # Injects try-catches
-    output = inject_notebook_try_catches(notebook_str)
+    notebook_str = inject_notebook_try_catches(notebook_str)
 
     # Injects params
-    output = inject_notebook_params(notebook_str, params, run_id)
+    notebook_str = inject_notebook_params(notebook_str, params, run_id)
     
     # Writes changes to file
-    set_file_str(notebook_file_location, output)
+    set_file_str(notebook_file_location, notebook_str)
 
         
 def inject_notebook_try_catches(notebook_str):
