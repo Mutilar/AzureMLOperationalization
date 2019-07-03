@@ -148,15 +148,15 @@ Failed runs were due to:
 
 ## DevOps Pipeline Variables
 
-| Name            	| Description                                        	| Example Value                                                         	| Where To Find                              	|
-|-----------------	|----------------------------------------------------	|-----------------------------------------------------------------------	|--------------------------------------------	|
-| sb.connection   	| Service Bus Queue Connection String                	| Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=... 	| Service Bus Queue's Shared Access Policies 	|
-| sb.name         	| Service Bus Queue Name                             	| example-queue-name                                                    	| Service Bus Queue's Mnemonic Name          	|
-| sp.password     	| Service Principal's Password                       	| 32 character alphanumeric string (e.g. ABc0/e1f+2g...)                	| App Registration's Client Secret           	|
-| sp.client       	| Service Principal's Application (client) ID        	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                       	| App Registration's Overview                	|
-| sp.tenant       	| Service Principal's Directory (tenant) ID          	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                       	| App Registration's Overview                	|
-| ws.subscription 	| Machine Learning Service Workspace Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                       	| Workspace's Overview                       	|
-  
+| Name            	| Description                                          	| Example Value                                    	| Where To Find                              	|
+|-----------------	|------------------------------------------------------	|--------------------------------------------------	|--------------------------------------------	|
+| sb.connection   	| Service Bus Queue's Connection String                	| Endpoint=sb://example.servicebus.windows.net/... 	| Service Bus Queue's Shared Access Policies 	|
+| sb.name         	| Service Bus Queue's Name                             	| example-queue-name                               	| Service Bus Queue's Mnemonic Name          	|
+| sp.password     	| Service Principal's Password                         	| 32 character alphanumeric string (e.g. A/fb0...) 	| App Registration's Client Secret           	|
+| sp.client       	| Service Principal's Application (client) ID          	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
+| sp.tenant       	| Service Principal's Directory (tenant) ID            	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
+| ws.subscription 	| Machine Learning Service Workspace's Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| Workspace's Overview                       	|
+
 # Notes 
 
 service bus connection string
