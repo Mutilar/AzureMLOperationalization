@@ -29,8 +29,8 @@ def fetch_experiment(params):
     #   While the Experiment name could be arbitrary, 
     #   we use it to connect DevOps builds to Experiments in Azure ML Compute
     exp = Experiment(
-        workspace=ws,
-        name=params["build_id"]
+        name=params["build_id"],
+        workspace=ws
     )
 
     # Returns experiment
@@ -63,7 +63,7 @@ def submit_run(params, exp, notebook_name):
     # Dispatchs job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
-            source_directory="snapshot/", # os.path.dirname("snapshot/inputs/" + notebook_name),
+            source_directory="snapshot/",
             notebook="inputs/" + notebook_name,
             output_notebook="outputs/output.ipynb",
             run_config=fetch_run_configuration(params["run_configuration"]),

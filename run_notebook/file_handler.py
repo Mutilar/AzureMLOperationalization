@@ -15,12 +15,14 @@ import zipfile
 def get_file_str(file_location):
     with open(file_location, "r") as file:
         return file.read()
-    return None
+    return False
 
 
 def set_file_str(file_location, output):
     with open(file_location, "w") as file:
         file.write(output)
+        return True
+    return False
 
 
 def add_pip_dependency(conda_file, dependency):
