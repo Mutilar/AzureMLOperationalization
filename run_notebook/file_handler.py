@@ -10,7 +10,7 @@ import requests
 import io 
 import zipfile
         
-
+TAB = '    '
 
 def get_file_str(file_location):
     with open(file_location, "r") as file:
@@ -65,7 +65,7 @@ def add_notebook_callback(params, notebook_location, run_id):
         
 def inject_notebook_try_catches(notebook_str):
 
-    output = ""
+    output = []
 
     # String per line in the notebook 
     lines = notebook_str.split("\n")
@@ -92,43 +92,41 @@ def inject_notebook_try_catches(notebook_str):
 
             # If the code block ends
             if lines[i] == '   ]':
-
                 found_code_source = False
 
                 # Add except statement, sending error message if errored
-                output += '    "except Exception as e:\\n",\n'
-                output += '    "    if HAS_ERRORED is False:\\n",\n'
-                output += '    "        _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",\n'
-                output += '    "        _msg = Message(_params.replace(\\"default_error_message\\", str(e).replace(\\"\'\\",\\"\\")))\\n",\n'
-                output += '    "        _queue_client.send(_msg)\\n",\n'
-                output += '    "        HAS_ERRORED = True\\n",\n'   
-                output += '    "        raise Exception(e)\\n"\n'
+                output.append('    "except Exception as e:\\n",')
+                output.append('    "    if HAS_ERRORED is False:\\n",')
+                output.append('    "        _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",')
+                output.append('    "        _msg = Message(_params.replace(\\"default_error_message\\", str(e).replace(\\"\'\\",\\"\\")))\\n",')
+                output.append('    "        _queue_client.send(_msg)\\n",')
+                output.append('    "        HAS_ERRORED = True\\n",')   
+                output.append('    "        raise Exception(e)\\n"')
 
                 # If this is the final code block, send success message if never errored
                 if cur_code_cell == num_code_cells:
-                    output = output[:(len(output)-1)] + ',\n'
-                    output += '    "if HAS_ERRORED is False:\\n",\n'
-                    output += '    "    _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",\n'
-                    output += '    "    _msg = Message(_params.replace(\\"default_error_message\\",\\"Ran successfully\\"))\\n",\n'
-                    output += '    "    _queue_client.send(_msg)\\n"\n'
+                    output = output[:(len(output)-1)] + ',')
+                    output.append('    "if HAS_ERRORED is False:\\n",')
+                    output.append('    "    _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",')
+                    output.append('    "    _msg = Message(_params.replace(\\"default_error_message\\",\\"Ran successfully\\"))\\n",')
+                    output.append('    "    _queue_client.send(_msg)\\n"')
 
         # If just started a new code block
         elif found_code_source_beginning:
-
             found_code_source = True
             found_code_source_beginning = False
             cur_code_cell += 1
 
-            # If first block, add global boolean
+            # If first block, add global variables
             if cur_code_cell == 1:
-                output += '    "from azure.servicebus import QueueClient, Message\\n",\n'
-                output += '    "_connection_string = \\"!CONNECTION_STRING\\"\\n",\n'
-                output += '    "_queue_name = \\"!NAME\\"\\n",\n'
-                output += '    "_params = \'!PARAMS\'\\n",\n'
-                output += '    "HAS_ERRORED = False\\n",\n' 
+                output.append('    "from azure.servicebus import QueueClient, Message\\n",')
+                output.append('    "_connection_string = \\"!CONNECTION_STRING\\"\\n",')
+                output.append('    "_queue_name = \\"!NAME\\"\\n",')
+                output.append('    "_params = \'!PARAMS\'\\n",')
+                output.append('    "HAS_ERRORED = False\\n",') 
 
             # Inject try statement
-            output += '    "try:\\n",\n'    
+            output.append('    "try:\\n",')    
 
         # If inside code block header
         elif found_code_cell:
@@ -144,24 +142,21 @@ def inject_notebook_try_catches(notebook_str):
 
         # Push line to output, with some manipulation to add spacing for try-catch blocks, and adding commas/return lines when necessary
         if found_code_source:
-            split_index = 5
 
             # If next line is the end of a code block, add a \n and , to end of line
             if lines[i+1] == '   ]':
-                output_to_be_truncated = lines[i][:split_index] + '    ' + lines[i][split_index:]
-                output_to_be_truncated = output_to_be_truncated[:(len(output_to_be_truncated)-1)]
-                output += output_to_be_truncated + '\\n",\n'
+                line_trimmed = lines[i][:5] + TAB + lines[i][5:]
+                line_trimmed = line_trimmed[:(len(line_trimmed)-1)]
+                output.append(line_trimmed + '\\n",')
                 
             # Add spacing to any pre-existing code
             else:
-                output += lines[i][:split_index] + '    ' + lines[i][split_index:] + '\n'
-
+                output.append(lines[i][:5] + TAB + lines[i][5:])
         else:
-
             # Leave the line untouched if it isn't inside a code block
-            output += lines[i] + '\n'
+            output.append(lines[i])
     
-    return output
+    return "\n".join(line for line in output)
 
 
 def inject_notebook_params(notebook_str, params, run_id): 
