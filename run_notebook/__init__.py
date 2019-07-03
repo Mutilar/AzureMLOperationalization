@@ -35,20 +35,22 @@ def main(msg: func.ServiceBusMessage):
 
 
 def start_build_pipeline(params):
+    rc_params = params["run_configuration"]
 
     # Downloads repository to snapshot and injects SB dependency
     fh.fetch_repository(
-        params["run_configuration"]["repository"]
+        rc_params["repository"]
     )
-    fh.add_service_bus_dependency(
-        params["run_configuration"]["conda_file"]
+    fh.add_pip_dependency(
+        rc_params["conda_file"],
+        'azure-servicebus'
     )
 
     # Fetches Experiment to submit run on
     exp = ah.fetch_experiment(params)
 
     # Creates new runs in DevOps, injects code into notebooks, and submits them to the Experiment
-    for notebook in params["run_configuration"]["notebooks"]:
+    for notebook in rc_params["notebooks"]:
 
         response = rh.post_new_run(params, notebook)
         run_id = response.json()["id"]
