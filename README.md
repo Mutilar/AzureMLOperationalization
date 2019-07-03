@@ -141,6 +141,21 @@ Failed runs were due to:
 - import __future__ statements ("notebooks/00_quick_start/rbm_movielens.ipynb")
   - Solution: ...
   - In theory, could scan for import __future__ and place them at the very top
+
+
+
+# Glossary
+
+## DevOps Pipeline Variables
+
+| Name            	| Description                                        	| Example Value                                                         	| Where To Find                              	|
+|-----------------	|----------------------------------------------------	|-----------------------------------------------------------------------	|--------------------------------------------	|
+| sb.connection   	| Service Bus Queue Connection String                	| Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=... 	| Service Bus Queue's Shared Access Policies 	|
+| sb.name         	| Service Bus Queue Name                             	| example-queue-name                                                    	| Service Bus Queue's Mnemonic Name          	|
+| sp.password     	| Service Principal's Password                       	| 32 character alphanumeric string (e.g. ABc0/e1f+2g...)                	| App Registration's Client Secret           	|
+| sp.client       	| Service Principal's Application (client) ID        	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                       	| App Registration's Overview                	|
+| sp.tenant       	| Service Principal's Directory (tenant) ID          	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                       	| App Registration's Overview                	|
+| ws.subscription 	| Machine Learning Service Workspace Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                       	| Workspace's Overview                       	|
   
 # Notes 
 
