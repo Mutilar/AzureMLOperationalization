@@ -191,6 +191,8 @@ def inject_notebook_params(notebook_str, params, run_id):
         callback_params
     )
 
+    return output
+
 #TODO: UNIT TEST
 def fetch_repository(repository):
 
