@@ -105,7 +105,7 @@ def inject_notebook_try_catches(notebook_str):
 
                 # If this is the final code block, send success message if never errored
                 if cur_code_cell == num_code_cells:
-                    output = output[:(len(output)-1)] + ','
+                    output[-1] += ','
                     output.append('    "if HAS_ERRORED is False:\\n",')
                     output.append('    "    _queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\\n",')
                     output.append('    "    _msg = Message(_params.replace(\\"default_error_message\\",\\"Ran successfully\\"))\\n",')
