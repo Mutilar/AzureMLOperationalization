@@ -190,35 +190,37 @@ enable function ==> function -> "configuration" (application settings) -> new ap
 
 ## To-do
 
-- [x] Defining Requirements  
-  - [x] Creating a list of requirements to address and streamline a data scientists' CICD workflow.
-    - *Priority:* 0
-    - *Definition of Done:* managerial approval and submission of first Connect.
-  - [x] Submitting a design proposal for the project. 
-    - *Priority:* 0
-    - *Definition of Done:* MLOps team approval, followed by integration of team's feedback.
-  - [x] Implementing triggers to assist in operationalization of Azure ML.
-    - *Priority:* 0
-    - *Definition of Done:* if a job can be created via the Azure ML SDK or underlying REST API calls.
-  - [x] Integrating Agentless Service into an Azure DevOps Pipeline, which has prebaked support for triggers, call-backs, state management.
-    - *Priority:* 1
-    - *Definition of Done:* if a job can be triggered from a typical use case (e.g. a pull request on a GitHub repository) to assist in streamlining CICD workflows.
-  - [x] Demonstrating use-cases of implemented functionalities.
-    - *Priority:* 1
-    - *Definition of Done:* a real-time demonstration of project to MLOps team, followed by integration of team's feedback.      
-  - [ ] Populating telemetry results, results from trainings, output notebooks, etc. from Azure ML into Azure DevOps.
-    - *Priority:* 2
-    - *Definition of Done:* job-specific results can be parsed and inputted back into the Azure DevOps dashboard for viewing.
-  - *Estimated Time:* 1 week
-- [x] Design Documentation
-  - Estimated Time: 1 week
-  - [x] Manager Approval
-- [x] Proof of Concept
-  - Estimated Time: 4-6 weeks
-- [ ] Implemetation of Azure Function Application
-  - Estimated Time: 3-5 weeks
-- [ ] Presentation
-  - Estimated Time: 1 week
+- [x] Creating a list of requirements to address and streamline a data scientists' CICD workflow.
+  - *Priority:* 0
+  - *Definition of Done:* managerial approval and submission of first Connect.
+- [x] Submitting a design proposal for the project. 
+  - *Priority:* 0
+  - *Definition of Done:* MLOps team approval, followed by integration of team's feedback.
+- [x] Implementing triggers to assist in operationalization of Azure ML.
+  - *Priority:* 0
+  - *Definition of Done:* if a job can be created via the Azure ML SDK or underlying REST API calls.
+- [x] Integrating Agentless Service into an Azure DevOps Pipeline, which has prebaked support for triggers, call-backs, state management.
+  - *Priority:* 1
+  - *Definition of Done:* if a job can be triggered from a typical use case (e.g. a pull request on a GitHub repository) to assist in streamlining CICD workflows.
+- [x] Demonstrating use-cases of implemented functionalities.
+  - *Priority:* 1
+  - *Definition of Done:* a real-time demonstration of project to MLOps team, followed by integration of team's feedback.      
+- [ ] Populating telemetry results, results from trainings, output notebooks, etc. from Azure ML into Azure DevOps.
+  - *Priority:* 2
+  - *Definition of Done:* job-specific results can be parsed and inputted back into the Azure DevOps dashboard for viewing.
+- [ ] Addressing Vienna's agent-based build pains by onboarding and implementing the agentless notebook pipeline.
+  - *Priority:* 2
+  - *Definition of Done:* Vienna's run notebook jobs are using an agentless pipeline to avoid stalling when waiting for agents, saving tangible amounts of time.
+- [ ] Integrating Event Grid triggers as an alternative and eventual replacement to the current Service Bus Queue approach.
+  - *Priority:* 2
+  - *Definition of Done:* making an end-to-end proof-of-concept for Event Grid that will eventually integrate with Azure ML Compute's notification system.
+- [ ] Informing the broader AII2 on the trials and tribulations of operationalizing Azure ML with the given suite of tools.
+  - *Priority:* 2
+  - *Definition of Done:* giving a Tech Talk to go over sticking points of Azure Functions, the Azure ML SDK, and how, as a team, we could improve our approach to operationalizing.
+- [ ] Proposing a third-party solution for using the agentless notebook pipeline.
+  - *Priority:* 2
+  - *Definition of Done:* writing a DevOps extension (or integrating with a pre-existing one), and formulating a plan to distribute the Azure Function to users' workspaces.
+
 
 
 
