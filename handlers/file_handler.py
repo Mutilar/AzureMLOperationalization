@@ -13,7 +13,7 @@ import zipfile
 TAB = '    '
 
 
-def get_file_str(self, file_location):
+def get_file_str(file_location):
     with open(file_location, "r") as file:
         return file.read()
     return False
