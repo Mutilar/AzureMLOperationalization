@@ -1,15 +1,22 @@
 # File Handler Unit Tests
 # -----------------------
 
-from . import file_handler as fh
+import sys
 
-FILE_INPUT = "./run_notebook/tests/hello-world.txt"
+sys.path.append("handlers")
 
-CONDA_INPUT = "./run_notebook/tests/conda-files/inputs/hello-world.yml"
-CONDA_OUTPUT = "./run_notebook/tests/conda-files/outputs/hello-world.yml"
+import request_handler as rh
+import file_handler as fh
+import azureml_handler as ah
 
-NOTEBOOK_INPUT = "./run_notebook/tests/notebooks/inputs/hello-world.ipynb"
-NOTEBOOK_OUTPUT = "./run_notebook/tests/notebooks/outputs/hello-world.ipynb"
+
+FILE_INPUT = "./tests/hello-world.txt"
+
+CONDA_INPUT = "./tests/conda-files/inputs/hello-world.yml"
+CONDA_OUTPUT = "./tests/conda-files/outputs/hello-world.yml"
+
+NOTEBOOK_INPUT = "./tests/notebooks/inputs/hello-world.ipynb"
+NOTEBOOK_OUTPUT = "./tests/notebooks/outputs/hello-world.ipynb"
 
 def test_get_file_str():
 

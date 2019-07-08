@@ -1,8 +1,12 @@
 import azure.functions as func
 
-from handlers.request_handler import RequestHandler as rh
-from handlers.file_handler import FileHandler as fh
-from handlers.azureml_handler import AzureMLHandler as ah
+import sys
+
+sys.path.append("handlers")
+
+import request_handler as rh
+import file_handler as fh
+import azureml_handler as ah
 
 
 # Job types
