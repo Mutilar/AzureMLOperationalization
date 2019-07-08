@@ -235,22 +235,19 @@ def fetch_repository(repository):
 def get_sb_msg_params(msg):
     params = get_msg_params(msg.get_body().decode("utf-8"))
     
-    if are_valid_params(params):
-        return params
+    # if are_valid_params(params):
+    return params
 
-    raise Exception("Parameters invalid")
-    return None
+    # raise Exception("Parameters invalid")
+    # return None
 
 def get_msg_params(msg_str):
     return yaml.safe_load(msg_str)
 
-def are_valid_params(params):
+# def are_valid_params(params):
     
-    params_template = get_msg_params(
-        get_file_str("./run_notebook/tests/params/hello-world.json")
-    )
+#     params_template = get_msg_params(
+#         get_file_str("./run_notebook/tests/params/hello-world.json")
+#     )
 
-    for key in params_template.keys():
-        
-
-
+#     # for key in params_template.keys():
