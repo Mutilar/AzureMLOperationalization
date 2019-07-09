@@ -6,7 +6,7 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
-    # Set Python Version
+    # SET PYTHON VERSION
     - task: UsePythonVersion@0
       displayName: "Setting Required Python Version for Azure Functions"
       inputs:
@@ -40,15 +40,18 @@ stages:
         appName: 'brhung-deployment-test'
         package: '$(System.DefaultWorkingDirectory)/output.zip'
 - stage: Validation
+  dependsOn:
+  - Deployment
+  condition: succeeded('Deployment') 
   jobs:
   - job: 
     displayName: End-to-End Testing Job
     pool: server
     steps:
-    # E2E Testing
+    # E2E TESTING
     - task: PublishToAzureServiceBus@1
       inputs:
-        azureSubscription: 'test' # Defined in DevOps Project Settings -> Service Connections
+        azureSubscription: 'test'
         messageBody: >
           {
           "name": "brhung-testing",
@@ -62,10 +65,7 @@ stages:
               "compute_target": "brhung-cpu",
               "notebooks": [                
                   "notebooks/00_quick_start/fastai_movielens.ipynb",
-                  "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb",
-                  "notebooks/00_quick_start/ncf_movielens.ipynb",
-                  "notebooks/00_quick_start/rlrmc_movielens.ipynb",
-                  "notebooks/00_quick_start/sar_movielens.ipynb"
+                  "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb"
               ]
           },
           "azure_resources": {
