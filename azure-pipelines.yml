@@ -39,7 +39,7 @@ stages:
         appType: 'functionAppLinux'
         appName: 'brhung-deployment-test'
         package: '$(System.DefaultWorkingDirectory)/output.zip'
-- stage: End-to-End Testing
+- stage: Validation
   jobs:
   - job: 
     displayName: End-to-End Testing Job
