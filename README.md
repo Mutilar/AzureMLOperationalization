@@ -33,62 +33,38 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 
 ## ```azure-pipelines.yml```
 
-This file controls the CD pipeline for the Function App.
+This file controls the CD pipeline for the Function App. It functions with two main stages: 
+
+### ```Deployment```
 
 ```yml
-jobs:
-- job:
-  displayName: Deploy Job
-  pool: 
-    vmImage: 'ubuntu-16.04'
-  steps:
-  # Set Python Version
-  - task: UsePythonVersion@0
-    displayName: Setting Required Python Version for Azure Functions
-    inputs:
-      versionSpec: '3.6'
-      architecture: 'x64'
-  # INIT CONDA ENVIRONMENT
-  - bash: |
-      python3.6 -m venv worker_venv
-      source worker_venv/bin/activate
-      pip3.6 install setuptools
-      pip3.6 install -r requirements.txt
-    displayName: Install Dependencies
-  # UNIT TESTS
-  - bash: |
-      source worker_venv/bin/activate
-      pytest
-    displayName: Run Unit Tests
-  # BUNDLE FUNCTION
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)/'
-      includeRootFolder: false
-      archiveType: 'zip'
-      archiveFile: '$(System.DefaultWorkingDirectory)/output.zip'
-      replaceExistingArchive: true
-  # DEPLOY FUNCTION
-  - task: AzureFunctionApp@1
-    inputs:
-      azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
-      appType: 'functionAppLinux'
-      appName: 'brhung-deployment-test'
-      package: '$(System.DefaultWorkingDirectory)/output.zip'
-- job:
-  displayName: E2E Test
-  pool: server
-  steps:
-  # E2E Testing
-  - task: PublishToAzureServiceBus@1
-    inputs:
-      azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
-      messageBody: >
-        {
-          ... (see CI pipeline definition for more details) ...
-        }
-      waitForCompletion: true # Allows for POST callback to close pipeline 
+- stage: Deployment
+  jobs:
+  - job: 
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: UsePythonVersion@0
+    - bash: pip3.6 install -r requirements.txt
+    - bash: pytest
+    - task: ArchiveFiles@2
+    - task: AzureFunctionApp@1
 ```
+
+This agent-based stage prepares the deployment environment, unit-tests, bundles, and finally deploys the Azure Function Application. 
+
+### ```Validation```
+
+```yml
+- stage: Validation
+  jobs:
+  - job: 
+    pool: server
+    steps:
+    - task: PublishToAzureServiceBus@1
+```
+
+This agentless stage then validates the changes by running a controlled job through the new deployment of the application to ensure everything is functioning as expected.
 
 ## ```requirements.txt```
 
