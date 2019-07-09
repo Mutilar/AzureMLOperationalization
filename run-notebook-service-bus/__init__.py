@@ -1,9 +1,6 @@
 import azure.functions as func
-
 import sys
-
 sys.path.append("handlers")
-
 import request_handler as rh
 import file_handler as fh
 import azureml_handler as ah
