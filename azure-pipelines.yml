@@ -1,100 +1,99 @@
-trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-16.04'
-
-steps:
-
-- task: UsePythonVersion@0
-  displayName: "Setting python version to 3.6 as required by functions"
-  inputs:
-    versionSpec: '3.6'
-    architecture: 'x64'
-
-- bash: |
-    python3.6 -m venv worker_venv
-    source worker_venv/bin/activate
-    pip3.6 install setuptools
-    pip3.6 install -r requirements.txt
-  displayName: Install Dependencies
-
-- bash: |
-    source worker_venv/bin/activate
-    pytest
-  displayName: Run Unit Tests
-
-
-# BUNDLE FUNCTION
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(System.DefaultWorkingDirectory)/output.zip'
-    replaceExistingArchive: true
-    
-# DEPLOY FUNCTION
-- task: AzureFunctionApp@1
-  inputs:
-    azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
-    appType: 'functionAppLinux'
-    appName: 'brhung-deployment-test'
-    package: '$(System.DefaultWorkingDirectory)/output.zip'
-
-# E2E Testing
-# - task: PublishToAzureServiceBus@1
-#   inputs:
-#     azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
-#     messageBody: >
-#       {
-#       "name": "brhung-testing",
-#       "job": "!START",
-#       "auth_token": "$(system.AccessToken)",
-#       "build_id": "$(Build.BuildId)",
-#       "run_condition": "all_pass",
-#       "run_configuration": {
-#           "repository": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
-#           "conda_file": "environment.yml",
-#           "compute_target": "brhung-cpu",
-#           "notebooks": [                
-#               "notebooks/00_quick_start/fastai_movielens.ipynb",
-#               "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb",
-#               "notebooks/00_quick_start/ncf_movielens.ipynb",
-#               "notebooks/00_quick_start/rlrmc_movielens.ipynb",
-#               "notebooks/00_quick_start/sar_movielens.ipynb"
-#           ]
-#       },
-#       "azure_resources": {
-#           "organization": "t-brhung",
-#           "project": "brhung-test-pipeline",
-#           "run_id": "default_run_id",
-#           "service_principal": {
-#               "username": "$(sp.client)",
-#               "tenant": "$(sp.tenant)",
-#               "password": "$(sp.password)"
-#           },
-#           "workspace": {
-#               "name": "brhung-ml",
-#               "subscription_id": "$(ws.subscription)",
-#               "resource_group": "brhung-testing"
-#           }
-#       },
-#       "wrap_up": {
-#           "queue": {
-#               "connection_string": "$(sb.connection)",
-#               "name": "$(sb.name)"
-#           },
-#           "call_back": {
-#               "error_message": "default_error_message",
-#               "plan_url": "$(system.CollectionUri)",
-#               "project_id": "$(system.TeamProjectId)", 
-#               "hub_name": "$(system.HostType)",
-#               "plan_id": "$(system.PlanId)",
-#               "job_id": "$(system.JobId)",
-#               "timeline_id": "$(system.TimelineId)",
-#               "task_id": "$(system.TaskInstanceId)"
-#           }
-#         }
-#       }
-#     waitForCompletion: true # Allows for POST callback to close pipeline
+jobs:
+- job: 
+  displayName: Deploy Job
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  # Set Python Version
+  - task: UsePythonVersion@0
+    displayName: "Setting Required Python Version for Azure Functions"
+    inputs:
+      versionSpec: '3.6'
+      architecture: 'x64'
+  # INIT CONDA ENVIRONMENT
+  - bash: |
+      python3.6 -m venv worker_venv
+      source worker_venv/bin/activate
+      pip3.6 install setuptools
+      pip3.6 install -r requirements.txt
+    displayName: Install Dependencies
+  # UNIT TESTS
+  - bash: |
+      source worker_venv/bin/activate
+      pytest
+    displayName: Run Unit Tests
+  # BUNDLE FUNCTION
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)/'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(System.DefaultWorkingDirectory)/output.zip'
+      replaceExistingArchive: true
+  # DEPLOY FUNCTION
+  - task: AzureFunctionApp@1
+    inputs:
+      azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
+      appType: 'functionAppLinux'
+      appName: 'brhung-deployment-test'
+      package: '$(System.DefaultWorkingDirectory)/output.zip'
+- job:
+  displayName: E2E Test
+  pool: server
+  steps:
+  # E2E Testing
+  - task: PublishToAzureServiceBus@1
+    inputs:
+      azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
+      messageBody: >
+        {
+        "name": "brhung-testing",
+        "job": "!START",
+        "auth_token": "$(system.AccessToken)",
+        "build_id": "$(Build.BuildId)",
+        "run_condition": "all_pass",
+        "run_configuration": {
+            "repository": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
+            "conda_file": "environment.yml",
+            "compute_target": "brhung-cpu",
+            "notebooks": [                
+                "notebooks/00_quick_start/fastai_movielens.ipynb",
+                "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb",
+                "notebooks/00_quick_start/ncf_movielens.ipynb",
+                "notebooks/00_quick_start/rlrmc_movielens.ipynb",
+                "notebooks/00_quick_start/sar_movielens.ipynb"
+            ]
+        },
+        "azure_resources": {
+            "organization": "t-brhung",
+            "project": "brhung-test-pipeline",
+            "run_id": "default_run_id",
+            "service_principal": {
+                "username": "$(sp.client)",
+                "tenant": "$(sp.tenant)",
+                "password": "$(sp.password)"
+            },
+            "workspace": {
+                "name": "brhung-ml",
+                "subscription_id": "$(ws.subscription)",
+                "resource_group": "brhung-testing"
+            }
+        },
+        "wrap_up": {
+            "queue": {
+                "connection_string": "$(sb.connection)",
+                "name": "$(sb.name)"
+            },
+            "call_back": {
+                "error_message": "default_error_message",
+                "plan_url": "$(system.CollectionUri)",
+                "project_id": "$(system.TeamProjectId)", 
+                "hub_name": "$(system.HostType)",
+                "plan_id": "$(system.PlanId)",
+                "job_id": "$(system.JobId)",
+                "timeline_id": "$(system.TimelineId)",
+                "task_id": "$(system.TaskInstanceId)"
+            }
+          }
+        }
+      waitForCompletion: true # Allows for POST callback to close pipeline
