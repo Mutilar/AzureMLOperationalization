@@ -37,7 +37,7 @@ def fetch_experiment(params):
     return exp
 
 
-def fetch_run_configuration(rc_params):
+def fetch_run_config(rc_params):
 
     # Init configuration for Python
     run_config = RunConfiguration(framework="python")
@@ -66,7 +66,7 @@ def submit_run(params, exp, notebook_name):
             source_directory="snapshot/",
             notebook="inputs/" + notebook_name,
             output_notebook="outputs/output.ipynb",
-            run_config=fetch_run_configuration(params["run_configuration"]),
+            run_config=fetch_run_config(params["run_configuration"]),
         )
     )
     
