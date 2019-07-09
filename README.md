@@ -13,7 +13,7 @@ Streamlining and expediating a data scientist's CI/CD workflow leveraging prebak
 
 Azure Python Functions can cleanly interact with the Azure ML SDK and can be easily integrated into Azure DevOps Pipelines. 
 
-### Core dependencies 
+### Core dependencies:
 - [Python 3.6.8][download-python]
 - [Azure Functions Core Tools][functions-run-local]
 - [Azure CLI][install-azure-cli]
@@ -25,6 +25,9 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > - RunNotebookServiceBus
 > > > - ```__init__.py```
 > > > - ```function.json```
+> > - Handlers
+> > > - ```azureml_handler.py```
+> > > - ```file_handler.py```
 > > - ```azure-pipelines.yml```
 > > - ```requirements.txt``` 
 
@@ -34,16 +37,57 @@ This file controls the CD pipeline for the Function App.
 
 ```yml
 jobs:
-- job: test 
-  timeoutInMinutes: 10 # Defining Max Runtime
-  pool: server # Defining Server Job
-  # Kick Off:
+- job:
+  displayName: Deploy Job
+  pool: 
+    vmImage: 'ubuntu-16.04'
   steps:
+  # Set Python Version
+  - task: UsePythonVersion@0
+    displayName: Setting Required Python Version for Azure Functions
+    inputs:
+      versionSpec: '3.6'
+      architecture: 'x64'
+  # INIT CONDA ENVIRONMENT
+  - bash: |
+      python3.6 -m venv worker_venv
+      source worker_venv/bin/activate
+      pip3.6 install setuptools
+      pip3.6 install -r requirements.txt
+    displayName: Install Dependencies
+  # UNIT TESTS
+  - bash: |
+      source worker_venv/bin/activate
+      pytest
+    displayName: Run Unit Tests
+  # BUNDLE FUNCTION
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)/'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(System.DefaultWorkingDirectory)/output.zip'
+      replaceExistingArchive: true
+  # DEPLOY FUNCTION
+  - task: AzureFunctionApp@1
+    inputs:
+      azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
+      appType: 'functionAppLinux'
+      appName: 'brhung-deployment-test'
+      package: '$(System.DefaultWorkingDirectory)/output.zip'
+- job:
+  displayName: E2E Test
+  pool: server
+  steps:
+  # E2E Testing
   - task: PublishToAzureServiceBus@1
     inputs:
-      azureSubscription: 'test' # Defined in DevOps Project Settings -> Service Connections
-      messageBody: '{"job":"kick_off", ...}' # See azure-pipeline-paramters.json
-      waitForCompletion: true # Allows for POST callback to close pipeline
+      azureSubscription: 'serviceBusConnectionString' # Defined in DevOps Project Settings -> Service Connections
+      messageBody: >
+        {
+          ... (see CI pipeline definition for more details) ...
+        }
+      waitForCompletion: true # Allows for POST callback to close pipeline 
 ```
 
 ## ```requirements.txt```
@@ -92,6 +136,20 @@ This script holds all the pythonic logic of the application. The main function i
 ### ```kick_off()```
 
 Kick-off fetches the repository of interest, and submits a new notebook run for each notebook specified in the input parameters.
+
+## ```azureml_handler.py```
+
+### ```fetch_experiment```
+
+### ```fetch_run_configuration```
+
+### ```submit_run```
+
+## ```file_handler.py```
+
+### ```fetch_repository```
+
+
 
 # Glossary
 
