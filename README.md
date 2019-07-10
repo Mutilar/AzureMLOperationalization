@@ -22,13 +22,15 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 # The File Directory
 
 > - RunNotebookFunctionApp
-> > - RunNotebookServiceBus
+> > - run_notebook_service_bus
 > > > - ```__init__.py```
 > > > - ```function.json```
-> > - Handlers
+> > - handlers
 > > > - ```azureml_handler.py```
 > > > - ```file_handler.py```
 > > > - ```request_handler.py```
+> > - tests
+> > > - ```test_handlers.py```
 > > - ```azure-pipelines.yml```
 > > - ```requirements.txt``` 
 
@@ -147,6 +149,9 @@ This script handles all HTTP related tasks, including ```post_new_run()``` and `
 >
 > This function, along with its helper functions, [updates a DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
 
+## ```test_handlers.py```
+
+This script handles all unit-testing of the Function App before it is deployed. Currently, unit tests only cover ```file_handler.py```-specific functions, as all other functions are very primitive. 
 
 # Glossary
 
