@@ -31,10 +31,10 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > > - ```request_handler.py```
 > > - tests
 > > > - ```test_handlers.py```
-> > - ```azure-pipelines.yml```
+> > - ```deployment_pipeline.yml```
 > > - ```requirements.txt``` 
 
-## ```azure-pipelines.yml```
+## ```deployment_pipeline.yml```
 
 This file controls the CD pipeline for the Function App. It functions with two main stages: 
 
