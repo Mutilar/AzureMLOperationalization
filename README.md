@@ -35,36 +35,38 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 
 This file controls the CD pipeline for the Function App. It functions with two main stages: 
 
-### ```Deployment```
+> #### ```Deployment```
+> 
+> This agent-based stage prepares the deployment environment, unit-tests, bundles, and  finally deploys the Azure Function Application. Simplified, it looks like this:
+>
+> ```yml
+> - stage: Deployment
+>   jobs:
+>   - job: 
+>     pool:
+>       vmImage: 'ubuntu-16.04'
+>     steps:
+>     - task: UsePythonVersion@0
+>     - bash: pip3.6 install -r requirements.txt
+>     - bash: pytest
+>     - task: ArchiveFiles@2
+>     - task: AzureFunctionApp@1
+> ```
+ 
+> #### ```Validation```
+>
+> This agentless stage validates the changes by running a controlled job through the new deployment of the application to ensure everything is functioning as expected. Simplified, it looks like this:
+> 
+> ```yml
+> - stage: Validation
+>   jobs:
+>   - job: 
+>     pool: server
+>     steps:
+>     - task: PublishToAzureServiceBus@1
+> ```
+> 
 
-```yml
-- stage: Deployment
-  jobs:
-  - job: 
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
-    - task: UsePythonVersion@0
-    - bash: pip3.6 install -r requirements.txt
-    - bash: pytest
-    - task: ArchiveFiles@2
-    - task: AzureFunctionApp@1
-```
-
-This agent-based stage prepares the deployment environment, unit-tests, bundles, and finally deploys the Azure Function Application. 
-
-### ```Validation```
-
-```yml
-- stage: Validation
-  jobs:
-  - job: 
-    pool: server
-    steps:
-    - task: PublishToAzureServiceBus@1
-```
-
-This agentless stage validates the changes by running a controlled job through the new deployment of the application to ensure everything is functioning as expected.
 
 ## ```requirements.txt```
 
@@ -73,7 +75,7 @@ This file controls the dependencies required for the Azure Function. This is mai
 ```
 ...
 azureml==0.2.7
-azureml-contrib-notebook==1.0.43.*
+azureml-contrib-notebook==1.0.43
 azureml-core==1.0.43
 azureml-pipeline==1.0.43
 azureml-sdk==1.0.43
@@ -88,54 +90,39 @@ pip3.6 install -r requirements.txt
 
 ## ```function.json```
 
-This file controls where the app looks for a main function (in this case, ```__init__.py```), as well as the bindings for the app. We can see below what the binding for a Service Bus Queue looks like:
-
-```json
-{
-  "scriptFile": "__init__.py",
-  "bindings": [
-    {
-      "name": "msg",
-      "type": "serviceBusTrigger",
-      "direction": "in",
-      "queueName": "function-queue",
-      "connection": "serviceBusConnectionString"
-    }
-  ]
-}
-```
+This file specifies the location of main function (e.g. in ```__init__.py```), as well as the Service Bus binding for the application.
 
 ## ```__init__.py```
 
 This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the ```start_build_pipeline()```. 
 
-### ```start_build_pipeline()```
-
-Fetches the repository of interest, creates a new Experiment SDK Object, and submits a set of notebook Runs to that object. 
+> #### ```start_build_pipeline()```
+> 
+> Fetches the repository of interest, creates a new Experiment SDK Object, and submits a set of notebook Runs to that object. 
 
 ## ```azureml_handler.py```
 
 This script handles all Azure ML SDK-related logic, including ```fetch_exp()```, ```fetch_run_config()```, and ```submit_run()```, which all manage Azure ML Workspace-related tasks.
 
-### ```fetch_experiment()```
+> #### ```fetch_experiment()```
+> 
+> This function authenticates with the ML Workspace with a Service Principal connection, fetches the [Workspace](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.workspace(class)?view=azure-ml-py), and then fetches and returns a new [Experiment](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py).
 
-This function authenticates with the ML Workspace with a Service Principal connection, fetches the [Workspace](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.workspace(class)?view=azure-ml-py), and then fetches and returns a new [Experiment](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py).
+> #### ```fetch_run_config()```
+>
+> This function generates a [RunConfiguration](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.runconfiguration?view=azure-ml-py) based on the pipeline parameters, specifying such things as the [ComputeTarget](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py) and [CondaDependencies](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.conda_dependencies.condadependencies?view=azure-ml-py). More flexibility of Run configurations can easily be implemented. 
 
-### ```fetch_run_config()```
-
-This function generates a [RunConfiguration](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.runconfiguration?view=azure-ml-py) based on the pipeline parameters, specifying such things as the [ComputeTarget](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py) and [CondaDependencies](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.conda_dependencies.condadependencies?view=azure-ml-py). More flexibility of Run configurations can easily be implemented. 
-
-### ```submit_run()```
-
-This function [submits a new Run](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment(class)?view=azure-ml-py#submit-config--tags-none----kwargs-) with configurations based on the pipeline parameters.
+> #### ```submit_run()```
+>
+> This function [submits a new Run](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment(class)?view=azure-ml-py#submit-config--tags-none----kwargs-) with configurations based on the pipeline parameters.
 
 ## ```file_handler.py```
 
 This script handles all file IO related tasks, currently only including ```fetch_repo()```.
 
-### ```fetch_repo()```
-
-This function pulls and extracts repositories from GitHub to be submitted in a Run's snapshot folder.
+> #### ```fetch_repo()```
+>
+> This function pulls and extracts repositories from GitHub to be submitted in a Run's snapshot folder.
 
 # Glossary
 
