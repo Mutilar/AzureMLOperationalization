@@ -42,10 +42,10 @@ def start_build_pipeline(params):
     fh.fetch_repository(
         rc_params["repository"]
     )
-    # fh.add_pip_dependency(
-    #     rc_params["conda_file"],
-    #     'azure-servicebus'
-    # )
+    fh.add_pip_dependency(
+        rc_params["conda_file"],
+        'azure-servicebus'
+    )
 
     # Fetches Experiment to submit run on
     exp = ah.fetch_experiment(params)
