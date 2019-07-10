@@ -5,7 +5,7 @@ from azureml.core.runconfig import RunConfiguration, DEFAULT_CPU_IMAGE, DEFAULT_
 from azureml.contrib.notebook import NotebookRunConfig
 
 
-def fetch_experiment(params):
+def fetch_exp(params):
     az_params = params["azure_resources"]
 
     # Gets Service Principal connection
@@ -27,7 +27,7 @@ def fetch_experiment(params):
 
     # Gets Experiment from Workspace
     #   While the Experiment name could be arbitrary, 
-    #   we use it to connect DevOps builds to Experiments in Azure ML Compute
+    #   we use it to correlate DevOps Builds to their respective Experiments
     exp = Experiment(
         name=params["build_id"],
         workspace=ws
@@ -39,34 +39,34 @@ def fetch_experiment(params):
 
 def fetch_run_config(rc_params):
 
-    # Init configuration for Python
+    # Inits configuration for Python
     run_config = RunConfiguration(framework="python")
 
-    # Specify compute target
+    # Specifies compute target
     run_config.target = rc_params["compute_target"]
 
-    # Configure Docker parameters
+    # Configures Docker parameters
     run_config.environment.docker.enabled = True
     run_config.environment.docker.base_image = DEFAULT_CPU_IMAGE
 
-    # Specify Conda file location
+    # Specifies Conda file location
     run_config.environment.python.conda_dependencies = CondaDependencies(
-        f'./snapshot/inputs/{rc_params["conda_file"]}'
+        "snapshot/inputs/" + rc_params["conda_file"]
     )
 
-    # Returning configuration
+    # Returns configuration
     return run_config
 
 
 def submit_run(params, exp, notebook_name):
 
-    # Dispatchs job with associated parameters to Azure ML Compute
+    # Dispatches job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
             source_directory="snapshot/",
             notebook="inputs/" + notebook_name,
             output_notebook="outputs/output.ipynb",
-            run_config=fetch_run_config(params["run_configuration"]),
+            run_config=fetch_run_config(params["run_config"]),
         )
     )
     
