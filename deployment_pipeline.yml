@@ -62,18 +62,35 @@ stages:
                 ]
             },
             "azure_resources": {
-                "organization": "t-brhung",
-                "project": "brhung-test-pipeline",
-                "run_id": "default_run_id",
-                "service_principal": {
-                    "username": "$(sp.client)",
-                    "tenant": "$(sp.tenant)",
-                    "password": "$(sp.password)"
+              "organization": "t-brhung",
+              "project": "brhung-test-pipeline",
+              "run_id": "default_run_id",
+              "service_principal": {
+                  "username": "$(sp.client)",
+                  "tenant": "$(sp.tenant)",
+                  "password": "$(sp.password)"
+              },
+              "workspace": {
+                  "name": "brhung-ml",
+                  "subscription_id": "$(ws.subscription)",
+                  "resource_group": "brhung-testing"
+              }
+            },
+            "wrap_up": {
+                "queue": {
+                    "connection_string": "$(sb.connection)",
+                    "name": "$(sb.name)"
                 },
-                "workspace": {
-                    "name": "brhung-ml",
-                    "subscription_id": "$(ws.subscription)",
-                    "resource_group": "brhung-testing"
+                "call_back": {
+                    "error_message": "default_error_message",
+                    "plan_url": "$(system.CollectionUri)",
+                    "project_id": "$(system.TeamProjectId)", 
+                    "hub_name": "$(system.HostType)",
+                    "plan_id": "$(system.PlanId)",
+                    "job_id": "$(system.JobId)",
+                    "timeline_id": "$(system.TimelineId)",
+                    "task_id": "$(system.TaskInstanceId)"
                 }
+              }
             }
           }
