@@ -53,8 +53,8 @@ stages:
             "job": "!START",
             "auth_token": "$(system.AccessToken)",
             "build_id": "$(Build.BuildId)",
-            "run_configuration": {
-                "repository": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
+            "run_config": {
+                "repo": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
                 "conda_file": "environment.yml",
                 "compute_target": "brhung-cpu",
                 "notebooks": [                
@@ -77,4 +77,3 @@ stages:
                 }
             }
           }
-        waitForCompletion: true # Allows for POST callback to close pipeline
