@@ -42,21 +42,12 @@ def start_build_pipeline(params):
     fh.fetch_repository(
         rc_params["repository"]
     )
-    fh.add_pip_dependency(
-        rc_params["conda_file"],
-        'azure-servicebus'
-    )
 
     # Fetches Experiment to submit run on
     exp = ah.fetch_experiment(params)
 
     # Creates new runs in DevOps, injects code into notebooks, and submits them to the Experiment
     for notebook in rc_params["notebooks"]:
-
-        response = rh.post_new_run(params, notebook)
-        run_id = response.json()["id"]
-
-        fh.add_notebook_callback(params, notebook, run_id)
 
         run = ah.submit_run(params, exp, notebook)
         run.tag(notebook)
