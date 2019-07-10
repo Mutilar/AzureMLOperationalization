@@ -8,19 +8,18 @@ import zipfile
         
 
 def fetch_repo(repo):
-    snapshot_dir = os.getcwd() + "/snapshot"
-
+    
     # Wipes snapshot directory, clearing out old files
-    if os.path.exists(snapshot_dir):
-        shutil.rmtree(snapshot_dir)
+    if os.path.exists(os.getcwd() + "/snapshot/"):
+        shutil.rmtree(os.getcwd() + "/snapshot/")
 
     # Recreates snapshot folder
-    os.makedirs(snapshot_dir)
+    os.makedirs(os.getcwd() + "/snapshot/")
 
     # Moves to snapshot directory
     os.chdir(
         os.path.dirname(
-            snapshot_dir
+            "./snapshot/"
         )
     )
 
