@@ -1,11 +1,9 @@
 
-![network-flow-diagram](images/title-slide.png)
-
 # Azure ML Operationalization
 
 [![Build Status](https://dev.azure.com/t-brhung/brhung-test-pipeline/_apis/build/status/Mutilar.brhung-deployment-testing?branchName=master)](https://dev.azure.com/t-brhung/brhung-test-pipeline/_build/latest?definitionId=8&branchName=master)
 
-Streamlining and Expediating a data scientist's CI/CD workflow leveraging prebaked functionalities of Azure DevOps Pipelines, Azure Functions, and Azure Service Bus Queues.
+Streamlining and expediating a data scientist's CI/CD workflow leveraging prebaked functionalities of Azure DevOps Pipelines, Azure Functions, and Azure Service Bus Queues.
 
 ### Key aspects:
 - [Azure DevOps Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/)
@@ -13,49 +11,60 @@ Streamlining and Expediating a data scientist's CI/CD workflow leveraging prebak
 - [Azure Functions](https://azure.microsoft.com/en-us/services/functions/)
 - [Azure Machine Learning](https://azure.microsoft.com/en-us/services/machine-learning-service/)
 
-Azure Python Functions can cleanly interact with the Azure ML SDK and can be easily integrated into Azure DevOps Pipelines. To quickly get up and running with your own implementation, documentation can be found [here][functions-create-first-function-python].
+Azure Python Functions can cleanly interact with the Azure ML SDK and can be easily integrated into Azure DevOps Pipelines. 
 
-### Core dependencies 
+### Core dependencies:
 - [Python 3.6.8][download-python]
 - [Azure Functions Core Tools][functions-run-local]
 - [Azure CLI][install-azure-cli]
 - [Azure ML SDK + Contrib][install-azure-ml-sdk]
 
-# Visualizing the Pipeline
-
-![network-flow-diagram](images/animated-process.gif)
-![sequence-diagram](images/service-bus-sequence-diagram.png)
-
 # The File Directory
 
-> - FunctionApp
-> > - ServiceBusQueueTrigger
+> - RunNotebookFunctionApp
+> > - RunNotebookServiceBus
 > > > - ```__init__.py```
 > > > - ```function.json```
+> > - Handlers
+> > > - ```azureml_handler.py```
+> > > - ```file_handler.py```
 > > - ```azure-pipelines.yml```
 > > - ```requirements.txt``` 
 
 ## ```azure-pipelines.yml```
 
-This file controls the DevOps pipeline flow. The pipeline required for this project is very simple. The first snippet seen below defines the [server job](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/phases?tabs=yaml&view=azure-devops#server-jobs):
+This file controls the CD pipeline for the Function App. It functions with two main stages: 
+
+### ```Deployment```
 
 ```yml
-jobs:
-- job: test 
-  timeoutInMinutes: 10 # Defining Max Runtime
-  pool: server # Defining Server Job
+- stage: Deployment
+  jobs:
+  - job: 
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: UsePythonVersion@0
+    - bash: pip3.6 install -r requirements.txt
+    - bash: pytest
+    - task: ArchiveFiles@2
+    - task: AzureFunctionApp@1
 ```
-Then, the only step in the pipeline is to publish the Azure ML Compute run parameters to a Service Bus Queue that will trigger the Azure Function to package and send the request:
+
+This agent-based stage prepares the deployment environment, unit-tests, bundles, and finally deploys the Azure Function Application. 
+
+### ```Validation```
 
 ```yml
-  # Kick Off:
-  steps:
-  - task: PublishToAzureServiceBus@1
-    inputs:
-      azureSubscription: 'test' # Defined in DevOps Project Settings -> Service Connections
-      messageBody: '{"job":"kick_off", ...}' # See azure-pipeline-paramters.json
-      waitForCompletion: true # Allows for POST callback to close pipeline
+- stage: Validation
+  jobs:
+  - job: 
+    pool: server
+    steps:
+    - task: PublishToAzureServiceBus@1
 ```
+
+This agentless stage then validates the changes by running a controlled job through the new deployment of the application to ensure everything is functioning as expected.
 
 ## ```requirements.txt```
 
@@ -90,7 +99,7 @@ This file controls where the app looks for a main function (in this case, ```__i
       "type": "serviceBusTrigger",
       "direction": "in",
       "queueName": "function-queue",
-      "connection": "test"
+      "connection": "serviceBusConnectionString"
     }
   ]
 }
@@ -98,49 +107,23 @@ This file controls where the app looks for a main function (in this case, ```__i
 
 ## ```__init__.py```
 
-This script holds all the pythonic logic of the application. The main function is short, favoring helper functions to handle the two distinct cases: ```kick_off()``` and ```wrap_up()```. 
-
+This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the ```kick_off()```. 
 
 ### ```kick_off()```
 
-Kick-off fetches the repository of interest, and submits a new notebook run for each notebook specified in the input parameters. Before submitting the notebook(s), it injects try-catch statements into them to enable call-backs to the Azure Function in case of failures. 
- 
+Kick-off fetches the repository of interest, and submits a new notebook run for each notebook specified in the input parameters.
 
-### ```wrap_up()```
+## ```azureml_handler.py```
 
-Wrap-up updates the test runs in DevOps, and checks if the experiment has finished executing all runs in the Azure ML Workspace. If it has, it closes the pipeline.
+### ```fetch_experiment```
 
+### ```fetch_run_configuration```
 
-# Tests Conducted
+### ```submit_run```
 
-** TBD: Azure ML notebooks that require additional permissions... **
+## ```file_handler.py```
 
-Successfully Runs:
-
-CPU:
-
-- SAR 
-- FASTAI
-- LIGHTGBM
-- SURPRISE
-- NCF
-
-GPU:
-- xDeepFM
-
-Failed runs were due to:
-
-- Fully commented blocks of code
-  - Solution: manually removed block of all commented lines
-- Empty blocks of code
-  - Solution: manually removed empty block
-- Unaccounted-for dependencies (e.g. Tensorflow's pip dependency)
-  - Solution: add tensorflow's pip dependency to the Conda file
-- "Java gateway process exited before sending its port number" ("notebooks/00_quick_start/als_movielens.ipynb", )
-  - Java Dependency issue....
-- import __future__ statements ("notebooks/00_quick_start/rbm_movielens.ipynb")
-  - Solution: ...
-  - In theory, could scan for import __future__ and place them at the very top
+### ```fetch_repository```
 
 
 
@@ -157,72 +140,11 @@ Failed runs were due to:
 | sp.tenant       	| Service Principal's Directory (tenant) ID            	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
 | ws.subscription 	| Machine Learning Service Workspace's Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| Workspace's Overview                       	|
 
-# Notes 
-
-service bus connection string
-azure service bus
-https://dev.azure.com/t-brhung/brhung-test-pipeline/_settings/adminservices
-for function.json
-
-enable function ==> function -> "configuration" (application settings) -> new application setting
-
 # Relevant Documentation
 
 - [Creating your first python function][functions-create-first-function-python]
 - [Installing the Azure CLI][install-azure-cli]
 - [Installing the Azure ML SDK][install-azure-ml-sdk]
-
-# References
-
-- [Github: Correction to Python Azure Function Documentation](https://github.com/MicrosoftDocs/azure-docs/pull/31932)
-  - Shows how much of the Python Azure Function documentation is sparse and relatively untested. 
-  - ![correction-to-documentation](images/correction-to-documentation.png)
-
-- [Medium: Notebooks at Netflix](https://medium.com/netflix-techblog/scheduling-notebooks-348e6c14cfd6)
-  - Shows the relevancy of notebook-based machine learning operationalization for large corporations.
-  - Highlights relevant sticking points from an data scientist's perspective.
-  - ![correction-to-documentation](images/netflix-pipeline-diagram.png)
-  
-- [Github: Data Scientists are Asking for CI/CD Solutions](https://github.com/Azure/azure-functions-core-tools/issues/640)
-  - Evidence data scientists are seeking solutions to workflow optimization, and Azure is only beginning to offer these services.
-  - ![correction-to-documentation](images/example-user.png )
-
-
-## To-do
-
-- [x] Creating a list of requirements to address and streamline a data scientists' CICD workflow.
-  - *Priority:* 0
-  - *Definition of Done:* managerial approval and submission of first Connect.
-- [x] Submitting a design proposal for the project. 
-  - *Priority:* 0
-  - *Definition of Done:* MLOps team approval, followed by integration of team's feedback.
-- [x] Implementing triggers to assist in operationalization of Azure ML.
-  - *Priority:* 0
-  - *Definition of Done:* if a job can be created via the Azure ML SDK or underlying REST API calls.
-- [x] Integrating Agentless Service into an Azure DevOps Pipeline, which has prebaked support for triggers, call-backs, state management.
-  - *Priority:* 1
-  - *Definition of Done:* if a job can be triggered from a typical use case (e.g. a pull request on a GitHub repository) to assist in streamlining CICD workflows.
-- [x] Demonstrating use-cases of implemented functionalities.
-  - *Priority:* 1
-  - *Definition of Done:* a real-time demonstration of project to MLOps team, followed by integration of team's feedback.      
-- [ ] Populating telemetry results, results from trainings, output notebooks, etc. from Azure ML into Azure DevOps.
-  - *Priority:* 2
-  - *Definition of Done:* job-specific results can be parsed and inputted back into the Azure DevOps dashboard for viewing.
-- [ ] Addressing Vienna's agent-based build pains by onboarding and implementing the agentless notebook pipeline.
-  - *Priority:* 2
-  - *Definition of Done:* Vienna's run notebook jobs are using an agentless pipeline to avoid stalling when waiting for agents, saving tangible amounts of time.
-- [ ] Integrating Event Grid triggers as an alternative and eventual replacement to the current Service Bus Queue approach.
-  - *Priority:* 2
-  - *Definition of Done:* making an end-to-end proof-of-concept for Event Grid that will eventually integrate with Azure ML Compute's notification system.
-- [ ] Informing the broader AII2 on the trials and tribulations of operationalizing Azure ML with the given suite of tools.
-  - *Priority:* 2
-  - *Definition of Done:* giving a Tech Talk to go over sticking points of Azure Functions, the Azure ML SDK, and how, as a team, we could improve our approach to operationalizing.
-- [ ] Proposing a third-party solution for using the agentless notebook pipeline.
-  - *Priority:* 2
-  - *Definition of Done:* writing a DevOps extension (or integrating with a pre-existing one), and formulating a plan to distribute the Azure Function to users' workspaces.
-
-
-
 
 [functions-create-first-function-python]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python
 [install-azure-cli]: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli

@@ -1,5 +1,5 @@
 from azureml._base_sdk_common.common import perform_interactive_login
-from azureml.core import Workspace, Experiment, ScriptRunConfig #, TODO Run?
+from azureml.core import Workspace, Experiment, ScriptRunConfig
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import RunConfiguration, DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 from azureml.contrib.notebook import NotebookRunConfig
@@ -17,8 +17,6 @@ def fetch_experiment(params):
         service_principal=True
     )
 
-    # https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.workspace(class)?view=azure-ml-py
-
     # Gets Workspace
     ws_params = az_params["workspace"]
     ws = Workspace.get(
@@ -26,8 +24,6 @@ def fetch_experiment(params):
         subscription_id=ws_params["subscription_id"],
         resource_group=ws_params["resource_group"]
     )
-
-    # https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment(class)?view=azure-ml-py
 
     # Gets Experiment from Workspace
     #   While the Experiment name could be arbitrary, 
@@ -41,8 +37,7 @@ def fetch_experiment(params):
     return exp
 
 
-def fetch_run_configuration(rc_params):
-    # https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.runconfig.runconfiguration?view=azure-ml-py
+def fetch_run_config(rc_params):
 
     # Init configuration for Python
     run_config = RunConfiguration(framework="python")
@@ -64,7 +59,6 @@ def fetch_run_configuration(rc_params):
 
 
 def submit_run(params, exp, notebook_name):
-    # https://docs.microsoft.com/en-us/python/api/azureml-contrib-notebook/azureml.contrib.notebook.notebookrunconfig?view=azure-ml-py
 
     # Dispatchs job with associated parameters to Azure ML Compute
     run = exp.submit(
@@ -72,7 +66,7 @@ def submit_run(params, exp, notebook_name):
             source_directory="snapshot/",
             notebook="inputs/" + notebook_name,
             output_notebook="outputs/output.ipynb",
-            run_config=fetch_run_configuration(params["run_configuration"]),
+            run_config=fetch_run_config(params["run_configuration"]),
         )
     )
     
