@@ -2,7 +2,6 @@ import requests
 
 
 def post_new_run(params, notebook_name):
-    # https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/create?view=azure-devops-rest-5.0
     az_params = params["azure_resources"]
 
     return requests.post(
@@ -13,7 +12,6 @@ def post_new_run(params, notebook_name):
 
 
 def post_run_results(params, run_properties):
-    # https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0#shallowreference
     az_params = params["azure_resources"]
     cb_params = params["wrap_up"]["call_back"]
 

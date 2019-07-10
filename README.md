@@ -28,6 +28,7 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > - Handlers
 > > > - ```azureml_handler.py```
 > > > - ```file_handler.py```
+> > > - ```request_handler.py```
 > > - ```azure-pipelines.yml```
 > > - ```requirements.txt``` 
 
@@ -90,7 +91,7 @@ pip3.6 install -r requirements.txt
 
 ## ```function.json```
 
-This file specifies the location of main function (e.g. in ```__init__.py```), as well as the Service Bus binding for the application.
+This file specifies the location of main function (e.g. ```__init__.py```), as well as the Service Bus binding for the application.
 
 ## ```__init__.py```
 
@@ -110,7 +111,7 @@ This script handles all Azure ML SDK-related logic, including ```fetch_exp()```,
 
 > #### ```fetch_run_config()```
 >
-> This function generates a [RunConfiguration](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.runconfiguration?view=azure-ml-py) based on the pipeline parameters, specifying such things as the [ComputeTarget](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py) and [CondaDependencies](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.conda_dependencies.condadependencies?view=azure-ml-py). More flexibility of Run configurations can easily be implemented. 
+> This function generates a [RunConfiguration](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.runconfiguration?view=azure-ml-py) based on the pipeline parameters, specifying such things as the [ComputeTarget](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py) and [CondaDependencies](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.conda_dependencies.condadependencies?view=azure-ml-py). More flexible of Run configurations can easily be implemented. 
 
 > #### ```submit_run()```
 >
@@ -118,11 +119,34 @@ This script handles all Azure ML SDK-related logic, including ```fetch_exp()```,
 
 ## ```file_handler.py```
 
-This script handles all file IO related tasks, currently only including ```fetch_repo()```.
+This script handles all file IO related tasks, including ```fetch_repo()```, ```add_pip_dependency()```, and ```add_notebook_callback()```.
 
 > #### ```fetch_repo()```
 >
 > This function pulls and extracts repositories from GitHub to be submitted in a Run's snapshot folder.
+
+> #### ```add_pip_dependency()```
+>
+> This function injects pip dependencies into the Conda file specified in the pipeline parameters.
+
+> #### ```add_notebook_callback()```
+>
+> This function adds try-catches around each code-block of a notebook with callbacks to re-trigger the Azure Function when the notebook is finished running. 
+> 
+> *Note: this is a not an "ideal" solution from an architectural perspective, but a more platform-level, agnostic approach (e.g. with Event Grid integration for triggering the Function) is currently out of scope.*
+
+## ```request_handler.py```
+
+This script handles all HTTP related tasks, including ```post_new_run()``` and ```post_run_results()```.
+
+> #### ```post_new_run()```
+>
+> This function, along with its helper functions, [creates a new DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/create?view=azure-devops-rest-5.0) via the DevOps API.
+
+> #### ```post_run_results()```
+>
+> This function, along with its helper functions, [updates a DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
+
 
 # Glossary
 

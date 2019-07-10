@@ -41,7 +41,7 @@ def start_build_pipeline(params):
 
     for notebook in params["run_config"]["notebooks"]:
 
-        # Creates new DevOps Test
+        # Creates new DevOps Test Run
         response = rh.post_new_run(params, notebook)
         run_id = response.json()["id"]
 
@@ -55,5 +55,5 @@ def start_build_pipeline(params):
 
 def update_build_pipeline(params):
 
-    # Updates Test Results
+    # Updates DevOps Test Run Results
     rh.post_run_results(params)
