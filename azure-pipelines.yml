@@ -58,8 +58,7 @@ stages:
                 "conda_file": "environment.yml",
                 "compute_target": "brhung-cpu",
                 "notebooks": [                
-                    "notebooks/00_quick_start/fastai_movielens.ipynb",
-                    "notebooks/00_quick_start/lightgbm_tinycriteo.ipynb"
+                    "test.ipynb",
                 ]
             },
             "azure_resources": {
