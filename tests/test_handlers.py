@@ -1,9 +1,11 @@
 import sys
 sys.path.append("handlers")
-import file_handler as fh
+
 
 # File Handler Unit Tests
 # -----------------------
+
+import file_handler as fh
 
 FILE_INPUT = "./tests/hello-world.txt"
 
@@ -12,6 +14,7 @@ CONDA_OUTPUT = "./tests/conda-files/outputs/hello-world.yml"
 
 NOTEBOOK_INPUT = "./tests/notebooks/inputs/hello-world.ipynb"
 NOTEBOOK_OUTPUT = "./tests/notebooks/outputs/hello-world.ipynb"
+
 
 def test_get_file_str():
 
@@ -37,3 +40,12 @@ def test_inject_notebook_try_catches():
     assert fh.inject_notebook_try_catches(
         fh.get_file_str(NOTEBOOK_INPUT)
     ) == fh.get_file_str(NOTEBOOK_OUTPUT)
+
+
+# Request Handler Unit Tests
+# -----------------------
+
+import request_handler as rh
+
+
+# TODO:: validate json, url, header auth functions with example params

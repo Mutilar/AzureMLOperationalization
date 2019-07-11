@@ -82,12 +82,11 @@ def get_new_run_json(build_id, notebook_name):
 def get_run_update_json(cb_params, run_properties):
     # TODO properties
     outcome = 'Completed' if cb_params["error_message"] == 'Ran successfully' else 'Aborted'
-    return [
-        {
-            'state': outcome,
-            'comment': cb_params["error_message"]
-        }
-    ]
+    return {
+        'state': outcome,
+        'comment': cb_params["error_message"]
+    }
+    
 
 
 def get_run_results_json(cb_params, run_properties):

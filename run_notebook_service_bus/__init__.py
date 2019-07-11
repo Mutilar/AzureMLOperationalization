@@ -68,7 +68,9 @@ def update_build_pipeline(params):
     # current_run = handlers.fetch_run(params, exp)
 
     # Updates Test Results
-    rh.patch_run_update(params, None) # current_run.get_details())
+    rh.post_run_results(params, None)
+    rh.patch_run_update(params, None)
+    # current_run.get_details())
 
     # Checks if pipeline has finished all runs
     finished_count = 0
