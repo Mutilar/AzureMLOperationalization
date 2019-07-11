@@ -84,7 +84,7 @@ def get_run_update_json(cb_params, run_properties):
     outcome = 'Completed' if cb_params["error_message"] == 'Ran successfully' else 'Aborted'
     return [
         {
-            'state': outcome
+            'state': outcome,
             'comment': cb_params["error_message"]
         }
     ]
