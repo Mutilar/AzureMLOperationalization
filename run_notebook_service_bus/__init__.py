@@ -64,7 +64,7 @@ def start_build_pipeline(params):
 
 def update_build_pipeline(params):
 
-    exp = ah.fetch_experiment(params)
+    exp = ah.fetch_exp(params)
     # current_run = handlers.fetch_run(params, exp)
 
     # Updates Test Results
