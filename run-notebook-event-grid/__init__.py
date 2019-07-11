@@ -18,12 +18,15 @@ UNFINISHED_RUN = ["Queued", "Preparing", "Starting", "Running"]
 PASSED_PIPELINE = "Succeeded"
 FAILED_PIPELINE = "Failed"
 
-def main(msg: func.ServiceBusMessage):
-
-    # Converts bytes into JSON
-    params = yaml.safe_load(
-        msg.get_body().decode("utf-8")
-    )
+def main(event: func.EventGridEvent):
+    # result = json.dumps({
+    #     'id': event.id,
+    #     'data': event.get_json(),
+    #     'topic': event.topic,
+    #     'subject': event.subject,
+    #     'event_type': event.event_type,
+    # })
+    params = event.get_json()
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     if params["job"] == START_BUILD:
@@ -75,17 +78,17 @@ def update_build_pipeline(params):
     notebook_failed = False
     for run in exp.get_runs():
 
+        # If run is finished
         if not any(flag in str(run) for flag in UNFINISHED_RUN):
             finished_count += 1
         
+        # If run failed
         if FAILED_RUN in str(run):
             notebook_failed = True
 
     # If all runs are finished, closes pipeline
     if finished_count == len(params["run_config"]["notebooks"]):
-
         if notebook_failed and params["run_condition"] == "all_pass":
             rh.post_pipeline_callback(params, FAILED_PIPELINE)
-        
         else:
             rh.post_pipeline_callback(params, PASSED_PIPELINE)

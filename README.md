@@ -97,11 +97,15 @@ This file specifies the location of main function (e.g. ```__init__.py```), as w
 
 ## ```__init__.py```
 
-This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the ```start_build_pipeline()```. 
+This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the distinct job types: ```start_build_pipeline()``` and ```update_build_pipeline()```. 
 
 > #### ```start_build_pipeline()```
 > 
-> Fetches the repository of interest, creates a new Experiment SDK Object, and submits a set of notebook Runs to that object. 
+> Fetches the repository of interest, creates a new Experiment SDK Object, and submits a set of notebook Runs to that object after injecting try-catch statements to facilitate callbacks to the DevOps pipeline.
+
+> #### ```update_build_pipeline()```
+> 
+> Updates the DevOps Test Runs based on results from Azure ML Compute, and checks to close the pipeline in all Runs are completed.
 
 ## ```azureml_handler.py```
 
@@ -139,7 +143,11 @@ This script handles all file IO related tasks, including ```fetch_repo()```, ```
 
 ## ```request_handler.py```
 
-This script handles all HTTP related tasks, including ```post_new_run()``` and ```post_run_results()```.
+This script handles all HTTP related tasks, including ```post_pipeline_callback()```, ```post_new_run()```, and ```post_run_results()```.
+
+> #### ```post_pipeline_callback()```
+> 
+> This function, along with its helper functions, [closes the DevOps Pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/http-rest-api?view=azure-devops#where-should-a-task-signal-completion-when-callback-is-chosen-as-the-completion-event) via the DevOps API.
 
 > #### ```post_new_run()```
 >
