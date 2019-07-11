@@ -19,50 +19,14 @@ PASSED_PIPELINE = "Succeeded"
 FAILED_PIPELINE = "Failed"
 
 def main(event: func.EventGridEvent):
-    # result = json.dumps({
-    #     'id': event.id,
-    #     'data': event.get_json(),
-    #     'topic': event.topic,
-    #     'subject': event.subject,
-    #     'event_type': event.event_type,
-    # })
-    params = event.get_json()
-
-    # Kicks off test runs to Azure ML Compute, called from a CI pipeline
-    if params["job"] == START_BUILD:
-        start_build_pipeline(params)
     
-    # Updates telemetry in Azure DevOps, called from a Experiment Run
-    elif params["job"] == UPDATE_BUILD:
-        update_build_pipeline(params)
-
-
-def start_build_pipeline(params):
-
-    # Downloads repo to snapshot folder and adds SB pip dependency for callback
-    fh.fetch_repo(
-        params["run_config"]["repo"]
-    )
-    fh.add_pip_dependency(
-        params["run_config"]["conda_file"],
-        'azure-servicebus'
-    )
-
-    # Fetches Experiment to submit runs on
-    exp = ah.fetch_exp(params)
-
-    for notebook in params["run_config"]["notebooks"]:
-
-        # Creates new DevOps Test Run
-        response = rh.post_new_run(params, notebook)
-        run_id = response.json()["id"]
-
-        # Adds try-catch callback mechanism to notebooks
-        fh.add_notebook_callback(params, notebook, run_id)
-
-        # Submits notebook Run to Experiment
-        run = ah.submit_run(params, exp, notebook)
-        run.tag(notebook)
+    # TODO: Event-grid based wrap-up
+    # Instead of all parameters getting passed via the JSON payload of the Event, 
+    # only enough information to fetch the experiment and it's runs is needed for wrap-up. 
+    params = event.get_json()
+    
+    # Updates telemetry in Azure DevOps, triggered from a Experiment Run
+    update_build_pipeline(params)
 
 
 def update_build_pipeline(params):
