@@ -1,5 +1,5 @@
 from azureml._base_sdk_common.common import perform_interactive_login
-from azureml.core import Workspace, Experiment, ScriptRunConfig
+from azureml.core import Workspace, Experiment, ScriptRunConfig, Run
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import RunConfiguration, DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 from azureml.contrib.notebook import NotebookRunConfig
@@ -72,3 +72,7 @@ def submit_run(params, exp, notebook_name):
     
     # Returns reference to run
     return run
+
+
+# def fetch_run(params, exp):
+#     return get_run(exp, 1)
