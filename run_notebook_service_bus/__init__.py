@@ -32,7 +32,7 @@ def start_build_pipeline(params):
         params["run_config"]["repo"]
     )
     fh.add_pip_dependency(
-        rc_params["conda_file"],
+        params["run_config"]["conda_file"],
         'azure-servicebus'
     )
 
