@@ -4,6 +4,7 @@ import sys
 sys.path.append("handlers")
 import file_handler as fh
 import azureml_handler as ah
+import request_handler as rh
 
 # Job types
 START_BUILD = "!START"
