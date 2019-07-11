@@ -68,7 +68,7 @@ def update_build_pipeline(params):
     # current_run = handlers.fetch_run(params, exp)
 
     # Updates Test Results
-    rh.post_run_results(params, None)
+    # rh.post_run_results(params, None)
     rh.patch_run_update(params, None)
     # current_run.get_details())
 
