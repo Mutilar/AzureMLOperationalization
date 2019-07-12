@@ -103,7 +103,6 @@ def get_run_results_json(cb_params, run_details):
             'startedDate': run_details['startTimeUtc'],
             'completedDate': run_details['endTimeUtc'],
             'errorMessage': cb_params["error_message"],
-            'durationInMs': 1337,
             'outcome': outcome
         }
     ]
