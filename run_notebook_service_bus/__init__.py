@@ -18,6 +18,9 @@ UNFINISHED_RUN = ["Queued", "Preparing", "Starting", "Running"]
 PASSED_PIPELINE = "Succeeded"
 FAILED_PIPELINE = "Failed"
 
+# Run Conditions for pipelines
+ALL_NOTEBOOKS_MUST_PASS = "all_pass"
+
 def main(msg: func.ServiceBusMessage):
 
     # Converts bytes into JSON
@@ -60,6 +63,7 @@ def start_build_pipeline(params):
         # Submits notebook Run to Experiment
         run = ah.submit_run(params, exp, notebook)
         run.tag(notebook)
+        run.tag("run_id", run_id)
 
 
 def update_build_pipeline(params):
@@ -68,15 +72,17 @@ def update_build_pipeline(params):
     # current_run = handlers.fetch_run(params, exp)
 
     # Updates Test Results
-    # rh.post_run_results(params, None)
+    rh.post_run_results(params, None)
     rh.patch_run_update(params, None)
-    # current_run.get_details())
 
     # Checks if pipeline has finished all runs
     finished_count = 0
     notebook_failed = False
     for run in exp.get_runs():
-        run_properties = run.get_properties()
+        # current_run.get_details(), run.get_properties()
+
+        if params["azure_resources"]["run_id"] == run.get_tags()["run_id"]:
+            raise Exception(run.get_details())
 
         if not any(flag in str(run) for flag in UNFINISHED_RUN):
             finished_count += 1
@@ -87,7 +93,7 @@ def update_build_pipeline(params):
     # If all runs are finished, closes pipeline
     if finished_count == len(params["run_config"]["notebooks"]):
 
-        if notebook_failed and params["run_condition"] == "all_pass":
+        if notebook_failed and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS:
             rh.post_pipeline_callback(params, FAILED_PIPELINE)
         
         else:
