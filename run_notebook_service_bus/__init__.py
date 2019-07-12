@@ -75,7 +75,10 @@ def update_build_pipeline(params):
     exp_status = ah.fetch_exp_status(exp)
 
     # Gets current Run
-    run = ah.fetch_run(params, exp)
+    run = ah.fetch_run(
+        exp,
+        params["azure_resources"]["run_id"]
+    )
     
     # Updates Test Results from Run's telemetry
     dh.post_run_results(params, run.get_details())
