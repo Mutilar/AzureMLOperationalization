@@ -102,7 +102,7 @@ def fetch_exp_status(exp):
             all_finished = False
 
         # Checks if any Runs have failed
-        if run.get_status() is FAILED_RUN    
+        if run.get_status() is FAILED_RUN:
             notebook_failed = True
 
     return {
