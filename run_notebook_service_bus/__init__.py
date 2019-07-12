@@ -86,7 +86,7 @@ def update_build_pipeline(params):
         # current_run.get_details(), run.get_properties()
 
         if params["azure_resources"]["run_id"] == run.get_tags()["run_id"]:
-            raise Exception(run.get_details() + "\n\n\n" + run.get_properties())
+            raise Exception(str(run.get_details()) + "\n\n\n" + str(run.get_properties()))
 
         if not any(flag in str(run) for flag in UNFINISHED_RUN):
             finished_count += 1
