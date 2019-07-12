@@ -80,9 +80,14 @@ def submit_run(params, exp, notebook_name):
 def fetch_run(exp, run_id):
 
     # Finds Run with matching RunID
-    for run in exp.get_runs():
-        if run.get_tags()["run_id"] == run_id:
-            return run
+    # for run in exp.get_runs(tags = {
+    #     "run_id": run_id
+    # }):
+    #     return run
+
+    return exp.get_runs(tags = {
+        "run_id": run_id
+    })[0]
 
 def fetch_exp_status(exp):
 
@@ -92,11 +97,12 @@ def fetch_exp_status(exp):
     for run in exp.get_runs():
 
         # Checks if any Runs are still running
-        if any(flag in str(run) for flag in UNFINISHED_RUN):
+
+        if any(flag is run.get_status() for flag in UNFINISHED_RUN):
             all_finished = False
 
         # Checks if any Runs have failed
-        if FAILED_RUN in str(run):
+        if run.get_status() is FAILED_RUN    
             notebook_failed = True
 
     return {
