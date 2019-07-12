@@ -27,8 +27,8 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > > - ```function.json```
 > > - handlers
 > > > - ```azureml_handler.py```
+> > > - ```devops_handler.py```
 > > > - ```file_handler.py```
-> > > - ```request_handler.py```
 > > - tests
 > > > - ```test_handlers.py```
 > > - ```deployment_pipeline.yml```
