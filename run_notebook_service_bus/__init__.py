@@ -65,7 +65,7 @@ def start_build_pipeline(params):
 
 def update_build_pipeline(params):
 
-    # Allow for finalization of current Run
+    # Allows for finalization of current Run
     sleep(120) 
 
     # Fetches Experiment to fetch Runs from
@@ -81,7 +81,7 @@ def update_build_pipeline(params):
     rh.post_run_results(params, run.get_details())
     rh.patch_run_update(params, run.get_details())
 
-    # If all Runs are finished, closes pipeline
+    # Closes pipeline if all Runs are finished
     if exp_status["finished"] is True
         if exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS:
             rh.post_pipeline_callback(params, FAILED_PIPELINE)

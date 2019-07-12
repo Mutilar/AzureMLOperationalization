@@ -1,4 +1,5 @@
 import requests
+import datetime
 
 
 def post_pipeline_callback(params, result):
@@ -21,24 +22,24 @@ def post_new_run(params, notebook_name):
     )
 
 
-def patch_run_update(params, run_properties):
+def patch_run_update(params, run_details):
     az_params = params["azure_resources"]
     cb_params = params["wrap_up"]["call_back"]
 
     return requests.patch(
         get_run_update_url(az_params),
-        json=get_run_update_json(cb_params, run_properties),
+        json=get_run_update_json(cb_params, run_details),
         headers=get_auth_header(params["auth_token"])
     )
 
 
-def post_run_results(params, run_properties):
+def post_run_results(params, run_details):
     az_params = params["azure_resources"]
     cb_params = params["wrap_up"]["call_back"]
 
     return requests.post(
         get_run_results_url(az_params),
-        json=get_run_results_json(cb_params, run_properties),
+        json=get_run_results_json(cb_params, run_details),
         headers=get_auth_header(params["auth_token"])
     )
 
@@ -79,7 +80,7 @@ def get_new_run_json(build_id, notebook_name):
     }
 
 
-def get_run_update_json(cb_params, run_properties):
+def get_run_update_json(cb_params, run_details):
     # TODO properties
     outcome = 'Completed' if cb_params["error_message"] == 'Ran successfully' else 'Aborted'
     return {
@@ -89,7 +90,7 @@ def get_run_update_json(cb_params, run_properties):
     
 
 
-def get_run_results_json(cb_params, run_properties):
+def get_run_results_json(cb_params, run_details):
     # TODO properties
     outcome = 'Passed' if cb_params["error_message"] == 'Ran successfully' else 'Failed'
     return [
@@ -97,6 +98,8 @@ def get_run_results_json(cb_params, run_properties):
             'testCaseTitle': 'Run Notebook',
             'automatedTestName': 'TestName',
             'priority': 1,
+            'createdDate': run_details['startTimeUtc'],
+            'completedDate': run_details['endTimeUtc'],
             'errorMessage': cb_params["error_message"],
             'outcome': outcome
         }
