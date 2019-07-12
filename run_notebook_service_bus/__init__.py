@@ -1,6 +1,7 @@
 import azure.functions as func
 import yaml
 import sys
+from time import sleep
 sys.path.append("handlers")
 import file_handler as fh
 import azureml_handler as ah
@@ -68,6 +69,9 @@ def start_build_pipeline(params):
 
 def update_build_pipeline(params):
 
+    # Allow for finalization
+    sleep(120) 
+
     exp = ah.fetch_exp(params)
     # current_run = handlers.fetch_run(params, exp)
 
@@ -79,9 +83,10 @@ def update_build_pipeline(params):
     finished_count = 0
     notebook_failed = False
     for run in exp.get_runs():
+        # current_run.get_details(), run.get_properties()
 
         if params["azure_resources"]["run_id"] == run.get_tags()["run_id"]:
-            raise Exception(run.get_properties())
+            raise Exception(run.get_details() + "\n\n\n" + run.get_properties())
 
         if not any(flag in str(run) for flag in UNFINISHED_RUN):
             finished_count += 1
