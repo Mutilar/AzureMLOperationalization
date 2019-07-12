@@ -54,21 +54,21 @@ stages:
         azureSubscription: 'test'
         messageBody: >
           {
-            "name": "brhung-testing",
+            "name": "$(name)",
             "job": "!START",
             "auth_token": "$(system.AccessToken)",
             "build_id": "$(Build.BuildId)",
             "run_config": {
-              "repo": "https://github.com/Mutilar/brhung-notebook/archive/master.zip",
+              "repo": "$(gh.repo)",
               "conda_file": "environment.yml",
-              "compute_target": "brhung-cpu",
+              "compute_target": "$(ex.compute)",
               "notebooks": [                
-                "test.ipynb",
+                "test.ipynb"
               ]
             },
             "azure_resources": {
-              "organization": "t-brhung",
-              "project": "brhung-test-pipeline",
+              "organization": "$(do.organization)",
+              "project": "$(do.project)",
               "run_id": "default_run_id",
               "service_principal": {
                 "username": "$(sp.client)",
@@ -76,9 +76,9 @@ stages:
                 "password": "$(sp.password)"
               },
               "workspace": {
-                "name": "brhung-ml",
+                "name": "$(ws.name)",
                 "subscription_id": "$(ws.subscription)",
-                "resource_group": "brhung-testing"
+                "resource_group": "$(ws.resourceGroup)"
               }
             },
             "wrap_up": {

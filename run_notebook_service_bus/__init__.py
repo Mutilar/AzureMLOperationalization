@@ -60,6 +60,7 @@ def start_build_pipeline(params):
         # Submits notebook Run to Experiment
         run = ah.submit_run(params, exp, notebook)
         run.tag(notebook)
+        run.tag("auto-created", params["name"])
         run.tag("run_id", run_id)
 
 
