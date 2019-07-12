@@ -11,10 +11,6 @@ import request_handler as rh
 START_BUILD = "!START"
 UPDATE_BUILD = "!UPDATE"
 
-# States of runs
-FAILED_RUN = "Failed"
-UNFINISHED_RUN = ["Queued", "Preparing", "Starting", "Running"]
-
 # States of pipelines
 PASSED_PIPELINE = "Succeeded"
 FAILED_PIPELINE = "Failed"
@@ -46,10 +42,10 @@ def start_build_pipeline(params):
     )
     fh.add_pip_dependency(
         params["run_config"]["conda_file"],
-        'azure-servicebus'
+        "azure-servicebus"
     )
 
-    # Fetches Experiment to submit runs on
+    # Fetches Experiment to submit Runs on
     exp = ah.fetch_exp(params)
 
     for notebook in params["run_config"]["notebooks"]:
@@ -69,36 +65,25 @@ def start_build_pipeline(params):
 
 def update_build_pipeline(params):
 
-    # Allow for finalization
+    # Allow for finalization of current Run
     sleep(120) 
 
+    # Fetches Experiment to fetch Runs from
     exp = ah.fetch_exp(params)
-    # current_run = handlers.fetch_run(params, exp)
 
-    # Updates Test Results
-    rh.post_run_results(params, None)
-    rh.patch_run_update(params, None)
+    # Checks if all Runs have finished, and if any have failed
+    exp_status = ah.fetch_exp_status(exp)
 
-    # Checks if pipeline has finished all runs
-    finished_count = 0
-    notebook_failed = False
-    for run in exp.get_runs():
-        # current_run.get_details(), run.get_properties()
+    # Gets current Run
+    run = ah.fetch_run(params, exp)
+    
+    # Updates Test Results from Run's telemetry
+    rh.post_run_results(params, run.get_details())
+    rh.patch_run_update(params, run.get_details())
 
-        if params["azure_resources"]["run_id"] == run.get_tags()["run_id"]:
-            raise Exception(str(run.get_details()) + "\n\n\n" + str(run.get_properties()))
-
-        if not any(flag in str(run) for flag in UNFINISHED_RUN):
-            finished_count += 1
-        
-        if FAILED_RUN in str(run):
-            notebook_failed = True
-
-    # If all runs are finished, closes pipeline
-    if finished_count == len(params["run_config"]["notebooks"]):
-
-        if notebook_failed and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS:
+    # If all Runs are finished, closes pipeline
+    if exp_status["finished"] is True
+        if exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS:
             rh.post_pipeline_callback(params, FAILED_PIPELINE)
-        
         else:
             rh.post_pipeline_callback(params, PASSED_PIPELINE)

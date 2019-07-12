@@ -4,6 +4,10 @@ from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import RunConfiguration, DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 from azureml.contrib.notebook import NotebookRunConfig
 
+# States of runs
+FAILED_RUN = "Failed"
+UNFINISHED_RUN = ["Queued", "Preparing", "Starting", "Running"]
+
 
 def fetch_exp(params):
     az_params = params["azure_resources"]
@@ -73,6 +77,29 @@ def submit_run(params, exp, notebook_name):
     # Returns reference to run
     return run
 
+def fetch_run(exp, run_id):
 
-# def fetch_run(params, exp):
-#     return get_run(exp, 1)
+    # Finds Run with matching RunID
+    for run in exp.get_runs():
+        if run.get_tags()["run_id"] == run_id:
+            return run
+
+def fetch_exp_status(exp):
+
+    all_finished = True
+    any_failed = False
+
+    for run in exp.get_runs():
+
+        # Checks if any Runs are still running
+        if any(flag in str(run) for flag in UNFINISHED_RUN):
+            all_finished = False
+
+        # Checks if any Runs have failed
+        if FAILED_RUN in str(run):
+            notebook_failed = True
+
+    return {
+        "finished": all_finished,
+        "failed": any_failed
+    }
