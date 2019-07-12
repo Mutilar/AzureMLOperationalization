@@ -123,6 +123,34 @@ This script handles all Azure ML SDK-related logic, including ```fetch_exp()```,
 >
 > This function [submits a new Run](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment(class)?view=azure-ml-py#submit-config--tags-none----kwargs-) with configurations based on the pipeline parameters.
 
+> #### ```fetch_run()```
+>
+> This function [fetches a Run by its RunID tag](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py#get-runs-type-none--tags-none--properties-none--include-children-false-) specified by the DevOps Test Run. 
+
+> #### ```fetch_exp_status()```
+>
+> This function determines the status of the pipeline by [fetching all Runs](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py#get-runs-type-none--tags-none--properties-none--include-children-false-) and [checking their status](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.run.run?view=azure-ml-py#get-status--)
+
+## ```devops_handler.py```
+
+This script handles all DevOps related tasks, including ```post_pipeline_callback()```, ```post_new_run()```, ```patch_run_update()```, and ```post_run_results()```.
+
+> #### ```post_pipeline_callback()```
+> 
+> This function, along with its helper functions, [closes the DevOps Pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/http-rest-api?view=azure-devops#where-should-a-task-signal-completion-when-callback-is-chosen-as-the-completion-event) via the DevOps API.
+
+> #### ```post_new_run()```
+>
+> This function, along with its helper functions, [creates a new DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/create?view=azure-devops-rest-5.0) via the DevOps API.
+
+> #### ```patch_run_update()```
+>
+> This function, along with its helper functions, [updates a DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/update?view=azure-devops-rest-5.0) via the DevOps API.
+
+> #### ```post_run_results()```
+>
+> This function, along with its helper functions, [adds a DevOps Test Run Result](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
+
 ## ```file_handler.py```
 
 This script handles all file IO related tasks, including ```fetch_repo()```, ```add_pip_dependency()```, and ```add_notebook_callback()```.
@@ -140,22 +168,6 @@ This script handles all file IO related tasks, including ```fetch_repo()```, ```
 > This function adds try-catches around each code-block of a notebook with callbacks to re-trigger the Azure Function when the notebook is finished running. 
 > 
 > *Note: this is a not an "ideal" solution from an architectural perspective, but a more platform-level, agnostic approach (e.g. with Event Grid integration for triggering the Function) is currently out of scope.*
-
-## ```request_handler.py```
-
-This script handles all HTTP related tasks, including ```post_pipeline_callback()```, ```post_new_run()```, and ```post_run_results()```.
-
-> #### ```post_pipeline_callback()```
-> 
-> This function, along with its helper functions, [closes the DevOps Pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/http-rest-api?view=azure-devops#where-should-a-task-signal-completion-when-callback-is-chosen-as-the-completion-event) via the DevOps API.
-
-> #### ```post_new_run()```
->
-> This function, along with its helper functions, [creates a new DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/create?view=azure-devops-rest-5.0) via the DevOps API.
-
-> #### ```post_run_results()```
->
-> This function, along with its helper functions, [updates a DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
 
 ## ```test_handlers.py```
 
