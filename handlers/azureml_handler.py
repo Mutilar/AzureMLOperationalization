@@ -80,14 +80,11 @@ def submit_run(params, exp, notebook_name):
 def fetch_run(exp, run_id):
 
     # Finds Run with matching RunID
-    # for run in exp.get_runs(tags = {
-    #     "run_id": run_id
-    # }):
-    #     return run
-
-    return exp.get_runs(tags = {
+    for run in exp.get_runs(tags = {
         "run_id": run_id
-    })[0]
+    }):
+        return run
+
 
 def fetch_exp_status(exp):
 
