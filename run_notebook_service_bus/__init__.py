@@ -5,7 +5,7 @@ from time import sleep
 sys.path.append("handlers")
 import file_handler as fh
 import azureml_handler as ah
-import request_handler as rh
+import devops_handler as dh
 
 # Job types
 START_BUILD = "!START"
@@ -51,7 +51,7 @@ def start_build_pipeline(params):
     for notebook in params["run_config"]["notebooks"]:
 
         # Creates new DevOps Test Run
-        response = rh.post_new_run(params, notebook)
+        response = dh.post_new_run(params, notebook)
         run_id = response.json()["id"]
 
         # Adds try-catch callback mechanism to notebooks
@@ -78,12 +78,12 @@ def update_build_pipeline(params):
     run = ah.fetch_run(params, exp)
     
     # Updates Test Results from Run's telemetry
-    rh.post_run_results(params, run.get_details())
-    rh.patch_run_update(params, run.get_details())
+    dh.post_run_results(params, run.get_details())
+    dh.patch_run_update(params, run.get_details())
 
     # Closes pipeline if all Runs are finished
     if exp_status["finished"] is True:
         if exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS:
-            rh.post_pipeline_callback(params, FAILED_PIPELINE)
+            dh.post_pipeline_callback(params, FAILED_PIPELINE)
         else:
-            rh.post_pipeline_callback(params, PASSED_PIPELINE)
+            dh.post_pipeline_callback(params, PASSED_PIPELINE)

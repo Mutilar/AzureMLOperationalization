@@ -45,7 +45,7 @@ def test_inject_notebook_try_catches():
 # Request Handler Unit Tests
 # -----------------------
 
-import request_handler as rh
+import devops_handler as dh
 
 
 # TODO:: validate json, url, header auth functions with example params
