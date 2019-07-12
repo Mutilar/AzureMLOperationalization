@@ -1,5 +1,4 @@
 import requests
-import datetime
 
 
 def post_pipeline_callback(params, result):
