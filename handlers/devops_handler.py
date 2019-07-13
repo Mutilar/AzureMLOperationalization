@@ -96,6 +96,24 @@ def get_run_results_json(cb_params, run_details):
     outcome = 'Passed' if cb_params["error_message"] == 'Ran successfully' else 'Failed'
     return [
         {
+            'testCaseTitle': 'Validate Notebook',
+            'automatedTestName': 'TestName',
+            'priority': 1,
+            'createdDate': run_details['startTimeUtc'],
+            'startedDate': run_details['startTimeUtc'],
+            'completedDate': run_details['endTimeUtc'],
+            'outcome': 'PEP8 validated succesfully'
+        },
+        {
+            'testCaseTitle': 'Authenticate Notebook',
+            'automatedTestName': 'TestName',
+            'priority': 1,
+            'createdDate': run_details['startTimeUtc'],
+            'startedDate': run_details['startTimeUtc'],
+            'completedDate': run_details['endTimeUtc'],
+            'outcome': 'Authenticated succesfully'
+        },
+        {
             'testCaseTitle': 'Run Notebook',
             'automatedTestName': 'TestName',
             'priority': 1,
