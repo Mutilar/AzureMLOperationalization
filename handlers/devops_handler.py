@@ -102,7 +102,7 @@ def get_run_results_json(cb_params, run_details):
             'createdDate': run_details['startTimeUtc'],
             'startedDate': run_details['startTimeUtc'],
             'completedDate': run_details['endTimeUtc'],
-            'outcome': 'PEP8 validated succesfully'
+            'outcome': outcome
         },
         {
             'testCaseTitle': 'Authenticate Notebook',
@@ -111,7 +111,7 @@ def get_run_results_json(cb_params, run_details):
             'createdDate': run_details['startTimeUtc'],
             'startedDate': run_details['startTimeUtc'],
             'completedDate': run_details['endTimeUtc'],
-            'outcome': 'Authenticated succesfully'
+            'outcome': outcome
         },
         {
             'testCaseTitle': 'Run Notebook',
