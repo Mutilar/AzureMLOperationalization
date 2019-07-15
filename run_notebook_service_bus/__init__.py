@@ -48,7 +48,7 @@ def start_build_pipeline(params):
     # Fetches Experiment to submit Runs on
     exp = ah.fetch_exp(params)
 
-    for notebook in params["run_config"]["notebooks"]:
+    for notebook in params["run_config"]["notebooks"].split(","):
 
         # Creates new DevOps Test Run
         response = dh.post_new_run(params, notebook)
