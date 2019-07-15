@@ -84,7 +84,8 @@ def start_build_pipeline(params):
             notebook=notebook,
             exp=exp,
             conda_file=rc_params["conda_file"],
-            compute_target=rc_params["compute_target"]
+            compute_target=rc_params["compute_target"],
+            base_image=rc_params["base_image"]
         )
 
         # Marks Run with relevant properties

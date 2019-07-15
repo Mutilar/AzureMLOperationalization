@@ -62,7 +62,8 @@ stages:
               "repo": "$(gh.repo)",
               "notebooks": "$(rp.notebooks)",
               "conda_file": "$(rp.condaFile)",
-              "compute_target": "$(ex.compute)"
+              "compute_target": "$(ex.compute)",
+              "base_image": "$(ex.image)"
             },
             "azure_resources": {
               "organization": "$(do.organization)",

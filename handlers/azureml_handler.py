@@ -41,7 +41,7 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
     return exp
 
 
-def fetch_run_config(rc_params):
+def fetch_run_config(conda_file, compute_target, base_image):
     """ Generates a Run Configuration based on the pipeline parameters,
     specifying such things as the Compute Target and Conda Dependencies. 
     """
@@ -50,22 +50,22 @@ def fetch_run_config(rc_params):
     run_config = RunConfiguration(framework="python")
 
     # Specifies compute target
-    run_config.target = rc_params["compute_target"]
+    run_config.target = compute_target
 
     # Configures Docker parameters
     run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = DEFAULT_CPU_IMAGE
+    run_config.environment.docker.base_image = base_image
 
     # Specifies Conda file location
     run_config.environment.python.conda_dependencies = CondaDependencies(
-        "snapshot/inputs/" + rc_params["conda_file"]
+        "snapshot/inputs/" + conda_file
     )
 
     # Returns configuration
     return run_config
 
 
-def submit_run(params, exp, notebook):
+def submit_run(notebook, exp, conda_file, compute_target, base_image):
     """ Submits a new Run with configurations based on the pipeline parameters.
     """
 
@@ -75,7 +75,11 @@ def submit_run(params, exp, notebook):
             source_directory="snapshot/",
             notebook="inputs/" + notebook,
             output_notebook="outputs/output.ipynb",
-            run_config=fetch_run_config(params["run_config"]),
+            run_config=fetch_run_config(
+                conda_file=conda_file,
+                compute_target=compute_target,
+                base_image=base_image
+            )
         )
     )
     
