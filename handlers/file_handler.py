@@ -27,7 +27,7 @@ def set_file_str(file_location, output):
 
 
 def add_pip_dependency(conda_file, dependency):
-    """ Adds a new pip dependency to a given Conda file
+    """ Adds a new pip dependency to a given conda file.
     """
 
     conda_file_location = "./snapshot/inputs/" + conda_file
@@ -50,6 +50,10 @@ def inject_pip_dependency(file_str, dependency):
 
 
 def add_notebook_callback(params, notebook, run_id):
+    """ Enables notebooks to call back to the Azure Function.
+    This is done to update the Pipeline based on Run results.
+    """
+    
     notebook_file_location = "./snapshot/inputs/" + notebook
 
     # Opens the notebook
@@ -64,6 +68,9 @@ def add_notebook_callback(params, notebook, run_id):
 
         
 def inject_notebook_try_catches(notebook_str):
+    """ Adds try-catching to all notebook code blocks to allow for callbacks.
+    """
+
     output = []
 
     # String per line in the notebook 
@@ -159,7 +166,9 @@ def inject_notebook_try_catches(notebook_str):
 
 
 def inject_notebook_params(notebook_str, params, run_id): 
-    
+    """ Overrides placeholder string snippets with necessary parameters for callbacks.
+    """
+
     # Injects Service Bus Queue parameters
     output = notebook_str.replace(
         "!CONNECTION_STRING",
@@ -191,6 +200,8 @@ def inject_notebook_params(notebook_str, params, run_id):
 
 
 def fetch_repo(repo):
+    """ Clones a GitHub repository locally into the snapshot folder
+    """
     
     # Wipes snapshot directory, clearing out old files
     if os.path.exists(os.getcwd() + "/snapshot/"):
@@ -223,9 +234,6 @@ def fetch_repo(repo):
         os.listdir(os.getcwd())[0],
         "inputs"
     )
-
-    # # Creates output folder
-    # os.makedirs("outputs")
 
     # Returns to main directory
     os.chdir("..")

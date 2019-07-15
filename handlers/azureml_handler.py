@@ -14,6 +14,9 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
     fetches the Workspace, and then fetches and returns a new Experiment.
     """
 
+    # TODO:: fault contract
+    # TODO:: Specify service connection name, then fetch properties, don't pass in list on proprities for service principal handshake
+
     # Gets Service Principal connection
     perform_interactive_login(
         username=sp_username,
@@ -99,7 +102,7 @@ def fetch_run(exp, run_id):
 
 
 def fetch_exp_status(exp):
-    """ Determines the status of the pipeline by fetching all Runs and checking their status
+    """ Determines the status of the pipeline by fetching all Runs and checking their status.
     """
 
     all_finished = True
