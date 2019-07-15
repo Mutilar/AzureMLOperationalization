@@ -9,31 +9,31 @@ FAILED_RUN = "Failed"
 UNFINISHED_RUN = ["Queued", "Preparing", "Starting", "Running"]
 
 
-def fetch_exp(params):
-    az_params = params["azure_resources"]
+def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, ws_resource_group, build_id):
+    """ Authenticates with the ML Workspace with a Service Principal connection,
+    fetches the Workspace, and then fetches and returns a new Experiment.
+    """
 
     # Gets Service Principal connection
-    sp_params = az_params["service_principal"]
     perform_interactive_login(
-        username=sp_params["username"],
-        tenant=sp_params["tenant"],
-        password=sp_params["password"],
+        username=sp_username,
+        tenant=sp_tenant,
+        password=sp_password,
         service_principal=True
     )
 
     # Gets Workspace
-    ws_params = az_params["workspace"]
     ws = Workspace.get(
-        name=ws_params["name"],
-        subscription_id=ws_params["subscription_id"],
-        resource_group=ws_params["resource_group"]
+        name=ws_name,
+        subscription_id=ws_subscription_id,
+        resource_group=ws_resource_group
     )
 
     # Gets Experiment from Workspace
     #   While the Experiment name could be arbitrary, 
     #   we use it to correlate DevOps Builds to their respective Experiments
     exp = Experiment(
-        name=params["build_id"],
+        name=build_id,
         workspace=ws
     )
 
@@ -42,6 +42,9 @@ def fetch_exp(params):
 
 
 def fetch_run_config(rc_params):
+    """ Generates a Run Configuration based on the pipeline parameters,
+    specifying such things as the Compute Target and Conda Dependencies. 
+    """
 
     # Inits configuration for Python
     run_config = RunConfiguration(framework="python")
@@ -62,13 +65,15 @@ def fetch_run_config(rc_params):
     return run_config
 
 
-def submit_run(params, exp, notebook_name):
+def submit_run(params, exp, notebook):
+    """ Submits a new Run with configurations based on the pipeline parameters.
+    """
 
     # Dispatches job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
             source_directory="snapshot/",
-            notebook="inputs/" + notebook_name,
+            notebook="inputs/" + notebook,
             output_notebook="outputs/output.ipynb",
             run_config=fetch_run_config(params["run_config"]),
         )
@@ -78,23 +83,26 @@ def submit_run(params, exp, notebook_name):
     return run
 
 def fetch_run(exp, run_id):
+    """ Fetches a Run by its Run ID tag specified by the DevOps Test Run.
+    """
 
     # Finds Run with matching RunID
     for run in exp.get_runs(tags = {
         "run_id": run_id
     }):
         return run
+    return None
 
 
 def fetch_exp_status(exp):
+    """ Determines the status of the pipeline by fetching all Runs and checking their status
+    """
 
     all_finished = True
     any_failed = False
-
     for run in exp.get_runs():
 
         # Checks if any Runs are still running
-
         if any(flag is run.get_status() for flag in UNFINISHED_RUN):
             all_finished = False
 

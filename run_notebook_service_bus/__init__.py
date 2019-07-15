@@ -35,59 +35,120 @@ def main(msg: func.ServiceBusMessage):
 
 
 def start_build_pipeline(params):
+    rc_params = params["run_config"]
+    az_params = params["azure_resources"]
+    sp_params = az_params["service_principal"]
+    ws_params = az_params["workspace"]
 
     # Downloads repo to snapshot folder and adds SB pip dependency for callback
     fh.fetch_repo(
-        params["run_config"]["repo"]
+        repo=rc_params["repo"]
     )
     fh.add_pip_dependency(
-        params["run_config"]["conda_file"],
-        "azure-servicebus"
+        conda_file=rc_params["conda_file"],
+        dependency="azure-servicebus"
     )
 
     # Fetches Experiment to submit Runs on
-    exp = ah.fetch_exp(params)
+    exp = ah.fetch_exp(
+        sp_username=sp_params["username"],
+        sp_tenant=sp_params["tenant"],
+        sp_password=sp_params["password"],
+        ws_name=ws_params["name"],
+        ws_subscription_id=ws_params["subscription_id"],
+        ws_resource_group=ws_params["resource_group"],
+        build_id=params["build_id"]
+    )
 
-    for notebook in params["run_config"]["notebooks"].split(","):
+    for notebook in rc_params["notebooks"].split(","):
 
         # Creates new DevOps Test Run
-        response = dh.post_new_run(params, notebook)
+        response = dh.post_new_run(
+            notebook=notebook,
+            organization=az_params["organization"],
+            project=az_params["project"],
+            build_id=params["build_id"],
+            auth_token=params["auth_token"]
+        )
         run_id = response.json()["id"]
 
         # Adds try-catch callback mechanism to notebooks
-        fh.add_notebook_callback(params, notebook, run_id)
+        fh.add_notebook_callback(
+            notebook=notebook, 
+            params=params, 
+            run_id=run_id
+        )
 
         # Submits notebook Run to Experiment
-        run = ah.submit_run(params, exp, notebook)
+        run = ah.submit_run(
+            notebook=notebook,
+            exp=exp,
+            conda_file=rc_params["conda_file"],
+            compute_target=rc_params["compute_target"]
+        )
+
+        # Marks Run with relevant properties
         run.tag(notebook)
         run.tag("auto-created", params["name"])
         run.tag("run_id", run_id)
 
 
 def update_build_pipeline(params):
-
+    cb_params = params["wrap_up"]["call_back"]
+    az_params = params["azure_resources"]
+    sp_params = az_params["service_principal"]
+    ws_params = az_params["workspace"]
+    
     # Allows for finalization of current Run
     sleep(120) 
 
     # Fetches Experiment to fetch Runs from
-    exp = ah.fetch_exp(params)
+    exp = ah.fetch_exp(
+        sp_username=sp_params["username"],
+        sp_tenant=sp_params["tenant"],
+        sp_password=sp_params["password"],
+        ws_name=ws_params["name"],
+        ws_subscription_id=ws_params["subscription_id"],
+        ws_resource_group=ws_params["resource_group"],
+        build_id=params["build_id"]
+    )
 
     # Checks if all Runs have finished, and if any have failed
     exp_status = ah.fetch_exp_status(exp)
 
     # Gets current Run
     run = ah.fetch_run(
-        exp,
-        params["azure_resources"]["run_id"]
+        exp=exp,
+        run_id=az_params["run_id"]
     )
     
     # Updates Test Results from Run's telemetry
-    dh.post_run_results(params, run.get_details())
-    dh.patch_run_update(params, run.get_details())
+    dh.post_run_results(
+        error_message=cb_params["error_message"],
+        run_details=run.get_details(),
+        organization=az_params["organization"],
+        project=az_params["project"],
+        run_id=az_params["run_id"], 
+        auth_token=params["auth_token"]
+    )
+    dh.patch_run_update(
+        error_message=cb_params["error_message"],
+        organization=az_params["organization"],
+        project=az_params["project"],
+        run_id=az_params["run_id"], 
+        auth_token=params["auth_token"]
+    )
 
     # Closes pipeline if all Runs are finished
     if exp_status["finished"] is True:
-        if exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS:
-            dh.post_pipeline_callback(params, FAILED_PIPELINE)
-        else:
-            dh.post_pipeline_callback(params, PASSED_PIPELINE)
+        result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
+        dh.post_pipeline_callback(
+            result=result,
+            plan_url=cb_params["plan_url"],
+            project_id=cb_params["project_id"],
+            hub_name=cb_params["hub_name"],
+            plan_id=cb_params["plan_id"],
+            task_id=cb_params["task_id"],
+            job_id=cb_params["job_id"],
+            auth_token=params["auth_token"]
+        )

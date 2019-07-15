@@ -8,12 +8,18 @@ import zipfile
 
 
 def get_file_str(file_location):
+    """ Reads a file
+    """
+    
     with open(file_location, "r") as file:
         return file.read()
     return False
 
 
 def set_file_str(file_location, output):
+    """ Writes a string to a file
+    """
+
     with open(file_location, "w") as file:
         file.write(output)
         return True
@@ -21,6 +27,9 @@ def set_file_str(file_location, output):
 
 
 def add_pip_dependency(conda_file, dependency):
+    """ Adds a new pip dependency to a given Conda file
+    """
+
     conda_file_location = "./snapshot/inputs/" + conda_file
 
     # Open the Conda file
@@ -40,8 +49,8 @@ def inject_pip_dependency(file_str, dependency):
     )
 
 
-def add_notebook_callback(params, notebook_location, run_id):
-    notebook_file_location = "./snapshot/inputs/" + notebook_location
+def add_notebook_callback(params, notebook, run_id):
+    notebook_file_location = "./snapshot/inputs/" + notebook
 
     # Opens the notebook
     notebook_str = get_file_str(notebook_file_location)
