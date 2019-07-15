@@ -174,7 +174,7 @@ This script handles all unit-testing of the Function App before it is deployed. 
 
 # Glossary
 
-## DevOps Pipeline Variables
+## DevOps Pipeline Secret Variables
 
 | Name            	| Description                                          	| Example Value                                    	| Where To Find                              	|
 |-----------------	|------------------------------------------------------	|--------------------------------------------------	|--------------------------------------------	|
@@ -184,6 +184,21 @@ This script handles all unit-testing of the Function App before it is deployed. 
 | sp.client       	| Service Principal's Application (client) ID          	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
 | sp.tenant       	| Service Principal's Directory (tenant) ID            	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
 | ws.subscription 	| Machine Learning Service Workspace's Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| Workspace's Overview                       	|
+
+## DevOps Pipeline Public Variables
+
+| Name             	| Description                       	| Example Value                                      	| Where To Find                       	|
+|------------------	|-----------------------------------	|----------------------------------------------------	|-------------------------------------	|
+| do.organization  	| DevOps Organization's Name        	| example-organization-name                          	| DevOps Organization's Mnemonic Name 	|
+| do.project       	| DevOps Project's Name             	| example-project-name                               	| DevOps Project's Mnemonic Name      	|
+| ex.compute       	| Azure ML Compute Target's Name    	| example-compute                                    	| Machine Learning Workspace's Assets 	|
+| gh.repo          	| Location of GitHub Repository     	| https://github.com/example/repo/archive/master.zip 	| GitHub Repository's Overview        	|
+| ws.name          	| Machine Learning Workspace's Name 	| example-ws-name                                    	| Workspace's Mnemonic Name           	|
+| ws.resourceGroup 	| Workspace's Resource Group's Name 	| example-resource-group-name                        	| Workspace's Overview                	|
+| rp.condaFile     	| Repository's Conda File Location  	| src/example-notebooks/environment.yml              	| Repository's File Directory         	|
+| rp.notebooks     	| Repository's Notebooks to Run     	| one.ipynb,two.ipynb,three.ipynb                    	| Repository's File Directory         	|
+
+
 
 [functions-create-first-function-python]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python
 [install-azure-cli]: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli

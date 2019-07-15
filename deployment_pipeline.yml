@@ -60,11 +60,9 @@ stages:
             "build_id": "$(Build.BuildId)",
             "run_config": {
               "repo": "$(gh.repo)",
-              "conda_file": "environment.yml",
-              "compute_target": "$(ex.compute)",
-              "notebooks": [                
-                "test.ipynb"
-              ]
+              "notebooks": "$(rp.notebooks)",
+              "conda_file": "$(rp.condaFile)",
+              "compute_target": "$(ex.compute)"
             },
             "azure_resources": {
               "organization": "$(do.organization)",
