@@ -126,11 +126,11 @@ def update_build_pipeline(params):
     
     # Download output notebook
     run.download_file(
-        name="outputs/output.ipynb"
+        name="outputs/output.ipynb",
         output_file_path="snapshot/outputs/output.ipynb"
     )
 
-    # Attach output notebook
+    # Updates Test Results with Run's telemetry and output notebook
     dh.post_run_attachment(
         file_name="output.ipynb",
         stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb")),
@@ -139,8 +139,6 @@ def update_build_pipeline(params):
         run_id=az_params["run_id"],
         auth_token=params["auth_token"]
     )
-
-    # Updates Test Results from Run's telemetry
     dh.post_run_results(
         error_message=cb_params["error_message"],
         run_details=run.get_details(),
