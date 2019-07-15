@@ -224,8 +224,8 @@ def fetch_repo(repo):
         "inputs"
     )
 
-    # Creates output folder
-    os.makedirs("outputs")
+    # # Creates output folder
+    # os.makedirs("outputs")
 
     # Returns to main directory
     os.chdir("..")
