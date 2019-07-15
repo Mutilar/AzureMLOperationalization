@@ -35,9 +35,9 @@ stages:
     # DEPLOY FUNCTION
     - task: AzureFunctionApp@1
       inputs:
-        azureSubscription: 'ExperimentnLearnNonProd(bc69d98c-7d2b-4542-88a4-f86eb4aea4a5)'
+        azureSubscription: '$(fx.azureSubscription)'
         appType: 'functionAppLinux'
-        appName: 'brhung-deployment-test'
+        appName: '$(fx.name)'
         package: '$(System.DefaultWorkingDirectory)/output.zip'
 - stage: Validation
   dependsOn:
