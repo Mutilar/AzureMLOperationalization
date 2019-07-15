@@ -1,6 +1,6 @@
 import azure.functions as func
 import yaml
-from base64 import b64encode as encode
+from base64 import encodestring as encode
 from time import sleep
 import sys
 sys.path.append("handlers")
