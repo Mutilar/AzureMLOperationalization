@@ -187,18 +187,18 @@ This script handles all unit-testing of the Function App before it is deployed. 
 
 ## DevOps Pipeline Public Variables
 
-| Name             	| Description                       	| Example Value                                      	| Where To Find                       	|
-|------------------	|-----------------------------------	|----------------------------------------------------	|-------------------------------------	|
-| do.organization  	| DevOps Organization's Name        	| example-organization-name                          	| DevOps Organization's Mnemonic Name 	|
-| do.project       	| DevOps Project's Name             	| example-project-name                               	| DevOps Project's Mnemonic Name      	|
-| ex.compute       	| Azure ML Compute Target's Name    	| example-compute                                    	| Machine Learning Workspace's Assets 	|
-| gh.repo          	| Location of GitHub Repository     	| https://github.com/example/repo/archive/master.zip 	| GitHub Repository's Overview        	|
-| ws.name          	| Machine Learning Workspace's Name 	| example-ws-name                                    	| Workspace's Mnemonic Name           	|
-| ws.resourceGroup 	| Workspace's Resource Group's Name 	| example-resource-group-name                        	| Workspace's Overview                	|
-| rp.condaFile     	| Repository's Conda File Location  	| src/example-notebooks/environment.yml              	| Repository's File Directory         	|
-| rp.notebooks     	| Repository's Notebooks to Run     	| one.ipynb,two.ipynb,three.ipynb                    	| Repository's File Directory         	|
-
-
+| Name                 	| Description                         	| Example Value                                            	| Where To Find                       	|
+|----------------------	|-------------------------------------	|----------------------------------------------------------	|-------------------------------------	|
+| do.organization      	| DevOps Organization's Name          	| example-organization-name                                	| DevOps Organization's Mnemonic Name 	|
+| do.project           	| DevOps Project's Name               	| example-project-name                                     	| DevOps Project's Mnemonic Name      	|
+| ex.compute           	| Azure ML Compute Target's Name      	| example-compute                                          	| Machine Learning Workspace's Assets 	|
+| fx.azureSubscription 	| Azure Subscription for Function App 	| ExampleSubscription(a1234567-89bc-0123-def4-abc56789def) 	| Function App's Overview             	|
+| fx.name              	| Function App's Name                 	| example-function-app                                     	| Function App's Mnemonic Name        	|
+| gh.repo              	| Location of GitHub Repository       	| https://github.com/example/repo/archive/master.zip       	| GitHub Repository's Overview        	|
+| ws.name              	| Machine Learning Workspace's Name   	| example-ws-name                                          	| Workspace's Mnemonic Name           	|
+| ws.resourceGroup     	| Workspace's Resource Group's Name   	| example-resource-group-name                              	| Workspace's Overview                	|
+| rp.condaFile         	| Repository's Conda File Location    	| src/example-notebooks/environment.yml                    	| Repository's File Directory         	|
+| rp.notebooks         	| Repository's Notebooks to Run       	| one.ipynb,two.ipynb,three.ipynb                          	| Repository's File Directory         	|
 
 [functions-create-first-function-python]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python
 [install-azure-cli]: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
