@@ -1,7 +1,8 @@
 import azure.functions as func
 import yaml
-import sys
+from base64 import b64encode as encode
 from time import sleep
+import sys
 sys.path.append("handlers")
 import file_handler as fh
 import azureml_handler as ah
@@ -123,6 +124,22 @@ def update_build_pipeline(params):
         run_id=az_params["run_id"]
     )
     
+    # Download output notebook
+    run.download_file(
+        name="outputs/output.ipynb"
+        output_file_path="snapshot/outputs/output.ipynb"
+    )
+
+    # Attach output notebook
+    dh.post_run_attachment(
+        file_name="output.ipynb",
+        stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb")),
+        organization=az_params["organization"],
+        project=az_params["project"],
+        run_id=az_params["run_id"],
+        auth_token=params["auth_token"]
+    )
+
     # Updates Test Results from Run's telemetry
     dh.post_run_results(
         error_message=cb_params["error_message"],
