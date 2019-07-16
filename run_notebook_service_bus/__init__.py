@@ -19,6 +19,9 @@ FAILED_PIPELINE = "Failed"
 # Run Conditions for pipelines
 ALL_NOTEBOOKS_MUST_PASS = "all_pass"
 
+# Directories
+OUTPUT_NOTEBOOK_LOCATION = "snapshot/outputs/output.ipynb"
+
 def main(msg: func.ServiceBusMessage):
 
     # Converts bytes into JSON
@@ -74,7 +77,7 @@ def start_build_pipeline(params):
         )
         run_id = response.json()["id"]
 
-        # Adds try-catch callback mechanism to notebooks
+        # Adds try-catch callback mechanism to notebook
         fh.add_notebook_callback(
             notebook=notebook, 
             params=params, 
@@ -125,16 +128,18 @@ def update_build_pipeline(params):
         run_id=az_params["run_id"]
     )
     
-    # Download output notebook
+    # Download, scrub, and stream output notebook
     run.download_file(
         name="outputs/output.ipynb",
-        output_file_path="snapshot/outputs/output.ipynb"
+        output_file_path=OUTPUT_NOTEBOOK_LOCATION
     )
+    output_notebook_string = fh.remove_notebook_callback(OUTPUT_NOTEBOOK_LOCATION)
+    output_notebook_stream = encode(output_notebook_str.encode("utf-8"))
 
     # Updates Test Results with Run's telemetry and output notebook
     dh.post_run_attachment(
         file_name="output.ipynb",
-        stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb").encode("utf-8")),
+        stream=output_notebook_stream,
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"],
@@ -142,7 +147,7 @@ def update_build_pipeline(params):
     )
     dh.post_run_attachment(
         file_name="output.txt",
-        stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb").encode("utf-8")),
+        stream=output_notebook_stream,
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"],
