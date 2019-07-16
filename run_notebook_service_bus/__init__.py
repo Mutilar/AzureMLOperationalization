@@ -132,7 +132,7 @@ def update_build_pipeline(params):
 
     # Updates Test Results with Run's telemetry and output notebook
     dh.post_run_attachment(
-        file_name="output.ipynb",
+        file_name="output.txt",
         stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb").encode("utf-8")),
         organization=az_params["organization"],
         project=az_params["project"],
