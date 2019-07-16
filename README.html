@@ -1,0 +1,254 @@
+<h1 id="azure-ml-operationalization">Azure ML Operationalization</h1>
+<p><a href="https://dev.azure.com/t-brhung/brhung-test-pipeline/_build/latest?definitionId=8&amp;branchName=master"><embed src="https://dev.azure.com/t-brhung/brhung-test-pipeline/_apis/build/status/Mutilar.brhung-deployment-testing?branchName=master" /></a></p>
+<p>Streamlining and expediting a data scientist's CI/CD workflow leveraging prebaked functionalities of Azure DevOps Pipelines, Azure Functions, and Azure Service Bus Queues.</p>
+<h3 id="key-aspects">Key aspects:</h3>
+<ul>
+<li><a href="https://azure.microsoft.com/en-us/services/devops/pipelines/">Azure DevOps Pipelines</a></li>
+<li><a href="https://azure.microsoft.com/en-us/services/service-bus/">Azure Service Bus</a></li>
+<li><a href="https://azure.microsoft.com/en-us/services/functions/">Azure Functions</a></li>
+<li><a href="https://azure.microsoft.com/en-us/services/machine-learning-service/">Azure Machine Learning</a></li>
+</ul>
+<p>Azure Python Functions can cleanly interact with the Azure ML SDK and can be easily integrated into Azure DevOps Pipelines.</p>
+<h3 id="core-dependencies">Core dependencies:</h3>
+<ul>
+<li><a href="https://www.python.org/downloads/">Python 3.6.8</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#v2">Azure Functions Core Tools</a></li>
+<li><a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a></li>
+<li><a href="https://docs.microsoft.com/en-us/python/api/overview/azure/ml/install?view=azure-ml-py">Azure ML SDK + Contrib</a></li>
+</ul>
+<h1 id="the-file-directory">The File Directory</h1>
+<blockquote>
+<ul>
+<li>RunNotebookFunctionApp &gt; - run_notebook_service_bus &gt; &gt; - <code>__init__.py</code> &gt; &gt; - <code>function.json</code> &gt; - handlers &gt; &gt; - <code>azureml_handler.py</code> &gt; &gt; - <code>devops_handler.py</code> &gt; &gt; - <code>file_handler.py</code> &gt; - tests &gt; &gt; - <code>test_handlers.py</code> &gt; - <code>deployment_pipeline.yml</code> &gt; - <code>requirements.txt</code></li>
+</ul>
+</blockquote>
+<h2 id="deployment_pipeline.yml"><code>deployment_pipeline.yml</code></h2>
+<p>This file controls the CD pipeline for the Function App. It functions with two main stages:</p>
+<blockquote>
+<h4><code>Deployment</code></h4>
+<p>This agent-based stage prepares the deployment environment, unit-tests, bundles, and finally deploys the Azure Function Application. Simplified, it looks like this:</p>
+<pre class="yml"><code>- stage: Deployment
+  jobs:
+  - job: 
+    pool:
+      vmImage: &#39;ubuntu-16.04&#39;
+    steps:
+    - task: UsePythonVersion@0
+    - bash: pip3.6 install -r requirements.txt
+    - bash: pytest
+    - task: ArchiveFiles@2
+    - task: AzureFunctionApp@1</code></pre>
+</blockquote>
+<blockquote>
+<h4><code>Validation</code></h4>
+<p>This agentless stage validates the changes by running a controlled job through the new deployment of the application to ensure everything is functioning as expected. Simplified, it looks like this:</p>
+<pre class="yml"><code>- stage: Validation
+  jobs:
+  - job: 
+    pool: server
+    steps:
+    - task: PublishToAzureServiceBus@1</code></pre>
+</blockquote>
+<h2 id="requirements.txt"><code>requirements.txt</code></h2>
+<p>This file controls the dependencies required for the Azure Function. This is mainly the Azure ML SDK, its associated dependencies, and support for HTTP requests, file system manipulation, etc.</p>
+<pre><code>...
+azureml==0.2.7
+azureml-contrib-notebook==1.0.43
+azureml-core==1.0.43
+azureml-pipeline==1.0.43
+azureml-sdk==1.0.43
+...</code></pre>
+<p>When deploying the function app, these are injected into the package, as seem in the deployment YAML file:</p>
+<pre><code>pip3.6 install -r requirements.txt</code></pre>
+<h2 id="function.json"><code>function.json</code></h2>
+<p>This file specifies the location of main function (e.g. <code>__init__.py</code>), as well as the Service Bus binding for the application.</p>
+<h2 id="init__.py"><code>__init__.py</code></h2>
+<p>This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the distinct job types: <code>start_build_pipeline()</code> and <code>update_build_pipeline()</code>.</p>
+<blockquote>
+<h4><code>start_build_pipeline()</code></h4>
+<p>Fetches the repository of interest, creates a new Experiment SDK Object, and submits a set of notebook Runs to that object after injecting try-catch statements to facilitate callbacks to the DevOps pipeline.</p>
+</blockquote>
+<blockquote>
+<h4><code>update_build_pipeline()</code></h4>
+<p>Updates the DevOps Test Runs based on results from Azure ML Compute, and checks to close the pipeline in all Runs are completed.</p>
+</blockquote>
+<h2 id="azureml_handler.py"><code>azureml_handler.py</code></h2>
+<p>This script handles all Azure ML SDK-related logic, including <code>fetch_exp()</code>, <code>fetch_run_config()</code>, and <code>submit_run()</code>, which all manage Azure ML Workspace-related tasks.</p>
+<blockquote>
+<h4><code>fetch_experiment()</code></h4>
+<p>This function authenticates with the ML Workspace with a Service Principal connection, fetches the <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.workspace(class)?view=azure-ml-py">Workspace</a>, and then fetches and returns a new <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py">Experiment</a>.</p>
+</blockquote>
+<blockquote>
+<h4><code>fetch_run_config()</code></h4>
+<p>This function generates a <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.runconfiguration?view=azure-ml-py">RunConfiguration</a> based on the pipeline parameters, specifying such things as the <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py">ComputeTarget</a> and <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.conda_dependencies.condadependencies?view=azure-ml-py">CondaDependencies</a>. More flexible of Run configurations can easily be implemented.</p>
+</blockquote>
+<blockquote>
+<h4><code>submit_run()</code></h4>
+<p>This function <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment(class)?view=azure-ml-py#submit-config--tags-none----kwargs-">submits a new Run</a> with configurations based on the pipeline parameters.</p>
+</blockquote>
+<blockquote>
+<h4><code>fetch_run()</code></h4>
+<p>This function <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py#get-runs-type-none--tags-none--properties-none--include-children-false-">fetches a Run by its RunID tag</a> specified by the DevOps Test Run.</p>
+</blockquote>
+<blockquote>
+<h4><code>fetch_exp_status()</code></h4>
+<p>This function determines the status of the pipeline by <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py#get-runs-type-none--tags-none--properties-none--include-children-false-">fetching all Runs</a> and <a href="https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.run.run?view=azure-ml-py#get-status--">checking their status</a></p>
+</blockquote>
+<h2 id="devops_handler.py"><code>devops_handler.py</code></h2>
+<p>This script handles all DevOps related tasks, including <code>post_pipeline_callback()</code>, <code>post_new_run()</code>, <code>patch_run_update()</code>, and <code>post_run_results()</code>.</p>
+<blockquote>
+<h4><code>post_pipeline_callback()</code></h4>
+<p>This function, along with its helper functions, <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/http-rest-api?view=azure-devops#where-should-a-task-signal-completion-when-callback-is-chosen-as-the-completion-event">closes the DevOps Pipeline</a> via the DevOps API.</p>
+</blockquote>
+<blockquote>
+<h4><code>post_new_run()</code></h4>
+<p>This function, along with its helper functions, <a href="https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/create?view=azure-devops-rest-5.0">creates a new DevOps Test Run</a> via the DevOps API.</p>
+</blockquote>
+<blockquote>
+<h4><code>patch_run_update()</code></h4>
+<p>This function, along with its helper functions, <a href="https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/update?view=azure-devops-rest-5.0">updates a DevOps Test Run</a> via the DevOps API.</p>
+</blockquote>
+<blockquote>
+<h4><code>post_run_results()</code></h4>
+<p>This function, along with its helper functions, <a href="https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0">adds a DevOps Test Run Result</a> with result telemetry via the DevOps API.</p>
+</blockquote>
+<h2 id="file_handler.py"><code>file_handler.py</code></h2>
+<p>This script handles all file IO related tasks, including <code>fetch_repo()</code>, <code>add_pip_dependency()</code>, and <code>add_notebook_callback()</code>.</p>
+<blockquote>
+<h4><code>fetch_repo()</code></h4>
+<p>This function pulls and extracts repositories from GitHub to be submitted in a Run's snapshot folder.</p>
+</blockquote>
+<blockquote>
+<h4><code>add_pip_dependency()</code></h4>
+<p>This function injects pip dependencies into the Conda file specified in the pipeline parameters.</p>
+</blockquote>
+<blockquote>
+<h4><code>add_notebook_callback()</code></h4>
+<p>This function adds try-catches around each code-block of a notebook with callbacks to re-trigger the Azure Function when the notebook is finished running.</p>
+<p><em>Note: this is a not an &quot;ideal&quot; solution from an architectural perspective, but a more platform-level, agnostic approach (e.g. with Event Grid integration for triggering the Function) is currently out of scope.</em></p>
+</blockquote>
+<h2 id="test_handlers.py"><code>test_handlers.py</code></h2>
+<p>This script handles all unit-testing of the Function App before it is deployed. Currently, unit tests only cover <code>file_handler.py</code>-specific functions, as all other functions are very primitive.</p>
+<h1 id="glossary">Glossary</h1>
+<h2 id="devops-pipeline-secret-variables">DevOps Pipeline Secret Variables</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Description</th>
+<th align="left">Example Value</th>
+<th align="left">Where To Find</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">sb.connection</td>
+<td align="left">Service Bus Queue's Connection String</td>
+<td align="left">Endpoint=sb://example.servicebus.windows.net/...</td>
+<td align="left">Service Bus Queue's Shared Access Policies</td>
+</tr>
+<tr class="even">
+<td align="left">sb.name</td>
+<td align="left">Service Bus Queue's Name</td>
+<td align="left">example-queue-name</td>
+<td align="left">Service Bus Queue's Mnemonic Name</td>
+</tr>
+<tr class="odd">
+<td align="left">sp.password</td>
+<td align="left">Service Principal's Password</td>
+<td align="left">32 character alphanumeric string (e.g. A/fb0...)</td>
+<td align="left">App Registration's Client Secret</td>
+</tr>
+<tr class="even">
+<td align="left">sp.client</td>
+<td align="left">Service Principal's Application (client) ID</td>
+<td align="left">GUID (e.g. a1234567-89bc-0123-def4-abc56789def)</td>
+<td align="left">App Registration's Overview</td>
+</tr>
+<tr class="odd">
+<td align="left">sp.tenant</td>
+<td align="left">Service Principal's Directory (tenant) ID</td>
+<td align="left">GUID (e.g. a1234567-89bc-0123-def4-abc56789def)</td>
+<td align="left">App Registration's Overview</td>
+</tr>
+<tr class="even">
+<td align="left">ws.subscription</td>
+<td align="left">Machine Learning Service Workspace's Subscription ID</td>
+<td align="left">GUID (e.g. a1234567-89bc-0123-def4-abc56789def)</td>
+<td align="left">Workspace's Overview</td>
+</tr>
+</tbody>
+</table>
+<h2 id="devops-pipeline-public-variables">DevOps Pipeline Public Variables</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Description</th>
+<th align="left">Example Value</th>
+<th align="left">Where To Find</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">do.organization</td>
+<td align="left">DevOps Organization's Name</td>
+<td align="left">example-organization-name</td>
+<td align="left">DevOps Organization's Mnemonic Name</td>
+</tr>
+<tr class="even">
+<td align="left">do.project</td>
+<td align="left">DevOps Project's Name</td>
+<td align="left">example-project-name</td>
+<td align="left">DevOps Project's Mnemonic Name</td>
+</tr>
+<tr class="odd">
+<td align="left">ex.compute</td>
+<td align="left">Azure ML Compute Target's Name</td>
+<td align="left">example-compute</td>
+<td align="left">Machine Learning Workspace's Assets</td>
+</tr>
+<tr class="even">
+<td align="left">fx.azureSubscription</td>
+<td align="left">Azure Subscription for Function App</td>
+<td align="left">ExampleSubscription(a1234567-89bc-0123-def4-abc56789def)</td>
+<td align="left">Function App's Overview</td>
+</tr>
+<tr class="odd">
+<td align="left">fx.name</td>
+<td align="left">Function App's Name</td>
+<td align="left">example-function-app</td>
+<td align="left">Function App's Mnemonic Name</td>
+</tr>
+<tr class="even">
+<td align="left">gh.repo</td>
+<td align="left">Location of GitHub Repository</td>
+<td align="left">https://github.com/example/repo/archive/master.zip</td>
+<td align="left">GitHub Repository's Overview</td>
+</tr>
+<tr class="odd">
+<td align="left">ws.name</td>
+<td align="left">Machine Learning Workspace's Name</td>
+<td align="left">example-ws-name</td>
+<td align="left">Workspace's Mnemonic Name</td>
+</tr>
+<tr class="even">
+<td align="left">ws.resourceGroup</td>
+<td align="left">Workspace's Resource Group's Name</td>
+<td align="left">example-resource-group-name</td>
+<td align="left">Workspace's Overview</td>
+</tr>
+<tr class="odd">
+<td align="left">rp.condaFile</td>
+<td align="left">Repository's Conda File Location</td>
+<td align="left">src/example-notebooks/environment.yml</td>
+<td align="left">Repository's File Directory</td>
+</tr>
+<tr class="even">
+<td align="left">rp.notebooks</td>
+<td align="left">Repository's Notebooks to Run</td>
+<td align="left">one.ipynb,two.ipynb,three.ipynb</td>
+<td align="left">Repository's File Directory</td>
+</tr>
+</tbody>
+</table>
