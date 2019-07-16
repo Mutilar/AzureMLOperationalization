@@ -60,7 +60,7 @@ stages:
             "build_id": "$(Build.BuildId)",
             "run_config": {
               "repo": "$(gh.repo)",
-              "version": "$(rp.version)"
+              "version": "$(rp.version)",
               "notebooks": "$(rp.notebooks)",
               "conda_file": "$(rp.condaFile)",
               "compute_target": "$(ex.compute)",
