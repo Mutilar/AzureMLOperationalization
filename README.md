@@ -146,6 +146,10 @@ This script handles all DevOps related tasks, including ```post_pipeline_callbac
 >
 > This function, along with its helper functions, [updates a DevOps Test Run](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/update?view=azure-devops-rest-5.0) via the DevOps API.
 
+> #### ```post_run_attachment()```
+>
+> This function, along with its helper functions, [uploads a DevOps Test Run Attachment](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/Attachments/Create%20Test%20Run%20Attachment?view=azure-devops-rest-5.0) via the DevOps API. 
+
 > #### ```post_run_results()```
 >
 > This function, along with its helper functions, [adds a DevOps Test Run Result](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
@@ -187,18 +191,19 @@ This script handles all unit-testing of the Function App before it is deployed. 
 
 ## DevOps Pipeline Public Variables
 
-| Name                 	| Description                         	| Example Value                                            	| Where To Find                       	|
-|----------------------	|-------------------------------------	|----------------------------------------------------------	|-------------------------------------	|
-| do.organization      	| DevOps Organization's Name          	| example-organization-name                                	| DevOps Organization's Mnemonic Name 	|
-| do.project           	| DevOps Project's Name               	| example-project-name                                     	| DevOps Project's Mnemonic Name      	|
-| ex.compute           	| Azure ML Compute Target's Name      	| example-compute                                          	| Machine Learning Workspace's Assets 	|
-| fx.azureSubscription 	| Azure Subscription for Function App 	| ExampleSubscription(a1234567-89bc-0123-def4-abc56789def) 	| Function App's Overview             	|
-| fx.name              	| Function App's Name                 	| example-function-app                                     	| Function App's Mnemonic Name        	|
-| gh.repo              	| Location of GitHub Repository       	| https://github.com/example/repo/archive/master.zip       	| GitHub Repository's Overview        	|
-| ws.name              	| Machine Learning Workspace's Name   	| example-ws-name                                          	| Workspace's Mnemonic Name           	|
-| ws.resourceGroup     	| Workspace's Resource Group's Name   	| example-resource-group-name                              	| Workspace's Overview                	|
-| rp.condaFile         	| Repository's Conda File Location    	| src/example-notebooks/environment.yml                    	| Repository's File Directory         	|
-| rp.notebooks         	| Repository's Notebooks to Run       	| one.ipynb,two.ipynb,three.ipynb                          	| Repository's File Directory         	|
+| Name                 	| Description                            	| Example Value                                                     	| Where To Find                       	|
+|----------------------	|----------------------------------------	|-------------------------------------------------------------------	|-------------------------------------	|
+| do.organization      	| DevOps Organization's Name             	| example-organization-name                                         	| DevOps Organization's Mnemonic Name 	|
+| do.project           	| DevOps Project's Name                  	| example-project-name                                              	| DevOps Project's Mnemonic Name      	|
+| ex.compute           	| Azure ML Compute Target's Name         	| example-compute                                                   	| Machine Learning Workspace's Assets 	|
+| fx.azureSubscription 	| Azure Subscription for Function App    	| ExampleSubscription(a1234567-89bc-0123-def4-abc56789def)          	| Function App's Overview             	|
+| fx.name              	| Function App's Name                    	| example-function-app                                              	| Function App's Mnemonic Name        	|
+| gh.repo              	| Location of GitHub Repository          	| https://github.com/example/repo/archive/master.zip                	| GitHub Repository's Overview        	|
+| ws.name              	| Machine Learning Workspace's Name      	| example-ws-name                                                   	| Workspace's Mnemonic Name           	|
+| ws.resourceGroup     	| Workspace's Resource Group's Name      	| example-resource-group-name                                       	| Workspace's Overview                	|
+| rp.condaFile         	| Repository's Conda File Location       	| src/example-notebooks/environment.yml                             	| Repository's File Directory         	|
+| rp.notebooks         	| Repository's Notebooks to Run          	| one.ipynb,two.ipynb,three.ipynb                                   	| Repository's File Directory         	|
+| rp.version           	| Repository's Commit/Branch of Interest 	| "master", "dev", "bb7ad65dbc727ec09fe0613d51ce8585087de1b1", etc. 	| GitHub Repository's Overview        	|
 
 [functions-create-first-function-python]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python
 [install-azure-cli]: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
