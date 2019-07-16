@@ -66,6 +66,16 @@ def add_notebook_callback(params, notebook, run_id):
     # Writes changes to file
     set_file_str(notebook_file_location, notebook_str)
 
+
+def remove_notebook_callback(notebook_file_location):
+    """ Removes all injected notebook code for previewing output notebook.
+    """
+
+    # Opens the notebook
+    notebook_str = get_file_str(notebook_file_location)
+
+    # Scrubs try-catches and returns string
+    return scrub_notebook_try_catches(notebook_str)
         
 def inject_notebook_try_catches(notebook_str):
     """ Adds try-catching to all notebook code blocks to allow for callbacks.
@@ -197,6 +207,102 @@ def inject_notebook_params(notebook_str, params, run_id):
     )
 
     return output
+
+
+def scrub_notebook_try_catches(notebook_str):
+    """ Removes notebook try-catching injected code for previewing.
+    """
+
+    output = []
+
+    # String per line in the notebook 
+    lines = notebook_str.split("\n")
+
+    # Flow control variables
+    found_code_cell = False
+    found_code_source_beginning = False
+    found_code_source = False
+
+    # Tracks what code cell is currently being editted
+    num_code_cells = 0
+    cur_code_cell = 0
+
+    file_length = len(lines)
+
+    # Counts number of code cells
+    for i in range(0, file_length):
+        if lines[i] == '   "cell_type": "code",':
+            num_code_cells += 1
+
+    # Iterates across notebook adding trys, catches, service bus messages
+    i = 0
+    while i < file_length:
+
+        # If currently inside a code block
+        if found_code_source:  
+
+            # If the code block ends
+            if lines[i] == '   ]':
+                found_code_source = False
+
+                # Remove "failure" callback
+                del output[-1]
+                del output[-1]
+                del output[-1]
+                del output[-1]
+                del output[-1]
+                del output[-1]
+                del output[-1]
+
+                # If this is the final code block, remove "success" callback
+                if cur_code_cell == num_code_cells:
+                    del output[-1]
+                    del output[-1]
+                    del output[-1]
+                    del output[-1]
+
+                output[-1] = output[-1][:(len(output[-1])-4)] + "\""
+
+        # If just started a new code block
+        elif found_code_source_beginning:
+            found_code_source = True
+            found_code_source_beginning = False
+            cur_code_cell += 1
+
+            # If first block, remove global variables
+            if cur_code_cell == 1:
+                del lines[i:i+5]
+                file_length -= 5
+
+            # Remove try statement
+            del lines[i]
+            file_length -= 1
+
+        # If inside code block header
+        elif found_code_cell:
+
+            # Found the code block source
+            if lines[i] == '   "source": [':
+                found_code_cell = False
+                found_code_source_beginning = True
+        
+        # Found the beginning of a code block header
+        elif cur_code_cell < num_code_cells and lines[i] == '   "cell_type": "code",':
+            found_code_cell = True
+
+        # Push line to output, with some manipulation to add spacing for try-catch blocks, and adding commas/return lines when necessary
+        if found_code_source:
+
+            # Removing indenting from code snippets
+            output.append(lines[i][:5] + lines[i][5+4:])
+        else:
+
+            # Leave the line untouched if it isn't inside a code block
+            output.append(lines[i])
+
+        i += 1
+    
+    return "\n".join(line for line in output)
 
 
 def fetch_repo(repo, version):
