@@ -1,6 +1,6 @@
 import azure.functions as func
 import yaml
-from base64 import encodestring as encode
+from base64 import b64encode as encode
 from time import sleep
 import sys
 sys.path.append("handlers")
@@ -133,7 +133,7 @@ def update_build_pipeline(params):
     # Updates Test Results with Run's telemetry and output notebook
     dh.post_run_attachment(
         file_name="output.ipynb",
-        stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb")),
+        stream=encode(fh.get_file_str("snapshot/outputs/output.ipynb").encode("utf-8")),
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"],
