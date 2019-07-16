@@ -199,7 +199,7 @@ def inject_notebook_params(notebook_str, params, run_id):
     return output
 
 
-def fetch_repo(repo):
+def fetch_repo(repo, version):
     """ Clones a GitHub repository locally into the snapshot folder
     """
     
@@ -217,11 +217,13 @@ def fetch_repo(repo):
         )
     )
 
-    # Downloads repository
+    # Downloads version of a repository
+    #   version can be a branch name (e.g. "master", "dev")
+    #   or commit hash (e.g. "bb7ad65dbc727ec09fe0613d51ce8585087de1b1")
     repo_zip = zipfile.ZipFile(
         io.BytesIO(
             requests.get(
-                repo
+                repo + "/archive/" + version + ".zip"
             ).content
         )
     )

@@ -43,7 +43,8 @@ def start_build_pipeline(params):
 
     # Downloads repo to snapshot folder and adds SB pip dependency for callback
     fh.fetch_repo(
-        repo=rc_params["repo"]
+        repo=rc_params["repo"],
+        version=rc_params["version"]
     )
     fh.add_pip_dependency(
         conda_file=rc_params["conda_file"],
