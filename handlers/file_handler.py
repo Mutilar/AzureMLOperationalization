@@ -246,20 +246,11 @@ def scrub_notebook_try_catches(notebook_str):
                 found_code_source = False
 
                 # Remove "failure" callback
-                del output[-1]
-                del output[-1]
-                del output[-1]
-                del output[-1]
-                del output[-1]
-                del output[-1]
-                del output[-1]
+                del output[-7:]
 
                 # If this is the final code block, remove "success" callback
                 if cur_code_cell == num_code_cells:
-                    del output[-1]
-                    del output[-1]
-                    del output[-1]
-                    del output[-1]
+                    del output[-4:]
 
                 output[-1] = output[-1][:(len(output[-1])-4)] + "\""
 
@@ -306,7 +297,7 @@ def scrub_notebook_try_catches(notebook_str):
 
 
 def fetch_repo(repo, version):
-    """ Clones a GitHub repository locally into the snapshot folder
+    """ Clones a GitHub repository locally into the snapshot folder.
     """
     
     # Wipes snapshot directory, clearing out old files
