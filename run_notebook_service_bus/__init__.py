@@ -134,7 +134,7 @@ def update_build_pipeline(params):
         output_file_path=OUTPUT_NOTEBOOK_LOCATION
     )
     output_notebook_string = fh.remove_notebook_callback(OUTPUT_NOTEBOOK_LOCATION)
-    output_notebook_stream = encode(output_notebook_str.encode("utf-8"))
+    output_notebook_stream = encode(output_notebook_string.encode("utf-8"))
 
     # Updates Test Results with Run's telemetry and output notebook
     dh.post_run_attachment(
