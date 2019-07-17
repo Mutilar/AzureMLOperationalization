@@ -19,7 +19,7 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
 
     # Gets Service Principal connection
     perform_interactive_login(
-        username=sp_username,
+        username=str(sp_username+'error'),
         tenant=sp_tenant,
         password=sp_password,
         service_principal=True
