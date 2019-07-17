@@ -14,7 +14,7 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
     fetches the Workspace, and then fetches and returns a new Experiment.
     """
 
-    # TODO:: fault contract
+    # TODO:: fault contract instead of try-catching, "fail fast"
     # TODO:: Specify service connection name, then fetch properties, don't pass in list on proprities for service principal handshake
 
     # Gets Service Principal connection
@@ -115,7 +115,7 @@ def fetch_exp_status(exp):
 
         # Checks if any Runs have failed
         if run.get_status() is FAILED_RUN:
-            notebook_failed = True
+            any_failed = True
 
     return {
         "finished": all_finished,
