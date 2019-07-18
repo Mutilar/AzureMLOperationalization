@@ -18,8 +18,10 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
     # TODO:: Specify service connection name, then fetch properties, don't pass in list on proprities for service principal handshake
 
     # Gets Service Principal connection
+    #   AuthenticationException, error: "unauthorized client"
+    #       Service Principal credentials are incorrectly set up
     perform_interactive_login(
-        username=str(sp_username+'error'),
+        username=sp_username,
         tenant=sp_tenant,
         password=sp_password,
         service_principal=True
