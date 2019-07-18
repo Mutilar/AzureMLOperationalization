@@ -1,5 +1,4 @@
 import azure.functions as func
-from yaml import safe_load as load
 from base64 import b64encode as encode
 from time import sleep
 import sys
@@ -25,52 +24,17 @@ OUTPUT_NOTEBOOK_LOCATION = "snapshot/outputs/output.ipynb"
 def main(msg: func.ServiceBusMessage):
 
     # Converts bytes into JSON
-    # params = load(
-    #    msg.get_body().decode("utf-8")
-    # )
     # https://docs.microsoft.com/en-us/python/api/azure-functions/azure.functions.servicebusmessage?view=azure-python
 
-    msg_properties = ""
-    try:
-        msg_properties = str(msg.user_properties)
-    except Exception as e:    
-        msg_properties = str(e)
-
-    msg_properties_decoded = ""
-    try:
-        msg_properties_decoded = str(msg.user_properties.decode("utf-8"))
-    except Exception as e:    
-        msg_properties_decoded = str(e)
-
-    msg_body_raw = ""
-    try:
-        msg_body_raw = str(msg.get_body())
-    except Exception as e:    
-        msg_body_raw = str(e)
-        
-    msg_body = ""
-    try:
-        msg_body = str(msg.get_body().decode("utf-8"))
-    except Exception as e:    
-        msg_body = str(e)
-
-    msg_body_json = ""
-    try:
-        msg_body_json = str(load(msg.get_body().decode("utf-8")))
-    except Exception as e:    
-        msg_body_json = str(e)
-
-    raise Exception("properties_decoded" + msg_properties_decoded + "\nproperties" + msg_properties + "\nbody_raw" + msg_body_raw + "\nbody" + msg_body + "\njson" + msg_body_json) 
-        
-    # "\n" + load( msg.get_body().decode("utf-8") ))
+    params = msg.user_properties
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
-    # if params["job"] == START_BUILD:
-    #     start_build_pipeline(params)
+    if params["job"] == START_BUILD:
+        start_build_pipeline(params)
     
     # # Updates telemetry in Azure DevOps, called from a Experiment Run
-    # elif params["job"] == UPDATE_BUILD:
-    #     update_build_pipeline(params)
+    elif params["job"] == UPDATE_BUILD:
+        update_build_pipeline(params)
 
 
 def start_build_pipeline(params):
