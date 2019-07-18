@@ -24,16 +24,38 @@ OUTPUT_NOTEBOOK_LOCATION = "snapshot/outputs/output.ipynb"
 
 def main(msg: func.ServiceBusMessage):
 
-
     # Converts bytes into JSON
     # params = load(
     #    msg.get_body().decode("utf-8")
     # )
+
+    msg_raw = ""
     try:
-        pars = msg.get_properties()
-        print(load(pars))
-    except Exception as e:
-        raise Exception("message:" + str(msg)) # "\n" + load( msg.get_body().decode("utf-8") ))
+        msg_raw = str(msg)
+    except Exception as e:    
+        msg_raw = str(e)
+
+    msg_body_raw = ""
+    try:
+        msg_body_raw = str(msg.get_body())
+    except Exception as e:    
+        msg_body_raw = str(e)
+        
+    msg_body = ""
+    try:
+        msg_body = str(msg.get_body().decode("utf-8"))
+    except Exception as e:    
+        msg_body = str(e)
+
+    msg_body_json = ""
+    try:
+        msg_body_json = str(load(msg.get_body().decode("utf-8")))
+    except Exception as e:    
+        msg_body_json = str(e)
+
+    raise Exception("message:" + msg_raw + "\nbody_raw" + msg_body_raw + "\nbody" + msg_body + "\njson" + msg_body_json) 
+        
+    # "\n" + load( msg.get_body().decode("utf-8") ))
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     # if params["job"] == START_BUILD:
