@@ -1,5 +1,5 @@
 import azure.functions as func
-import yaml
+from yaml import safe_load as load
 from base64 import b64encode as encode
 from time import sleep
 import sys
@@ -25,7 +25,7 @@ OUTPUT_NOTEBOOK_LOCATION = "snapshot/outputs/output.ipynb"
 def main(msg: func.ServiceBusMessage):
 
     # Converts bytes into JSON
-    params = yaml.safe_load(
+    params = load(
         msg.get_body().decode("utf-8")
     )
 
@@ -94,8 +94,7 @@ def start_build_pipeline(params):
         )
 
         # Marks Run with relevant properties
-        run.tag(notebook)
-        run.tag("auto-created", params["name"])
+        run.tag("file",notebook)
         run.tag("run_id", run_id)
 
 
@@ -118,9 +117,6 @@ def update_build_pipeline(params):
         ws_resource_group=ws_params["resource_group"],
         build_id=params["build_id"]
     )
-
-    # Checks if all Runs have finished, and if any have failed
-    exp_status = ah.fetch_exp_status(exp)
 
     # Gets current Run
     run = ah.fetch_run(
@@ -168,6 +164,9 @@ def update_build_pipeline(params):
         run_id=az_params["run_id"], 
         auth_token=params["auth_token"]
     )
+
+    # Checks if all Runs have finished, and if any have failed
+    exp_status = ah.fetch_exp_status(exp)
 
     # Closes pipeline if all Runs are finished
     if exp_status["finished"] is True:

@@ -54,7 +54,6 @@ stages:
         azureSubscription: 'test'
         messageBody: >
           {
-            "name": "$(name)",
             "job": "!START",
             "auth_token": "$(system.AccessToken)",
             "build_id": "$(Build.BuildId)",
