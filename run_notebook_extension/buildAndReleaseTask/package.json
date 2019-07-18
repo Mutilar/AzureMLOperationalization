@@ -1,0 +1,19 @@
+{
+  "name": "run_notebook_extension",
+  "version": "1.0.0",
+  "description": "Run Notebooks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "azure-pipelines-task-lib": "^2.8.0",
+    "typescript": "^3.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "@types/q": "^1.5.2"
+  }
+}

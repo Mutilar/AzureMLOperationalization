@@ -1,28 +1,35 @@
 {
     "manifestVersion": 1,
-    "id": "run-notebook-extension",
+    "id": "build-release-task",
+    "name": "Run Notebook Test",
+    "version": "0.0.1",
     "publisher": "t-brhung",
-    "version": "1.0.0",
-    "name": "Run Notebook Extension",
-    "description": "An extension",
-    "public": false,
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "description": "Test for Running Notebooks",
     "categories": [
         "Azure Pipelines"
     ],
-    "targets": [
+    "icons": {
+        "default": "icon.png"        
+    },
+    "files": [
         {
-            "id": "Microsoft.VisualStudio.Services.Cloud"
+            "path": "buildAndReleaseTask"
         }
     ],
     "contributions": [
         {
-            "id": "run-notebook",
+            "id": "custom-build-release-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "Run Notebook Contrib"
+                "name": "buildAndReleaseTask"
             }
         }
     ]
