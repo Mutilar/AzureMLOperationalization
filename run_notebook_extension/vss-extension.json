@@ -1,15 +1,15 @@
 {
     "manifestVersion": 1,
     "id": "build-release-task",
-    "name": "Run Notebook Test",
-    "version": "0.0.1",
+    "name": "Agentlessly Run Notebook",
+    "version": "0.0.2",
     "publisher": "t-brhung",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
         }
     ],    
-    "description": "Test for Running Notebooks",
+    "description": "Agentlessly Running Notebooks via an Azure Function",
     "categories": [
         "Azure Pipelines"
     ],
