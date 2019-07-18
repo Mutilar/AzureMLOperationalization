@@ -28,12 +28,19 @@ def main(msg: func.ServiceBusMessage):
     # params = load(
     #    msg.get_body().decode("utf-8")
     # )
+    # https://docs.microsoft.com/en-us/python/api/azure-functions/azure.functions.servicebusmessage?view=azure-python
 
-    msg_raw = ""
+    msg_properties = ""
     try:
-        msg_raw = str(msg)
+        msg_properties = str(msg.user_properties)
     except Exception as e:    
-        msg_raw = str(e)
+        msg_properties = str(e)
+
+    msg_properties_decoded = ""
+    try:
+        msg_properties_decoded = str(msg.user_properties.decode("utf-8"))
+    except Exception as e:    
+        msg_properties_decoded = str(e)
 
     msg_body_raw = ""
     try:
@@ -53,7 +60,7 @@ def main(msg: func.ServiceBusMessage):
     except Exception as e:    
         msg_body_json = str(e)
 
-    raise Exception("message:" + msg_raw + "\nbody_raw" + msg_body_raw + "\nbody" + msg_body + "\njson" + msg_body_json) 
+    raise Exception("properties_decoded" + msg_properties_decoded + "\nproperties" + msg_properties + "\nbody_raw" + msg_body_raw + "\nbody" + msg_body + "\njson" + msg_body_json) 
         
     # "\n" + load( msg.get_body().decode("utf-8") ))
 
