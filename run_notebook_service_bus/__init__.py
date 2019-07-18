@@ -26,19 +26,19 @@ def main(msg: func.ServiceBusMessage):
 
 
     # Converts bytes into JSON
-    params = load(
-       msg.get_body().decode("utf-8")
-    )
+    # params = load(
+    #    msg.get_body().decode("utf-8")
+    # )
 
-    raise Exception(str(msg.get_body()) + "\n" + str(msg.get_body().decode("utf-8")) + "\n" + load( msg.get_body().decode("utf-8") ))
+    raise Exception(str(msg.get_body()) + "\n" + str(msg.get_body().decode("utf-8")) ) # "\n" + load( msg.get_body().decode("utf-8") ))
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
-    if params["job"] == START_BUILD:
-        start_build_pipeline(params)
+    # if params["job"] == START_BUILD:
+    #     start_build_pipeline(params)
     
-    # Updates telemetry in Azure DevOps, called from a Experiment Run
-    elif params["job"] == UPDATE_BUILD:
-        update_build_pipeline(params)
+    # # Updates telemetry in Azure DevOps, called from a Experiment Run
+    # elif params["job"] == UPDATE_BUILD:
+    #     update_build_pipeline(params)
 
 
 def start_build_pipeline(params):
