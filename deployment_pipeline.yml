@@ -49,10 +49,10 @@ stages:
     pool: server
     steps:
     # E2E TESTING
-    - task: PublishToAzureServiceBus@1
+    - task: RunNotebookTest@1
       inputs:
         azureSubscription: 'test'
-        messageBody: >
+        messageBody: |
           {
             "name": "$(name)",
             "job": "!START",
@@ -97,5 +97,4 @@ stages:
                 "task_id": "$(system.TaskInstanceId)"
               }
             }
-          }
         waitForCompletion: true
