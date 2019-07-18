@@ -52,7 +52,7 @@ stages:
     - task: RunNotebookTest@1
       inputs:
         azureSubscription: 'test'
-        messageBody: |
+        messageBody: >
           {
             "job": "!START",
             "auth_token": "$(system.AccessToken)",
@@ -96,4 +96,5 @@ stages:
                 "task_id": "$(system.TaskInstanceId)"
               }
             }
+          }
         waitForCompletion: true
