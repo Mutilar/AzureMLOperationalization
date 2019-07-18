@@ -29,7 +29,11 @@ def main(msg: func.ServiceBusMessage):
     # params = load(
     #    msg.get_body().decode("utf-8")
     # )
-    raise Exception(msg.get_body()) # "\n" + load( msg.get_body().decode("utf-8") ))
+    try:
+        pars = msg.get_properties().decode("utf-8")
+        print(load(pars))
+    except Exception as e:
+        raise Exception(e + "message:" + str(msg)) # "\n" + load( msg.get_body().decode("utf-8") ))
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     # if params["job"] == START_BUILD:
