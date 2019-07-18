@@ -1,0 +1,29 @@
+{
+    "manifestVersion": 1,
+    "id": "run-notebook-extension",
+    "publisher": "t-brhung",
+    "version": "1.0.0",
+    "name": "Run Notebook Extension",
+    "description": "An extension",
+    "public": false,
+    "categories": [
+        "Azure Pipelines"
+    ],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services.Cloud"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "run-notebook",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "Run Notebook Contrib"
+            }
+        }
+    ]
+}
