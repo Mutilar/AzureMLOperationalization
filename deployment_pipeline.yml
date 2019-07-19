@@ -52,49 +52,49 @@ stages:
     - task: RunNotebookTest@1
       inputs:
         azureSubscription: 'test'
-        messageBody: > 
-        {
-          "job": "!START",
-          "auth_token": "$(system.AccessToken)",
-          "build_id": "$(Build.BuildId)",
-          "run_config": {
-            "repo": "$(gh.repo)",
-            "version": "$(rp.version)",
-            "notebooks": "$(rp.notebooks)",
-            "conda_file": "$(rp.condaFile)",
-            "compute_target": "$(ex.compute)",
-            "base_image": "$(ex.image)"
-          },
-          "azure_resources": {
-            "organization": "$(do.organization)",
-            "project": "$(do.project)",
-            "run_id": "default_run_id",
-            "service_principal": {
-              "username": "$(sp.client)",
-              "tenant": "$(sp.tenant)",
-              "password": "$(sp.password)"
+        messageBody: >
+          {
+            "job": "!START",
+            "auth_token": "$(system.AccessToken)",
+            "build_id": "$(Build.BuildId)",
+            "run_config": {
+              "repo": "$(gh.repo)",
+              "version": "$(rp.version)",
+              "notebooks": "$(rp.notebooks)",
+              "conda_file": "$(rp.condaFile)",
+              "compute_target": "$(ex.compute)",
+              "base_image": "$(ex.image)"
             },
-            "workspace": {
-              "name": "$(ws.name)",
-              "subscription_id": "$(ws.subscription)",
-              "resource_group": "$(ws.resourceGroup)"
-            }
-          },
-          "wrap_up": {
-            "queue": {
-              "connection_string": "$(sb.connection)",
-              "name": "$(sb.name)"
+            "azure_resources": {
+              "organization": "$(do.organization)",
+              "project": "$(do.project)",
+              "run_id": "default_run_id",
+              "service_principal": {
+                "username": "$(sp.client)",
+                "tenant": "$(sp.tenant)",
+                "password": "$(sp.password)"
+              },
+              "workspace": {
+                "name": "$(ws.name)",
+                "subscription_id": "$(ws.subscription)",
+                "resource_group": "$(ws.resourceGroup)"
+              }
             },
-            "call_back": {
-              "error_message": "default_error_message",
-              "plan_url": "$(system.CollectionUri)",
-              "project_id": "$(system.TeamProjectId)", 
-              "hub_name": "$(system.HostType)",
-              "plan_id": "$(system.PlanId)",
-              "job_id": "$(system.JobId)",
-              "timeline_id": "$(system.TimelineId)",
-              "task_id": "$(system.TaskInstanceId)"
+            "wrap_up": {
+              "queue": {
+                "connection_string": "$(sb.connection)",
+                "name": "$(sb.name)"
+              },
+              "call_back": {
+                "error_message": "default_error_message",
+                "plan_url": "$(system.CollectionUri)",
+                "project_id": "$(system.TeamProjectId)", 
+                "hub_name": "$(system.HostType)",
+                "plan_id": "$(system.PlanId)",
+                "job_id": "$(system.JobId)",
+                "timeline_id": "$(system.TimelineId)",
+                "task_id": "$(system.TaskInstanceId)"
+              }
             }
           }
-        }
         waitForCompletion: true
