@@ -66,7 +66,7 @@ This file controls the CD pipeline for the Function App. It functions with two m
 >   - job: 
 >     pool: server
 >     steps:
->     - task: PublishToAzureServiceBus@1
+>     - task: RunNotebookTest@1
 > ```
 
 
