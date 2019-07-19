@@ -1,4 +1,5 @@
 import azure.functions as func
+from yaml import safe_load as load
 from base64 import b64encode as encode
 from time import sleep
 import sys
