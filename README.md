@@ -188,7 +188,7 @@ This script handles all unit-testing of the Function App before it is deployed. 
 | ex.image             	| Azure ML Compute's Target Image                      	| mcr.microsoft.com/azureml/base:intelmpi2018.3-ubuntu16.04         	| Azure ML SDK's RunConfig Module            	|
 | fx.azureSubscription 	| Azure Subscription for Function App                  	| ExampleSubscription(a1234567-89bc-0123-def4-abc56789def)          	| Function App's Overview                    	|
 | fx.name              	| Function App's Name                                  	| example-function-app                                              	| Function App's Mnemonic Name               	|
-| gh.repo              	| Location of GitHub Repository                        	| https://github.com/example/repo/archive/master.zip                	| GitHub Repository's Overview               	|
+| gh.repo              	| Location of GitHub Repository                        	| https://github.com/example/repo                                   	| GitHub Repository's Overview               	|
 | rp.condaFile         	| Repository's Conda File Location                     	| src/example-notebooks/environment.yml                             	| Repository's File Directory                	|
 | rp.notebooks         	| Repository's Notebooks to Run                        	| one.ipynb,two.ipynb,three.ipynb                                   	| Repository's File Directory                	|
 | rp.version           	| Repository's Commit/Branch of Interest               	| "bb7ad65dbc727ec09fe0613d51ce8585087de1b1", "master", "dev", etc. 	| GitHub Repository's Overview               	|
@@ -197,42 +197,24 @@ This script handles all unit-testing of the Function App before it is deployed. 
 | sp.client            	| Service Principal's Application (client) ID          	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                   	| App Registration's Overview                	|
 | sp.password          	| Service Principal's Password                         	| 32 character alphanumeric string (e.g. A/fb0...)                  	| App Registration's Client Secret           	|
 | sp.tenant            	| Service Principal's Directory (tenant) ID            	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                   	| App Registration's Overview                	|
-| system.collectionId  	|                                                      	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                   	| Preprovided                                	|
-| system.definitionId  	|                                                      	| 8                                                                 	| Preprovided                                	|
-| system.teamProject   	| Name of DevOps Project                               	| example-project                                                   	| Preprovided                                	|
 | ws.name              	| Machine Learning Workspace's Name                    	| example-ws-name                                                   	| Workspace's Mnemonic Name                  	|
 | ws.resourceGroup     	| Workspace's Resource Group's Name                    	| example-resource-group-name                                       	| Workspace's Overview                       	|
 | ws.subscription      	| Machine Learning Service Workspace's Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)                   	| Workspace's Overview                       	|
 
+# DevOps System Variables
 
-# OLD 
-
-
-
-| Name            	| Description                                          	| Example Value                                    	| Where To Find                              	|
-|-----------------	|------------------------------------------------------	|--------------------------------------------------	|--------------------------------------------	|
-| sb.connection   	| Service Bus Queue's Connection String                	| Endpoint=sb://example.servicebus.windows.net/... 	| Service Bus Queue's Shared Access Policies 	|
-| sb.name         	| Service Bus Queue's Name                             	| example-queue-name                               	| Service Bus Queue's Mnemonic Name          	|
-| sp.password     	| Service Principal's Password                         	| 32 character alphanumeric string (e.g. A/fb0...) 	| App Registration's Client Secret           	|
-| sp.client       	| Service Principal's Application (client) ID          	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
-| sp.tenant       	| Service Principal's Directory (tenant) ID            	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| App Registration's Overview                	|
-| ws.subscription 	| Machine Learning Service Workspace's Subscription ID 	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def)  	| Workspace's Overview                       	|
-
-## DevOps Pipeline Public Variables
-
-| Name                 	| Description                            	| Example Value                                                     	| Where To Find                       	|
-|----------------------	|----------------------------------------	|-------------------------------------------------------------------	|-------------------------------------	|
-| do.organization      	| DevOps Organization's Name             	| example-organization-name                                         	| DevOps Organization's Mnemonic Name 	|
-| do.project           	| DevOps Project's Name                  	| example-project-name                                              	| DevOps Project's Mnemonic Name      	|
-| ex.compute           	| Azure ML Compute Target's Name         	| example-compute                                                   	| Machine Learning Workspace's Assets 	|
-| fx.azureSubscription 	| Azure Subscription for Function App    	| ExampleSubscription(a1234567-89bc-0123-def4-abc56789def)          	| Function App's Overview             	|
-| fx.name              	| Function App's Name                    	| example-function-app                                              	| Function App's Mnemonic Name        	|
-| gh.repo              	| Location of GitHub Repository          	| https://github.com/example/repo/archive/master.zip                	| GitHub Repository's Overview        	|
-| ws.name              	| Machine Learning Workspace's Name      	| example-ws-name                                                   	| Workspace's Mnemonic Name           	|
-| ws.resourceGroup     	| Workspace's Resource Group's Name      	| example-resource-group-name                                       	| Workspace's Overview                	|
-| rp.condaFile         	| Repository's Conda File Location       	| src/example-notebooks/environment.yml                             	| Repository's File Directory         	|
-| rp.notebooks         	| Repository's Notebooks to Run          	| one.ipynb,two.ipynb,three.ipynb                                   	| Repository's File Directory         	|
-| rp.version           	| Repository's Commit/Branch of Interest 	| "master", "dev", "bb7ad65dbc727ec09fe0613d51ce8585087de1b1", etc. 	| GitHub Repository's Overview        	|
+system.AccessToken			
+system.collectionId		GUID (e.g. a1234567-89bc-0123-def4-abc56789def)
+system.CollectionUri			
+system.definitionId		
+system.HostType			
+system.JobId			
+system.PlanId			
+system.TaskInstanceId			
+system.TaskInstanceName			
+system.teamProject	Name of DevOps Project	example-project	Preprovided
+system.TeamProjectId			
+system.TimelineId	
 
 [functions-create-first-function-python]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python
 [install-azure-cli]: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
