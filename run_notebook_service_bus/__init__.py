@@ -26,9 +26,9 @@ def main(msg: func.ServiceBusMessage):
     # Converts bytes into JSON
     # https://docs.microsoft.com/en-us/python/api/azure-functions/azure.functions.servicebusmessage?view=azure-python
 
-    # params = msg.user_properties
-
-    raise Exception(msg.user_properties)
+    params = load(
+        msg.get_body().decode("utf-8")
+    )
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     if params["job"] == START_BUILD:
