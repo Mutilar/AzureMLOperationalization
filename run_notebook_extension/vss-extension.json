@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "build-release-task",
     "name": "Agentlessly Run Notebook",
-    "version": "0.1.1",
+    "version": "0.1.6",
     "publisher": "t-brhung",
     "targets": [
         {

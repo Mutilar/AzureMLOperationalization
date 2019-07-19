@@ -26,20 +26,24 @@ def main(msg: func.ServiceBusMessage):
 
     # Converts bytes into JSON
     # https://docs.microsoft.com/en-us/python/api/azure-functions/azure.functions.servicebusmessage?view=azure-python
+    try:
 
-    params = load(
-        msg.get_body().decode("utf-8")
-    )
+        params = load(
+            msg.get_body().decode("utf-8")
+        )
+        raise Exception("yes" + str(msg.user_properties) + "\n" + str(params))
 
-    raise Exception(str(msg.user_properties) + "\n" + str(params))
+    except Exception as e:
 
-    # Kicks off test runs to Azure ML Compute, called from a CI pipeline
-    if params["job"] == START_BUILD:
-        start_build_pipeline(params)
+        raise Exception("no" + str(msg.user_properties) + "\n" + str(msg.get_body().decode("utf-8")))
+
+    # # Kicks off test runs to Azure ML Compute, called from a CI pipeline
+    # if params["job"] == START_BUILD:
+    #     start_build_pipeline(params)
     
-    # # Updates telemetry in Azure DevOps, called from a Experiment Run
-    elif params["job"] == UPDATE_BUILD:
-        update_build_pipeline(params)
+    # # # Updates telemetry in Azure DevOps, called from a Experiment Run
+    # elif params["job"] == UPDATE_BUILD:
+    #     update_build_pipeline(params)
 
 
 def start_build_pipeline(params):
