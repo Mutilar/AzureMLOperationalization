@@ -1,7 +1,0 @@
-name: hello-world
-channels:
-- defaults
-dependencies:
-- python==3.6.8
-- pip:
-  - papermill==0.18.2
