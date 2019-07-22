@@ -107,9 +107,12 @@ def fetch_exp_status(exp):
     """ Determines the status of the pipeline by fetching all Runs and checking their status.
     """
 
+    dbg = ""
+
     all_finished = True
     any_failed = False
     for run in exp.get_runs():
+        dbg += str(run) + "\n"
 
         # Checks if any Runs are still running
         if any(flag is run.get_status() for flag in UNFINISHED_RUN):
@@ -121,5 +124,6 @@ def fetch_exp_status(exp):
 
     return {
         "finished": all_finished,
-        "failed": any_failed
+        "failed": any_failed,
+        "debug": dbg
     }
