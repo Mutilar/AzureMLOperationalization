@@ -19,16 +19,12 @@ FAILED_PIPELINE = "Failed"
 # Run Conditions for pipelines
 ALL_NOTEBOOKS_MUST_PASS = "all_pass"
 
-# Directories
-OUTPUT_NOTEBOOK_LOCATION = "snapshot/outputs/output.ipynb"
-
 def main(msg: func.ServiceBusMessage):
     """ Decodes ServiceBus message trigger and delegates to helper functions to handle
     two unique job cases: kick-off and wrap-up.
     """
 
     # Converts bytes into JSON
-    # https://docs.microsoft.com/en-us/python/api/azure-functions/azure.functions.servicebusmessage?view=azure-python
     params = load(
         msg.get_body().decode("utf-8")
     )
@@ -43,6 +39,11 @@ def main(msg: func.ServiceBusMessage):
 
 
 def start_build_pipeline(params):
+    """ Fetches the repository of interest, creates a new Experiment SDK Object,
+    and submits a set of notebook Runs to that object after injecting try-catch statements
+    to facilitate callbacks to the DevOps pipeline.
+    """
+
     rc_params = params["run_config"]
     az_params = params["azure_resources"]
     sp_params = az_params["service_principal"]
@@ -98,11 +99,15 @@ def start_build_pipeline(params):
         )
 
         # Marks Run with relevant properties
-        run.tag("file",notebook)
+        run.tag("file", notebook)
         run.tag("run_id", run_id)
 
 
 def update_build_pipeline(params):
+    """ Updates the DevOps Test Runs based on results from Azure ML Compute, 
+    and checks to close the pipeline in all Runs are completed.
+    """
+
     cb_params = params["wrap_up"]["call_back"]
     az_params = params["azure_resources"]
     sp_params = az_params["service_principal"]
@@ -131,9 +136,9 @@ def update_build_pipeline(params):
     # Download, scrub, and stream output notebook
     run.download_file(
         name="outputs/output.ipynb",
-        output_file_path=OUTPUT_NOTEBOOK_LOCATION
+        output_file_path="snapshot/outputs/output.ipynb"
     )
-    output_notebook_string = fh.remove_notebook_callback(OUTPUT_NOTEBOOK_LOCATION)
+    output_notebook_string = fh.remove_notebook_callback("snapshot/outputs/output.ipynb")
     output_notebook_stream = encode(output_notebook_string.encode("utf-8"))
 
     # Updates Test Results with Run's telemetry and output notebook

@@ -112,7 +112,7 @@ def fetch_exp_status(exp):
     all_finished = True
     any_failed = False
     for run in exp.get_runs():
-        dbg += str(run) + "\n"
+        dbg += run.get_status() + "\n"
 
         # Checks if any Runs are still running
         if any(flag is run.get_status() for flag in UNFINISHED_RUN):
