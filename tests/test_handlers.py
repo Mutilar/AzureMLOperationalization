@@ -1,7 +1,6 @@
 import sys
 sys.path.append("handlers")
 
-
 # File Handler Unit Tests
 # -----------------------
 
@@ -57,12 +56,3 @@ def test_notebook_try_catches():
             fh.get_file_str(NOTEBOOK_INPUT)
         )
     ) == fh.get_file_str(NOTEBOOK_INPUT)
-
-
-# Request Handler Unit Tests
-# -----------------------
-
-import devops_handler as dh
-
-
-# TODO:: validate json, url, header auth functions with example params

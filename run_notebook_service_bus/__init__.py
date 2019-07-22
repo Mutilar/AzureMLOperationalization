@@ -141,14 +141,14 @@ def update_build_pipeline(params):
             auth_token=params["auth_token"]
         )
 
+    # Allows for finalization of current Run
+    sleep(30) 
+
     # Gets current Run
     run = ah.fetch_run(
         exp=exp,
         run_id=az_params["run_id"]
     )
-    
-    # Allows for finalization of current Run
-    sleep(30) 
 
     # Download, scrub, and stream output notebook
     run.download_file(
