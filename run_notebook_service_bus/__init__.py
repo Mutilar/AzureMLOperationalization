@@ -190,4 +190,3 @@ def update_build_pipeline(params):
             job_id=cb_params["job_id"],
             auth_token=params["auth_token"]
         )
-    raise Exception (str(exp_status) + "\n")
