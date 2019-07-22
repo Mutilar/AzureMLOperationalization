@@ -29,6 +29,8 @@ def main(msg: func.ServiceBusMessage):
         msg.get_body().decode("utf-8")
     )
 
+    raise Exception (str(params))
+
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     if params["job"] == START_BUILD:
         start_build_pipeline(params)
