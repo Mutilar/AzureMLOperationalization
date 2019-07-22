@@ -112,9 +112,6 @@ def update_build_pipeline(params):
     az_params = params["azure_resources"]
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
-    
-    # Allows for finalization of current Run
-    sleep(120) 
 
     # Fetches Experiment to fetch Runs from
     exp = ah.fetch_exp(
@@ -127,12 +124,32 @@ def update_build_pipeline(params):
         build_id=params["build_id"]
     )
 
+    # Checks if all Runs have finished, and if any have failed
+    exp_status = ah.fetch_exp_status(exp)
+
+    # Closes pipeline if all Runs are finished
+    if exp_status["finished"] is True:
+        result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
+        dh.post_pipeline_callback(
+            result=result,
+            plan_url=cb_params["plan_url"],
+            project_id=cb_params["project_id"],
+            hub_name=cb_params["hub_name"],
+            plan_id=cb_params["plan_id"],
+            task_id=cb_params["task_id"],
+            job_id=cb_params["job_id"],
+            auth_token=params["auth_token"]
+        )
+
     # Gets current Run
     run = ah.fetch_run(
         exp=exp,
         run_id=az_params["run_id"]
     )
     
+    # Allows for finalization of current Run
+    sleep(30) 
+
     # Download, scrub, and stream output notebook
     run.download_file(
         name="outputs/output.ipynb",
@@ -173,20 +190,3 @@ def update_build_pipeline(params):
         run_id=az_params["run_id"], 
         auth_token=params["auth_token"]
     )
-
-    # Checks if all Runs have finished, and if any have failed
-    exp_status = ah.fetch_exp_status(exp)
-
-    # Closes pipeline if all Runs are finished
-    if exp_status["finished"] is True:
-        result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
-        dh.post_pipeline_callback(
-            result=result,
-            plan_url=cb_params["plan_url"],
-            project_id=cb_params["project_id"],
-            hub_name=cb_params["hub_name"],
-            plan_id=cb_params["plan_id"],
-            task_id=cb_params["task_id"],
-            job_id=cb_params["job_id"],
-            auth_token=params["auth_token"]
-        )
