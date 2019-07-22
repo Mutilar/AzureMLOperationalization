@@ -23,6 +23,9 @@ ALL_NOTEBOOKS_MUST_PASS = "all_pass"
 OUTPUT_NOTEBOOK_LOCATION = "snapshot/outputs/output.ipynb"
 
 def main(msg: func.ServiceBusMessage):
+    """ Decodes ServiceBus message trigger and delegates to helper functions to handle
+    two unique job cases: kick-off and wrap-up.
+    """
 
     # Converts bytes into JSON
     # https://docs.microsoft.com/en-us/python/api/azure-functions/azure.functions.servicebusmessage?view=azure-python
@@ -182,3 +185,4 @@ def update_build_pipeline(params):
             job_id=cb_params["job_id"],
             auth_token=params["auth_token"]
         )
+    raise Exception (str(exp_status) + "\n")
