@@ -29,7 +29,7 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > > - ```azureml_handler.py```
 > > > - ```devops_handler.py```
 > > > - ```file_handler.py```
-> > - tests
+> > - unit_testing
 > > > - ```test_handlers.py```
 > > - ```deployment_pipeline.yml```
 > > - ```requirements.txt``` 
@@ -90,11 +90,11 @@ When deploying the function app, these are injected into the package, as seem in
 pip3.6 install -r requirements.txt
 ```
 
-## ```function.json```
+## ```run_notebook_service_bus/function.json```
 
-This file specifies the location of main function (e.g. ```__init__.py```), as well as the Service Bus binding for the application.
+This file specifies the location of main function (e.g. ```__init__.py```), as well as the Service Bus binding for the function.
 
-## ```__init__.py```
+## ```run_notebook_service_bus/__init__.py```
 
 This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the distinct job types: ```start_build_pipeline()``` and ```update_build_pipeline()```. 
 
@@ -106,7 +106,7 @@ This script holds all the pythonic logic of the application. The main function i
 > 
 > Updates the DevOps Test Runs based on results from Azure ML Compute, and checks to close the pipeline in all Runs are completed.
 
-## ```azureml_handler.py```
+## ```handlers/azureml_handler.py```
 
 This script handles all Azure ML SDK-related logic, including ```fetch_exp()```, ```fetch_run_config()```, and ```submit_run()```, which all manage Azure ML Workspace-related tasks.
 
@@ -130,7 +130,7 @@ This script handles all Azure ML SDK-related logic, including ```fetch_exp()```,
 >
 > This function determines the status of the pipeline by [fetching all Runs](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py#get-runs-type-none--tags-none--properties-none--include-children-false-) and [checking their status](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.run.run?view=azure-ml-py#get-status--)
 
-## ```devops_handler.py```
+## ```handlers/devops_handler.py```
 
 This script handles all DevOps related tasks, including ```post_pipeline_callback()```, ```post_new_run()```, ```patch_run_update()```, and ```post_run_results()```.
 
@@ -154,7 +154,7 @@ This script handles all DevOps related tasks, including ```post_pipeline_callbac
 >
 > This function, along with its helper functions, [adds a DevOps Test Run Result](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
 
-## ```file_handler.py```
+## ```handlers/file_handler.py```
 
 This script handles all file IO related tasks, including ```fetch_repo()```, ```add_pip_dependency()```, and ```add_notebook_callback()```.
 
@@ -172,9 +172,13 @@ This script handles all file IO related tasks, including ```fetch_repo()```, ```
 > 
 > *Note: this is a not an "ideal" solution from an architectural perspective, but a more platform-level, agnostic approach (e.g. with Event Grid integration for triggering the Function) is currently out of scope.*
 
-## ```test_handlers.py```
+> #### ```remove_notebook_callback()```
+>
+> This function removes try-catches around each code-block of a notebook after the notebook has been executed in Azure ML Compute so that results can be displayed cleanly in Azure DevOps. 
 
-This script handles all unit-testing of the Function App before it is deployed. Currently, unit tests only cover ```file_handler.py```-specific functions, as all other functions are very primitive. 
+## ```unit_testing/test_handlers.py```
+
+This script handles all unit-testing of the Function App before it is deployed.
 
 # Glossary
 
