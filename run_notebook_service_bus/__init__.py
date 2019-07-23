@@ -134,7 +134,7 @@ def update_build_pipeline(params):
         result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
         dh.post_pipeline_callback(
             result=result,
-            plan_url=cb_params["plan_url"],
+            organization=az_params["organization"],
             project_id=cb_params["project_id"],
             hub_name=cb_params["hub_name"],
             plan_id=cb_params["plan_id"],
