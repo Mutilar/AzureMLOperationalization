@@ -207,18 +207,14 @@ This script handles all unit-testing of the Function App before it is deployed.
 
 # DevOps System Variables
 
-system.AccessToken			
-system.collectionId		GUID (e.g. a1234567-89bc-0123-def4-abc56789def)
-system.CollectionUri			
-system.definitionId		
-system.HostType			
-system.JobId			
-system.PlanId			
-system.TaskInstanceId			
-system.TaskInstanceName			
-system.teamProject	Name of DevOps Project	example-project	Preprovided
-system.TeamProjectId			
-system.TimelineId	
+| Name                  	| Description                              	| Example Value                                   	|
+|-----------------------	|------------------------------------------	|-------------------------------------------------	|
+| system.AccessToken    	| Bearer Token to Authenticate with DevOps 	| Long Opaque String                              	|
+| system.HostType       	| DevOps Pipeline Type                     	| "build"                                         	|
+| system.JobId          	| DevOps Pipeline Identifier               	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def) 	|
+| system.PlanId         	| DevOps Pipeline Identifier               	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def) 	|
+| system.TaskInstanceId 	| DevOps Pipeline Identifier               	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def) 	|
+| system.TeamProjectId  	| DevOps Pipeline Identifier               	| GUID (e.g. a1234567-89bc-0123-def4-abc56789def) 	|
 
 [functions-create-first-function-python]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python
 [install-azure-cli]: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
