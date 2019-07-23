@@ -6,13 +6,13 @@ sys.path.append("handlers")
 
 import file_handler as fh
 
-FILE_INPUT = "./unit_testing/hello-world.txt"
+FILE_INPUT = "./unit_testing/hello_world.txt"
 
-CONDA_INPUT = "./unit_testing/conda-files/inputs/hello-world.yml"
-CONDA_OUTPUT = "./unit_testing/conda-files/outputs/hello-world.yml"
+CONDA_INPUT = "./unit_testing/conda_files/inputs/hello_world.yml"
+CONDA_OUTPUT = "./unit_testing/conda_files/outputs/hello_world.yml"
 
-NOTEBOOK_INPUT = "./unit_testing/notebooks/inputs/hello-world.ipynb"
-NOTEBOOK_OUTPUT = "./unit_testing/notebooks/outputs/hello-world.ipynb"
+NOTEBOOK_INPUT = "./unit_testing/notebooks/inputs/hello_world.ipynb"
+NOTEBOOK_OUTPUT = "./unit_testing/notebooks/outputs/hello_world.ipynb"
 
 
 def test_get_file_str():
