@@ -142,7 +142,7 @@ def update_build_pipeline(params):
         )
 
     # Allows for finalization of current Run
-    sleep(30) 
+    sleep(45) 
 
     # Gets current Run
     run = ah.fetch_run(
