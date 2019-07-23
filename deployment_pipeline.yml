@@ -49,7 +49,6 @@ stages:
     pool: server
     steps:
     # E2E TESTING
-    - task: RunNotebookTest@1
+    - task: RunNotebook@1
       inputs:
         azureSubscription: 'test'
-        waitForCompletion: true
