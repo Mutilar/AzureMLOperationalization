@@ -1,7 +1,7 @@
 import requests
 
 
-def post_pipeline_callback(result, organization, project_id, hub_name, plan_id, task_id, job_id, auth_token):
+def post_pipeline_callback(result, organization, project, hub_name, plan_id, task_id, job_id, auth_token):
     return requests.post(
         get_pipeline_callback_url(organization, project_id, hub_name, plan_id),
         json=get_pipeline_callback_json(result, task_id, job_id),
@@ -41,8 +41,8 @@ def post_run_results(error_message, run_details, organization, project, run_id, 
     )
 
 
-def get_pipeline_callback_url(organization, project_id, hub_name, plan_id):
-    return f'https://dev.azure.com/{organization}/{project_id}/_apis/distributedtask/hubs/{hub_name}/plans/{plan_id}/events?api-version=2.0-preview.1'
+def get_pipeline_callback_url(organization, project, hub_name, plan_id):
+    return f'https://dev.azure.com/{organization}/{project}/_apis/distributedtask/hubs/{hub_name}/plans/{plan_id}/events?api-version=2.0-preview.1'
 
 
 def get_new_run_url(organization, project):

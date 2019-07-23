@@ -133,7 +133,7 @@ def update_build_pipeline(params):
         dh.post_pipeline_callback(
             result=result,
             organization=az_params["organization"],
-            project_id=cb_params["project_id"],
+            project=az_params["project"],
             hub_name=cb_params["hub_name"],
             plan_id=cb_params["plan_id"],
             task_id=cb_params["task_id"],
