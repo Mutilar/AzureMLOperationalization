@@ -19,6 +19,7 @@ FAILED_PIPELINE = "Failed"
 # Run Conditions for pipelines
 ALL_NOTEBOOKS_MUST_PASS = "all_pass"
 
+
 def main(msg: func.ServiceBusMessage):
     """ Decodes ServiceBus message trigger and delegates to helper functions to handle
     two unique job cases: kick-off and wrap-up.
@@ -32,7 +33,7 @@ def main(msg: func.ServiceBusMessage):
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     if params["job"] == START_BUILD:
         start_build_pipeline(params)
-    
+
     # Updates telemetry in Azure DevOps, called from a Experiment Run
     elif params["job"] == UPDATE_BUILD:
         update_build_pipeline(params)
@@ -59,7 +60,7 @@ def start_build_pipeline(params):
         dependency="azure-servicebus"
     )
 
-    # Fetches Experiment to submit Runs on
+    # Fetches Experiment to submit runs on
     exp = ah.fetch_exp(
         sp_username=sp_params["username"],
         sp_tenant=sp_params["tenant"],
@@ -70,6 +71,7 @@ def start_build_pipeline(params):
         build_id=params["build_id"]
     )
 
+    # Submits notebook runs to Experiment, delimiting by commas
     for notebook in rc_params["notebooks"].split(","):
 
         # Creates new DevOps Test Run
@@ -97,7 +99,7 @@ def start_build_pipeline(params):
             compute_target=rc_params["compute_target"],
             base_image=rc_params["base_image"]
         )
-
+        
         # Marks Run with relevant properties
         run.tag("file", notebook)
         run.tag("run_id", run_id)
@@ -105,7 +107,7 @@ def start_build_pipeline(params):
 
 def update_build_pipeline(params):
     """ Updates the DevOps Test Runs based on results from Azure ML Compute, 
-    and checks to close the pipeline in all Runs are completed.
+    and checks to close the pipeline if all Runs are completed.
     """
 
     cb_params = params["wrap_up"]["call_back"]
