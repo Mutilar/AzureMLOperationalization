@@ -165,7 +165,7 @@ def update_build_pipeline(params):
     logs = run.get_all_logs("snapshot/outputs/")
     for log in logs:
         log_stream = encode(fh.get_file_str(log).encode("utf-8"))
-        dh.post_run_attachment(
+        r = dh.post_run_attachment(
             file_name=log,
             stream=log_stream,
             organization=az_params["organization"],
@@ -173,8 +173,9 @@ def update_build_pipeline(params):
             run_id=az_params["run_id"],
             auth_token=params["auth_token"]
         )
+        raise Exception (str(r) + str(r.status_code) + str(r.text))
 
-    raise Exception (str(logs) + "\n" + str(os.listdir("./snapshot/outputs/")))
+   
     dh.post_run_attachment(
         file_name="output.txt",
         stream=output_notebook_stream,
