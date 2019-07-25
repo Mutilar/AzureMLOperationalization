@@ -35,24 +35,24 @@ def test_inject_pip_dependency():
     ) == fh.get_file_str(CONDA_OUTPUT)
 
 
-def test_notebook_try_catches():
+# def test_notebook_try_catches():
 
-    assert fh.inject_notebook_try_catches(
-        fh.get_file_str(NOTEBOOK_INPUT)
-    ) == fh.get_file_str(NOTEBOOK_OUTPUT)
+#     assert fh.inject_notebook_try_catches(
+#         fh.get_file_str(NOTEBOOK_INPUT)
+#     ) == fh.get_file_str(NOTEBOOK_OUTPUT)
 
-    assert fh.scrub_notebook_try_catches(
-        fh.get_file_str(NOTEBOOK_OUTPUT)
-    ) == fh.get_file_str(NOTEBOOK_INPUT)
+#     assert fh.scrub_notebook_try_catches(
+#         fh.get_file_str(NOTEBOOK_OUTPUT)
+#     ) == fh.get_file_str(NOTEBOOK_INPUT)
 
-    assert fh.inject_notebook_try_catches(
-        fh.scrub_notebook_try_catches(
-            fh.get_file_str(NOTEBOOK_OUTPUT)
-        )
-    ) == fh.get_file_str(NOTEBOOK_OUTPUT)
+#     assert fh.inject_notebook_try_catches(
+#         fh.scrub_notebook_try_catches(
+#             fh.get_file_str(NOTEBOOK_OUTPUT)
+#         )
+#     ) == fh.get_file_str(NOTEBOOK_OUTPUT)
 
-    assert fh.scrub_notebook_try_catches(
-        fh.inject_notebook_try_catches(
-            fh.get_file_str(NOTEBOOK_INPUT)
-        )
-    ) == fh.get_file_str(NOTEBOOK_INPUT)
+#     assert fh.scrub_notebook_try_catches(
+#         fh.inject_notebook_try_catches(
+#             fh.get_file_str(NOTEBOOK_INPUT)
+#         )
+#     ) == fh.get_file_str(NOTEBOOK_INPUT)
