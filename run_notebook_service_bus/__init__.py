@@ -153,6 +153,19 @@ def update_build_pipeline(params):
         run_id=az_params["run_id"]
     )
 
+    # Updates Test Results with Run's output logs
+    logs = run.get_all_logs("snapshot/outputs/")
+    for log in logs:
+        log_stream = encode(fh.get_file_str(log).encode("utf-8"))
+        r = dh.post_run_attachment(
+            file_name=log.split("/")[-1],
+            stream=log_stream,
+            organization=az_params["organization"],
+            project=az_params["project"],
+            run_id=az_params["run_id"],
+            auth_token=params["auth_token"]
+        )
+   
     # Download, scrub, and stream output notebook
     run.download_file(
         name="outputs/output.ipynb",
@@ -161,21 +174,6 @@ def update_build_pipeline(params):
     output_notebook_string = fh.remove_notebook_callback("snapshot/outputs/output.ipynb")
     output_notebook_stream = encode(output_notebook_string.encode("utf-8"))
 
-    # Updates Test Results with Run's telemetry and output notebook
-    logs = run.get_all_logs("snapshot/outputs/")
-    for log in logs:
-        log_stream = encode(fh.get_file_str(log).encode("utf-8"))
-        r = dh.post_run_attachment(
-            file_name=log,
-            stream=log_stream,
-            organization=az_params["organization"],
-            project=az_params["project"],
-            run_id=az_params["run_id"],
-            auth_token=params["auth_token"]
-        )
-        raise Exception (str(r) + str(r.status_code) + str(r.text))
-
-   
     dh.post_run_attachment(
         file_name="output.txt",
         stream=output_notebook_stream,
