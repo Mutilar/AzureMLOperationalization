@@ -3,6 +3,7 @@ from yaml import safe_load as load
 from base64 import b64encode as encode
 from time import sleep
 import sys
+import os
 sys.path.append("handlers")
 import file_handler as fh
 import azureml_handler as ah
@@ -172,6 +173,8 @@ def update_build_pipeline(params):
             run_id=az_params["run_id"],
             auth_token=params["auth_token"]
         )
+
+    raise Exception (str(logs) + "\n" + str(os.listdir("./snapshot/outputs/")))
     dh.post_run_attachment(
         file_name="output.txt",
         stream=output_notebook_stream,
