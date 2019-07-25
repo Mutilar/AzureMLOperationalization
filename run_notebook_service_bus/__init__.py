@@ -163,7 +163,7 @@ def update_build_pipeline(params):
     # Updates Test Results with Run's telemetry and output notebook
     logs = run.get_all_logs("snapshot/outputs/")
     for log in logs:
-        log_stream = encode(fh.get_file_str("snapshot/outputs/" + log).encode("utf-8"))
+        log_stream = encode(fh.get_file_str(log).encode("utf-8"))
         dh.post_run_attachment(
             file_name=log,
             stream=log_stream,
