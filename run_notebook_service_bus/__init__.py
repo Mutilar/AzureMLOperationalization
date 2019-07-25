@@ -172,6 +172,7 @@ def update_build_pipeline(params):
             run_id=az_params["run_id"],
             auth_token=params["auth_token"]
         )
+    raise Exception (str(logs))
     dh.post_run_attachment(
         file_name="output.txt",
         stream=output_notebook_stream,
