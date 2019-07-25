@@ -161,8 +161,19 @@ def update_build_pipeline(params):
     output_notebook_stream = encode(output_notebook_string.encode("utf-8"))
 
     # Updates Test Results with Run's telemetry and output notebook
+    logs = run.get_all_logs("snapshot/outputs/")
+    for log in logs:
+        log_stream = encode(fh.get_file_str("snapshot/outputs/" + log).encode("utf-8"))
+        dh.post_run_attachment(
+            file_name=log,
+            stream=log_stream,
+            organization=az_params["organization"],
+            project=az_params["project"],
+            run_id=az_params["run_id"],
+            auth_token=params["auth_token"]
+        )
     dh.post_run_attachment(
-        file_name="output.ipynb",
+        file_name="output.txt",
         stream=output_notebook_stream,
         organization=az_params["organization"],
         project=az_params["project"],
@@ -170,7 +181,7 @@ def update_build_pipeline(params):
         auth_token=params["auth_token"]
     )
     dh.post_run_attachment(
-        file_name="output.txt",
+        file_name="output.ipynb",
         stream=output_notebook_stream,
         organization=az_params["organization"],
         project=az_params["project"],
