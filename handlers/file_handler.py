@@ -58,7 +58,7 @@ def add_notebook_callback(params, notebook, run_id):
     notebook_file_location = "./snapshot/inputs/" + notebook
 
     # Opens the notebook
-    notebook = Notebook(
+    notebook = nh.Notebook(
         get_file_str(notebook_file_location)
     )
     
@@ -126,7 +126,7 @@ def remove_notebook_callback(notebook_file_location):
     """
 
     # Opens the notebook
-    notebook = Notebook(
+    notebook = nh.Notebook(
         get_file_str(notebook_file_location)
     )
     
