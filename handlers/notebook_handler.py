@@ -91,8 +91,16 @@ class Notebook:
         """ Removes all lines of code injected by inject_code from a collection of specified code cells
         """
 
+        inside_injected_code = False
+
         for cell in cells:
-            while ["#INJECTED CODE START\n"] in self.notebook_json["cells"][cell]["source"]:
-                injection_start = self.notebook_json["cells"][cell]["source"].index(["#INJECTED CODE START\n"])
-                injection_end = self.notebook_json["cells"][cell]["source"].index(["#INJECTED CODE END\n"])
-                del self.notebook_json["cells"][cell]["source"][injection_start:injection_end]
+            counter = 0
+            cell_size = len(self.notebook_json["cells"][cell]["source"])
+            while counter < cell_size:
+                if self.notebook_json["cells"][cell]["source"][counter] == "#INJECTED CODE START\n":
+                    inside_injected_code = True
+                if inside_injected_code: 
+                    if self.notebook_json["cells"][cell]["source"][counter] == "#INJECTED CODE END\n":
+                        inside_injected_code = False
+                    del self.notebook_json["cells"][cell]["source"][counter]
+                counter += 1
