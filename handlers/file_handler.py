@@ -64,49 +64,49 @@ def add_notebook_callback(params, notebook, run_id):
     
     # Indents code to prepare for try catches
     notebook.indent_code(
-        notebook.get_cells("EVERY")
+        cells=notebook.get_cells(nh.EVERY_CELL)
     )
 
     # Injects try catches with failure callbacks
     notebook.inject_code(
-        notebook.get_cells("EVERY"),
-        "FRONT",
-        [
-            "try:\n"
+        cells=notebook.get_cells(nh.EVERY_CELL),
+        position=nh.BEGINNING_OF_CELL,
+        code=[
+            "try:"
         ]
     )
     notebook.inject_code(
-        notebook.get_cells("EVERY"),
-        "BACK",
-        [
-            "except Exception as e:\n",
-            nh.TAB + "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\n",
-            nh.TAB + "_msg = Message(_params.replace(\"default_error_message\", str(e).replace(\"\\\'\",\"\\\"\")))\n",
-            nh.TAB + "_queue_client.send(_msg)\n",
-            nh.TAB + "raise Exception(e)\n"
+        cells=notebook.get_cells(nh.EVERY_CELL),
+        position=nh.END_OF_CELL,
+        code=[
+            "except Exception as e:",
+            nh.TAB + "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)",
+            nh.TAB + "_msg = Message(_params.replace(\"default_error_message\", str(e).replace(\"\\\'\",\"\\\"\")))",
+            nh.TAB + "_queue_client.send(_msg)",
+            nh.TAB + "raise Exception(e)"
         ]
     )
     
     # Injects callback parameters
     notebook.inject_code(
-        notebook.get_cells("FIRST"),
-        "FRONT",
-        [
-            "from azure.servicebus import QueueClient, Message\n",
-            "_connection_string = \'!CONNECTION_STRING\'\n",
-            "_queue_name = \'!NAME\'\n",
-            "_params = \'!PARAMS\'\n",
+        cells=notebook.get_cells(nh.FIRST_CELL),
+        position=nh.BEGINNING_OF_CELL,
+        code=[
+            "from azure.servicebus import QueueClient, Message",
+            "_connection_string = \'!CONNECTION_STRING\'",
+            "_queue_name = \'!NAME\'",
+            "_params = \'!PARAMS\'",
         ]
     )
 
     # Injects success callback
     notebook.inject_code(
-        notebook.get_cells("LAST"),
-        "BACK",
-        [
-            "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\n",
-            "_msg = Message(_params.replace(\"default_error_message\",\"Ran successfully\"))\n",
-            "_queue_client.send(_msg)\n"
+        cells=notebook.get_cells(nh.LAST_CELL),
+        position=nh.END_OF_CELL,
+        code=[
+            "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)",
+            "_msg = Message(_params.replace(\"default_error_message\",\"Ran successfully\"))",
+            "_queue_client.send(_msg)"
         ]
     )
 
@@ -132,12 +132,12 @@ def remove_notebook_callback(notebook_file_location):
     
     # Removes injected code
     notebook.scrub_code(
-        notebook.get_cells("EVERY")
+        notebook.get_cells(nh.EVERY_CELL)
     )
 
     # Removes indentation (should only be called if "indent_code" is called previously)
     notebook.unindent_code(
-        notebook.get_cells("EVERY")
+        notebook.get_cells(nh.EVERY_CELL)
     )
 
     # Scrubs try-catches and returns string

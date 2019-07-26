@@ -2,6 +2,16 @@ import json
 
 TAB = "    "
 
+FIRST_CELL = "FIRST"
+LAST_CELL = "LAST"
+EVERY_CELL = "EVERY"
+
+BEGINNING_OF_CELL = "FRONT"
+END_OF_CELL = "BACK"
+
+INJECTED_CODE_START = "#INJECTED CODE START\n"
+INJECTED_CODE_END = "#INJECTED CODE END\n"
+
 
 class Notebook:
 
@@ -20,22 +30,22 @@ class Notebook:
         return str(json.dumps(self.notebook_json, indent=1))
 
 
-    def get_cells(self, position = "FIRST"):
+    def get_cells(self, position):
         """ Collecting a list of indices of cells to inject/indent in.
         """
 
         indices = []
-        if position == "FIRST":
+        if position == FIRST_CELL:
             counter = 0
             while self.notebook_json["cells"][counter]["cell_type"] != "code":
                 counter += 1
             indices.append(counter)
-        elif position == "LAST":
+        elif position == LAST_CELL:
             counter = -1
             while self.notebook_json["cells"][counter]["cell_type"] != "code":
                 counter -= 1
             indices.append(counter)
-        elif position == "EVERY":
+        elif position == EVERY_CELL:
             indices = []
             counter = 0
             for cell in self.notebook_json["cells"]:
@@ -45,7 +55,7 @@ class Notebook:
         return indices
 
 
-    def indent_code(self, cells = []):
+    def indent_code(self, cells):
         """ Adds a tab before every line of code.
         """
 
@@ -59,7 +69,7 @@ class Notebook:
                 counter += 1
 
 
-    def unindent_code(self, cells = []):
+    def unindent_code(self, cells):
         """ Removes a tab before every line of code from a collection of specified code cells.
         This is not a smart function, and should only be called if indent_code is called first.
         """
@@ -74,19 +84,26 @@ class Notebook:
                 counter += 1
 
 
-    def inject_code(self, cells = [], position = "FRONT", code = []):
+    def inject_code(self, cells, position, code):
         """ Adds a collection of lines of code at the front of back of a collection of specified code cells
         """
 
+        # Adds carriage return to each line
+        line = 0
+        num_lines = len(code)
+        while line < num_lines:
+            code[line] = code[line] + "\n"
+            line += 1
+
         for cell in cells:
-            if position == "FRONT":
-                self.notebook_json["cells"][cell]["source"] = ["#INJECTED CODE START\n"] + code + ["#INJECTED CODE END\n"] + self.notebook_json["cells"][cell]["source"]
-            elif position == "BACK":
+            if position == BEGINNING_OF_CELL:
+                self.notebook_json["cells"][cell]["source"] = [INJECTED_CODE_START] + code + [INJECTED_CODE_END] + self.notebook_json["cells"][cell]["source"]
+            elif position == END_OF_CELL:
                 self.notebook_json["cells"][cell]["source"][-1] = self.notebook_json["cells"][cell]["source"][-1] + "\n"
-                self.notebook_json["cells"][cell]["source"] = self.notebook_json["cells"][cell]["source"] + ["#INJECTED CODE START\n"] + code + ["#INJECTED CODE END\n"]
+                self.notebook_json["cells"][cell]["source"] = self.notebook_json["cells"][cell]["source"] + [INJECTED_CODE_START] + code + [INJECTED_CODE_END]
 
 
-    def scrub_code(self, cells = []):
+    def scrub_code(self, cells):
         """ Removes all lines of code injected by inject_code from a collection of specified code cells
         """
 
@@ -96,10 +113,10 @@ class Notebook:
             counter = 0
             cell_size = len(self.notebook_json["cells"][cell]["source"])
             while counter < cell_size:
-                if self.notebook_json["cells"][cell]["source"][counter] == "#INJECTED CODE START\n":
+                if self.notebook_json["cells"][cell]["source"][counter] == INJECTED_CODE_START:
                     inside_injected_code = True
                 if inside_injected_code: 
-                    if self.notebook_json["cells"][cell]["source"][counter] == "#INJECTED CODE END\n":
+                    if self.notebook_json["cells"][cell]["source"][counter] == INJECTED_CODE_END:
                         inside_injected_code = False
                     del self.notebook_json["cells"][cell]["source"][counter]
                     cell_size -= 1
