@@ -83,7 +83,7 @@ def add_notebook_callback(params, notebook, run_id):
             nh.TAB + "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\n",
             nh.TAB + "_msg = Message(_params.replace(\"default_error_message\", str(e).replace(\"\\\'\",\"\\\"\")))\n",
             nh.TAB + "_queue_client.send(_msg)\n",
-            nh.TAB + "raise Exception(e)"
+            nh.TAB + "raise Exception(e)\n"
         ]
     )
     
@@ -106,7 +106,7 @@ def add_notebook_callback(params, notebook, run_id):
         [
             "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)\n",
             "_msg = Message(_params.replace(\"default_error_message\",\"Ran successfully\"))\n",
-            "_queue_client.send(_msg)"
+            "_queue_client.send(_msg)\n"
         ]
     )
 
