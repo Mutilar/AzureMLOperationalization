@@ -1,5 +1,4 @@
 import json
-import file_handler as fh
 
 TAB = "    "
 
