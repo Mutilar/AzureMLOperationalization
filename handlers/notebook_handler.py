@@ -104,5 +104,6 @@ class Notebook:
                         inside_injected_code = False
                     del self.notebook_json["cells"][cell]["source"][counter]
                     cell_size -= 1
-                counter += 1
+                else:
+                    counter += 1
  
