@@ -93,6 +93,6 @@ class Notebook:
 
         for cell in cells:
             while ["#INJECTED CODE START\n"] in self.notebook_json["cells"][cell]["source"]:
-                injection_start = self.notebook_json["cells"][cell]["source"].index("#INJECTED CODE START\n")
-                injection_end = self.notebook_json["cells"][cell]["source"].index("#INJECTED CODE END\n")
+                injection_start = self.notebook_json["cells"][cell]["source"].index(["#INJECTED CODE START\n"])
+                injection_end = self.notebook_json["cells"][cell]["source"].index(["#INJECTED CODE END\n"])
                 del self.notebook_json["cells"][cell]["source"][injection_start:injection_end]
