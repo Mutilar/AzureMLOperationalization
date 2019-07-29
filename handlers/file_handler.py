@@ -94,14 +94,14 @@ def add_notebook_callback(params, notebook, run_id):
         position=nh.BEGINNING_OF_CELL,
         code=[
             "#SP AUTHENTICATION",
-            "from azureml._base_sdk_common.common import perform_interactive_login"
+            "from azureml._base_sdk_common.common import perform_interactive_login",
             "perform_interactive_login(",
             nh.TAB + "username=\"" + params["azure_resources"]["service_principal"]["username"] + "\",",
             nh.TAB + "tenant=\"" + params["azure_resources"]["service_principal"]["tenant"] + "\",",
             nh.TAB + "password=\"" + params["azure_resources"]["service_principal"]["password"] + "\",",
             nh.TAB + "service_principal=True"
             ")",
-            "#CALLBACK PARAMETERS"
+            "#CALLBACK PARAMETERS",
             "from azure.servicebus import QueueClient, Message",
             "_connection_string = \'!CONNECTION_STRING\'",
             "_queue_name = \'!NAME\'",
