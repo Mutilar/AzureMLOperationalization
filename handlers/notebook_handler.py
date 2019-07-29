@@ -105,13 +105,8 @@ class Notebook:
 
     def scrub_code(self, cells):
         """ Removes all lines of code injected by inject_code from a collection of specified code cells.
+        Also removes injected code cells from the beginning and end of the notebook.
         """
-
-        # Remove injected cells
-        for position in [0, -1]:
-            if self.notebook_json["cells"][position]["cell_type"] == "code":
-                if self.notebook_json["cells"][position]["source"][0] == INJECTED_CELL:
-                        del self.notebook_json["cells"][position]
 
         # Remove injected code
         inside_injected_code = False
@@ -128,9 +123,13 @@ class Notebook:
                     cell_size -= 1
                 else:
                     counter += 1
-        
-        # Check for injected cells as well...
-        # ...
+
+        # Remove injected cells
+        for position in [0, -1]:
+            if self.notebook_json["cells"][position]["cell_type"] == "code":
+                if self.notebook_json["cells"][position]["source"][0] == INJECTED_CELL:
+                        del self.notebook_json["cells"][position]
+
 
     def inject_cell(self, position, code):
         """ Add new code cell for pre- or post-execution scripts.
