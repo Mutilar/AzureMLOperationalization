@@ -29,6 +29,7 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > > - ```azureml_handler.py```
 > > > - ```devops_handler.py```
 > > > - ```file_handler.py```
+> > > - ```notebook_handler.py```
 > > - unit_testing
 > > > - ```test_handlers.py```
 > > - ```deployment_pipeline.yml```
@@ -175,6 +176,22 @@ This script handles all file IO related tasks, including ```fetch_repo()```, ```
 > #### ```remove_notebook_callback()```
 >
 > This function removes try-catches around each code-block of a notebook after the notebook has been executed in Azure ML Compute so that results can be displayed cleanly in Azure DevOps. 
+
+## ```handlers/notebook_handler.py```
+
+This class, ```Notebook```, handles all code manipulation for notebooks to be fed to Azure ML Compute, including ```inject_code()```, ```inject_cell()```, and ```scrub_code()```.
+
+> #### ```inject_code()```
+>
+> This function adds a collection of lines of code at the front or back of a collection of specified code cells.
+
+> #### ```inject_cell()```
+>
+> This function adds new code cell for pre- or post-execution scripts.
+
+> #### ```scrub_code()```
+>
+> This function removes all lines of code injected by inject_code from a collection of specified code cells. It also removes injected code cells from the beginning and end of the notebook.
 
 ## ```unit_testing/test_handlers.py```
 

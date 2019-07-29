@@ -36,7 +36,7 @@ class Notebook:
 
 
     def get_cells(self, position):
-        """ Collecting a list of indices of cells to inject/indent in.
+        """ Collects a list of indices of cells to inject/indent in.
         """
 
         indices = []
@@ -90,7 +90,7 @@ class Notebook:
 
 
     def inject_code(self, cells, position, code):
-        """ Adds a collection of lines of code at the front of back of a collection of specified code cells.
+        """ Adds a collection of lines of code at the front or back of a collection of specified code cells.
         """
 
         code = self.add_carriage_return(code)
@@ -108,7 +108,7 @@ class Notebook:
         Also removes injected code cells from the beginning and end of the notebook.
         """
 
-        # Remove injected code
+        # Removes injected code
         inside_injected_code = False
         for cell in cells:
             counter = 0
@@ -124,7 +124,7 @@ class Notebook:
                 else:
                     counter += 1
 
-        # Remove injected cells
+        # Removes injected cells
         for position in [0, -1]:
             if self.notebook_json["cells"][position]["cell_type"] == "code":
                 if self.notebook_json["cells"][position]["source"][0] == INJECTED_CELL:
@@ -132,7 +132,7 @@ class Notebook:
 
 
     def inject_cell(self, position, code):
-        """ Add new code cell for pre- or post-execution scripts.
+        """ Adds new code cell for pre- or post-execution scripts.
         """
 
         code = self.add_carriage_return(code)
