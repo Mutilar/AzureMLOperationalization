@@ -56,7 +56,7 @@ def start_build_pipeline(params):
         repo=rc_params["repo"],
         version=rc_params["version"]
     )
-    fh.add_pip_dependency(
+    fh.add_pip_dependencies(
         conda_file=rc_params["conda_file"],
         dependencies=[
             "azure-servicebus",
