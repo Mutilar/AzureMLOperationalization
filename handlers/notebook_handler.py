@@ -145,7 +145,7 @@ class Notebook:
             self.notebook_json["cells"][-1]["source"] = code
 
 
-    def add_carriage_return(code):
+    def add_carriage_return(self, code):
         """ Adds carriage returns to each line of code in a given list.
         """
 
