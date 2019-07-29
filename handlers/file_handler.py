@@ -94,9 +94,9 @@ def add_notebook_callback(params, notebook, run_id):
         code=[
             "#SP AUTHENTICATION",
             "perform_interactive_login(",
-            nh.TAB + "username=" + params["azure_resources"]["service_principal"]["username"] + ",",
-            nh.TAB + "tenant=" + params["azure_resources"]["service_principal"]["tenant"] + ",",
-            nh.TAB + "password=" + params["azure_resources"]["service_principal"]["password"] + ",",
+            nh.TAB + "username=\"" + params["azure_resources"]["service_principal"]["username"] + "\",",
+            nh.TAB + "tenant=\"" + params["azure_resources"]["service_principal"]["tenant"] + "\",",
+            nh.TAB + "password=\"" + params["azure_resources"]["service_principal"]["password"] + "\",",
             nh.TAB + "service_principal=True"
             ")",
             "#CALLBACK PARAMETERS"
