@@ -12,7 +12,7 @@ END_OF_CELL = "BACK"
 INJECTED_CODE_START = "#INJECTED CODE START\n"
 INJECTED_CODE_END = "#INJECTED CODE END\n"
 
-INJECTED_CELL = "#INJECTED CELL"
+INJECTED_CELL = "#INJECTED CELL\n"
 
 
 class Notebook:
@@ -107,8 +107,13 @@ class Notebook:
         """ Removes all lines of code injected by inject_code from a collection of specified code cells.
         """
 
+        # Remove injected cells
+        # if self.notebook_json["cells"][0]["cell_type"] == "code":
+        #     if self.notebook_json["cells"][0]["source"][] == INJECTED_CELL:
+        #             del self.notebook_json["cells"][cell]
+        #             break
+        # Remove injected code
         inside_injected_code = False
-
         for cell in cells:
             counter = 0
             cell_size = len(self.notebook_json["cells"][cell]["source"])
@@ -133,8 +138,8 @@ class Notebook:
         """ Add new code cell for pre- or post-execution scripts.
         """
 
-        code = [INJECTED_CELL] + code
         code = self.add_carriage_return(code)
+        code = [INJECTED_CELL] + code
 
 
         if position == FIRST_CELL:
