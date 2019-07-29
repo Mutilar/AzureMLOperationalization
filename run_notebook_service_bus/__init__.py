@@ -58,7 +58,11 @@ def start_build_pipeline(params):
     )
     fh.add_pip_dependency(
         conda_file=rc_params["conda_file"],
-        dependency="azure-servicebus"
+        dependencies=[
+            "azure-servicebus",
+            "azureml",
+            "azureml-sdk"
+        ]
     )
 
     # Fetches Experiment to submit runs on

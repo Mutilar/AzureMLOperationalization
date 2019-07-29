@@ -27,7 +27,7 @@ def set_file_str(file_location, output):
     return False
 
 
-def add_pip_dependency(conda_file, dependency):
+def add_pip_dependencies(conda_file, dependencies):
     """ Adds a new pip dependency to a given conda file.
     """
 
@@ -37,7 +37,8 @@ def add_pip_dependency(conda_file, dependency):
     conda_str = get_file_str(conda_file_location)
 
     # Inject the azure servicebus pip dependency for callbacks
-    conda_str = inject_pip_dependency(conda_str, dependency)
+    for dependency in dependencies:
+        conda_str = inject_pip_dependency(conda_str, dependency)
 
     # Writes changes to file
     set_file_str(conda_file_location, conda_str)
@@ -93,6 +94,7 @@ def add_notebook_callback(params, notebook, run_id):
         position=nh.BEGINNING_OF_CELL,
         code=[
             "#SP AUTHENTICATION",
+            "from azureml._base_sdk_common.common import perform_interactive_login"
             "perform_interactive_login(",
             nh.TAB + "username=\"" + params["azure_resources"]["service_principal"]["username"] + "\",",
             nh.TAB + "tenant=\"" + params["azure_resources"]["service_principal"]["tenant"] + "\",",
