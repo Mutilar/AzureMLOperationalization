@@ -93,7 +93,7 @@ class Notebook:
         """ Adds a collection of lines of code at the front of back of a collection of specified code cells.
         """
 
-        code = add_carriage_return(code)
+        code = self.add_carriage_return(code)
 
         for cell in cells:
             if position == BEGINNING_OF_CELL:
@@ -134,7 +134,7 @@ class Notebook:
         """
 
         code = [INJECTED_CELL] + code
-        code = add_carriage_return(code)
+        code = self.add_carriage_return(code)
 
 
         if position == FIRST_CELL:
