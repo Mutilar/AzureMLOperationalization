@@ -138,10 +138,10 @@ class Notebook:
 
 
         if position == FIRST_CELL:
-            self.notebook_json["cells"] = self.block_template_json + self.notebook_json["cells"]
+            self.notebook_json["cells"] = [self.block_template_json] + self.notebook_json["cells"]
             self.notebook_json["cells"][0]["source"] = code
         elif position == LAST_CELL:
-            self.notebook_json["cells"] = self.notebook_json["cells"] + self.block_template_json
+            self.notebook_json["cells"] = self.notebook_json["cells"] + [self.block_template_json]
             self.notebook_json["cells"][-1]["source"] = code
 
 
