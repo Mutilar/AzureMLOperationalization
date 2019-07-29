@@ -118,6 +118,20 @@ def add_notebook_callback(params, notebook, run_id):
         ]
     )
 
+    notebook.inject_cell(
+        position=nh.FIRST_CELL,
+        code=[
+            "print(\"hello\")"
+        ]
+    )
+    notebook.inject_cell(
+        position=nh.LAST_CELL,
+        code=[
+            "print(\"world\")"
+        ]
+    )
+
+
     # Injects callback parameters
     notebook_str = inject_notebook_params(
         str(notebook),

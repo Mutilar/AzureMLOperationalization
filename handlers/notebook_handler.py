@@ -12,6 +12,8 @@ END_OF_CELL = "BACK"
 INJECTED_CODE_START = "#INJECTED CODE START\n"
 INJECTED_CODE_END = "#INJECTED CODE END\n"
 
+INJECTED_CELL = "#INJECTED CELL"
+
 
 class Notebook:
 
@@ -21,6 +23,9 @@ class Notebook:
         """
 
         self.notebook_json = json.loads(notebook_str)
+        self.block_template_json = json.loads(
+            '{"cell_type":"code","execution_count":null,"metadata":{},"outputs":[],"source":[]}'
+        )
 
 
     def __str__(self):
@@ -85,15 +90,10 @@ class Notebook:
 
 
     def inject_code(self, cells, position, code):
-        """ Adds a collection of lines of code at the front of back of a collection of specified code cells
+        """ Adds a collection of lines of code at the front of back of a collection of specified code cells.
         """
 
-        # Adds carriage return to each line
-        line = 0
-        num_lines = len(code)
-        while line < num_lines:
-            code[line] = code[line] + "\n"
-            line += 1
+        code = add_carriage_return(code)
 
         for cell in cells:
             if position == BEGINNING_OF_CELL:
@@ -104,7 +104,7 @@ class Notebook:
 
 
     def scrub_code(self, cells):
-        """ Removes all lines of code injected by inject_code from a collection of specified code cells
+        """ Removes all lines of code injected by inject_code from a collection of specified code cells.
         """
 
         inside_injected_code = False
@@ -113,6 +113,9 @@ class Notebook:
             counter = 0
             cell_size = len(self.notebook_json["cells"][cell]["source"])
             while counter < cell_size:
+                if self.notebook_json["cells"][cell]["source"][counter] == INJECTED_CELL:
+                    del self.notebook_json["cells"][cell]
+                    break
                 if self.notebook_json["cells"][cell]["source"][counter] == INJECTED_CODE_START:
                     inside_injected_code = True
                 if inside_injected_code: 
@@ -122,4 +125,32 @@ class Notebook:
                     cell_size -= 1
                 else:
                     counter += 1
- 
+        
+        # Check for injected cells as well...
+        # ...
+
+    def inject_cell(self, position, code):
+        """ Add new code cell for pre- or post-execution scripts.
+        """
+
+        code = [INJECTED_CELL] + code
+        code = add_carriage_return(code)
+
+
+        if position == FIRST_CELL:
+            self.notebook_json["cells"] = self.block_template_json + self.notebook_json["cells"]
+            self.notebook_json["cells"][0]["source"] = code
+        elif position == LAST_CELL:
+            self.notebook_json["cells"] = self.notebook_json["cells"] + self.block_template_json
+            self.notebook_json["cells"][-1]["source"] = code
+
+
+    def add_carriage_return(code):
+        """ Adds carriage returns to each line of code in a given list.
+        """
+
+        line = 0
+        while line < len(code):
+            code[line] += "\n"
+            line += 1
+        return code
