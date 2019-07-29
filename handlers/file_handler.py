@@ -99,7 +99,7 @@ def add_notebook_callback(params, notebook, run_id):
             nh.TAB + "username=\"" + params["azure_resources"]["service_principal"]["username"] + "\",",
             nh.TAB + "tenant=\"" + params["azure_resources"]["service_principal"]["tenant"] + "\",",
             nh.TAB + "password=\"" + params["azure_resources"]["service_principal"]["password"] + "\",",
-            nh.TAB + "service_principal=True"
+            nh.TAB + "service_principal=True",
             ")",
             "#CALLBACK PARAMETERS",
             "from azure.servicebus import QueueClient, Message",

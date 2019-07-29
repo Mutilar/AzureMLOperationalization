@@ -108,19 +108,17 @@ class Notebook:
         """
 
         # Remove injected cells
-        # if self.notebook_json["cells"][0]["cell_type"] == "code":
-        #     if self.notebook_json["cells"][0]["source"][] == INJECTED_CELL:
-        #             del self.notebook_json["cells"][cell]
-        #             break
+        for position in [0, -1]
+            if self.notebook_json["cells"][position]["cell_type"] == "code":
+                if self.notebook_json["cells"][position]["source"][0] == INJECTED_CELL:
+                        del self.notebook_json["cells"][position]
+
         # Remove injected code
         inside_injected_code = False
         for cell in cells:
             counter = 0
             cell_size = len(self.notebook_json["cells"][cell]["source"])
             while counter < cell_size:
-                if self.notebook_json["cells"][cell]["source"][counter] == INJECTED_CELL:
-                    del self.notebook_json["cells"][cell]
-                    break
                 if self.notebook_json["cells"][cell]["source"][counter] == INJECTED_CODE_START:
                     inside_injected_code = True
                 if inside_injected_code: 
