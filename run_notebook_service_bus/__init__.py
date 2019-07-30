@@ -77,7 +77,8 @@ def start_build_pipeline(params):
     )
 
     # Submits notebook runs to Experiment, delimiting by commas
-    for notebook in rc_params["notebooks"].split(","):
+    notebooks = fh.fetch_notebooks("notebooks", "production-deploy-to-aks")
+    for notebook in notebooks: # rc_params["notebooks"].split(","):
 
         # Creates new DevOps Test Run
         response = dh.post_new_run(
