@@ -246,7 +246,7 @@ def fetch_repo(repo, version):
     os.chdir("..")
 
 
-def fetch_notebooks(folder, channel)
+def fetch_notebooks(folder, channel):
     """ Recursively step through file structure looking for release.json files.
     Then, look for notebooks pertaining to the specified channel.
     """
@@ -265,5 +265,7 @@ def fetch_notebooks(folder, channel)
                     notebooks += [
                         os.path.join(root, os.path.join(notebook["path"], notebook["name"]))
                     ]
+    
+    return notebooks
 
     
