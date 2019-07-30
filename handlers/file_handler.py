@@ -128,6 +128,14 @@ def add_notebook_callback(params, notebook, run_id):
         ]
     )
 
+    # Injecting pre-execution code
+    notebook.inject_cell(
+        position=nh.FIRST_CELL,
+        code=[
+            "print(\"hello\")"
+        ]
+    )
+
     # Injects callback parameters
     notebook_str = inject_notebook_params(
         str(notebook),

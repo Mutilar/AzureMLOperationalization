@@ -11,7 +11,6 @@ END_OF_CELL = "BACK"
 
 INJECTED_CODE_START = "#INJECTED CODE START\n"
 INJECTED_CODE_END = "#INJECTED CODE END\n"
-
 INJECTED_CELL = "#INJECTED CELL\n"
 
 
@@ -137,7 +136,6 @@ class Notebook:
 
         code = self.add_carriage_return(code)
         code = [INJECTED_CELL] + code
-
 
         if position == FIRST_CELL:
             self.notebook_json["cells"] = [self.block_template_json] + self.notebook_json["cells"]
