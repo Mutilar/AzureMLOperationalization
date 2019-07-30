@@ -267,8 +267,8 @@ def fetch_notebooks(folder, channel):
                         os.path.join(
                             root,
                             os.path.join(
-                                notebook_json["path"],
-                                notebook_json["name"]
+                                release_json["notebooks"][channel]["path"],
+                                release_json["notebooks"][channel]["name"]
                             )
                         ).split("/")[3:]
                     )
