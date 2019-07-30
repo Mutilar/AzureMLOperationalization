@@ -251,6 +251,8 @@ def fetch_notebooks(folder, channel):
     Then, look for notebooks pertaining to the specified channel.
     """
 
+    debug = ""
+
     notebooks = []
     for root, dirs, files in os.walk("/" + folder):
         for file in files:
@@ -261,11 +263,13 @@ def fetch_notebooks(folder, channel):
                     )
                 )
                 if channel in release_json["notebooks"]:
+                    debug += str(release_json["notebooks"]) + "\n" 
                     notebook_json = release_json["notebooks"][channel]
                     notebooks += [
                         os.path.join(root, os.path.join(notebook["path"], notebook["name"]))
                     ]
     
+    raise Exception ("release json output:" + debug)
     return notebooks
 
     
