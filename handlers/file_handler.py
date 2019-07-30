@@ -265,14 +265,12 @@ def fetch_notebooks(folder, channel):
                 if channel in release_json["notebooks"]:
                     notebook_json = release_json["notebooks"][channel]
                     notebooks += [
-                        "\\".join(
+                        os.path.join(
+                            root,
                             os.path.join(
-                                root,
-                                os.path.join(
-                                    notebook_json["path"],
-                                    notebook_json["name"]
-                                )
-                            ).split("/")[2:]
-                        )
+                                notebook_json["path"],
+                                notebook_json["name"]
+                            )
+                        ).split("/")[3:]
                     ]
     return notebooks
