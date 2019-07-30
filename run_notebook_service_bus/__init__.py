@@ -77,7 +77,7 @@ def start_build_pipeline(params):
     )
 
     # Submits notebook runs to Experiment, delimiting by commas
-    notebooks = fh.fetch_notebooks("notebooks", "production-deploy-to-aks")
+    notebooks = fh.fetch_notebooks("notebooks", "aml-pipelines-use-databricks-as-compute-target")
     for notebook in notebooks: # rc_params["notebooks"].split(","):
 
         # Creates new DevOps Test Run
