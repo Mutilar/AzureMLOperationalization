@@ -273,6 +273,6 @@ def fetch_notebooks(folder, channel):
                         ).split("/")[3:]
                     )
 
-                    notebooks += notebook_path
+                    notebooks += [notebook_path]
 
     return notebooks
