@@ -316,15 +316,15 @@ def fetch_requirements(changed_notebooks):
     return rq_params
 
 
-    def build_snapshot(changed_notebooks, dependencies):
-        
-        for notebook in changed_notebooks:
-            os.rename(
-                "./staging/inputs/" + notebook,
-                "./snapshot/inputs/" + notebook
-            )
-        for dependency in dependencies:
-            os.rename(
-                "./staging/inputs/" + dependency,
-                "./snapshot/inputs/" + dependency
-            )
+def build_snapshot(changed_notebooks, dependencies):
+    
+    for notebook in changed_notebooks:
+        os.rename(
+            "./staging/inputs/" + notebook,
+            "./snapshot/inputs/" + notebook
+        )
+    for dependency in dependencies:
+        os.rename(
+            "./staging/inputs/" + dependency,
+            "./snapshot/inputs/" + dependency
+        )
