@@ -46,6 +46,13 @@ def add_pip_packages(conda_file, requirements):
 
 
 def inject_pip_package(file_str, requirement):
+
+    # It should only inject if the package isn't already added.
+    if (" " + requirement + "\n") in file_str:
+        return file_str
+    if (" " + requirement + "==") in file_str:
+        return file_str
+
     return file_str.replace(
         "- pip:\n",
         "- pip:\n  - " + requirement + "\n"
@@ -318,11 +325,15 @@ def fetch_requirements(changed_notebooks):
 
 def build_snapshot(changed_notebooks, dependencies):
     
+
     for notebook in changed_notebooks:
-        os.rename(
-            "./staging/inputs/" + notebook,
-            "./snapshot/inputs/" + notebook
-        )
+        if os.path.exists("./staging/inputs/" + notebook):
+            os.rename(
+                "./staging/inputs/" + notebook,
+                "./snapshot/inputs/" + notebook
+            )
+        else:
+            raise Exception("./staging/inputs/" + notebook " was not found!")
     for dependency in dependencies:
         os.rename(
             "./staging/inputs/" + dependency,
