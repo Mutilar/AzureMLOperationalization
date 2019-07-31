@@ -340,7 +340,7 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
 
         # Moves notebook
         shutil.move(
-            staging_file
+            staging_file,
             snapshot_path
         )
 
