@@ -27,12 +27,12 @@ def test_get_file_str():
     ) == "hello world"
 
 
-def test_inject_pip_dependency():
+# def test_inject_pip_dependency():
 
-    assert fh.inject_pip_dependency(
-        fh.get_file_str(CONDA_INPUT),
-        "test-pip-dependency"
-    ) == fh.get_file_str(CONDA_OUTPUT)
+#     assert fh.inject_pip_dependency(
+#         fh.get_file_str(CONDA_INPUT),
+#         "test-pip-dependency"
+#     ) == fh.get_file_str(CONDA_OUTPUT)
 
 
 # def test_notebook_try_catches():
