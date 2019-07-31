@@ -77,6 +77,8 @@ def submit_run(notebook, exp, conda_file, compute_target, base_image):
             source_directory="snapshot/",
             notebook="inputs/" + notebook,
             output_notebook="outputs/output.ipynb",
+            cwd="inputs/" + os.path.dirname(notebook),
+            #celltimeout?=RELEASE.json detail
             run_config=fetch_run_config(
                 conda_file=conda_file,
                 compute_target=compute_target,
