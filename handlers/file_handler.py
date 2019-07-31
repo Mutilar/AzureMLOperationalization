@@ -327,11 +327,11 @@ def build_snapshot(changed_notebooks, dependencies):
     for notebook in changed_notebooks:
         if os.path.exists("./staging/inputs/" + notebook):
             os.rename(
-                "./staging/inputs/" + notebook,
-                "./snapshot/inputs/" + notebook
+                os.getcwd() + "/staging/inputs/" + notebook,
+                os.getcwd() + "/snapshot/inputs/" + notebook
             )
         else:
-            raise Exception("./staging/inputs/" + notebook + " was not found!\n"+str(os.listdir("./staging/")) + "\n"+str(os.listdir("./staging/inputs/")))
+            raise Exception("./staging/inputs/" + notebook + " was not found!\n"+str(os.listdir("./staging/")) + "\n"+str(os.listdir("./staging/inputs/"))+ "\n"+str(os.listdir("./staging/inputs/notebooks/how-to-use-azureml")))
     for dependency in dependencies:
         os.rename(
             "./staging/inputs/" + dependency,
