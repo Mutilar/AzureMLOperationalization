@@ -325,17 +325,29 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
     
 
     for notebook in changed_notebooks:
-
-        # Move notebook
-        os.rename(
-            os.getcwd() + "/staging/inputs/" + notebook,
-            os.getcwd() + "/snapshot/inputs/" + notebook
+        
+        staging_file = os.path.join(
+            "./staging/inputs/",
+            notebook
+        )
+        snapshot_path = os.path.join(
+            "./snapshot/inputs/",
+            os.path.dirname(notebook)
         )
 
-        # Add Notebook config file
+        if not os.path.exists(snapshot_path):
+            os.makedirs(snapshot_path)
+
+        # Moves notebook
+        shutil.move(
+            staging_file
+            snapshot_path
+        )
+
+        # Adds notebook config file
         set_file_str(
             file_location=os.path.join(
-                os.path.dirname("./snapshot/inputs/" + notebook),
+                snapshot_path,
                 'config.json'
             ),
             output=json.dumps(
@@ -348,7 +360,18 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
         )
 
     for dependency in dependencies:
-        os.rename(
-            "./staging/inputs/" + dependency,
-            "./snapshot/inputs/" + dependency
+
+        staging_file = os.path.join(
+            "./staging/inputs/",
+            dependency
+        )
+        snapshot_path = os.path.join(
+            "./snapshot/inputs/",
+            os.path.dirname(dependency)
+        )
+
+        # Moves dependency
+        shutil.move(
+            staging_file
+            snapshot_path
         )
