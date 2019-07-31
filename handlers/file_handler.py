@@ -229,7 +229,7 @@ def fetch_repo(repo, version):
 
     # Moves to snapshot directory
     os.chdir(
-        "./staging/"
+        os.getcwd() + "/staging/"
     )
 
     # Downloads version of a repository
@@ -321,17 +321,32 @@ def fetch_requirements(changed_notebooks):
     return rq_params
 
 
-def build_snapshot(changed_notebooks, dependencies):
+def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id, ws_resource_group):
     
 
     for notebook in changed_notebooks:
-        if os.path.exists("./staging/inputs/" + notebook):
-            os.rename(
-                os.getcwd() + "/staging/inputs/" + notebook,
-                os.getcwd() + "/snapshot/inputs/" + notebook
+
+        # Move notebook
+        os.rename(
+            os.getcwd() + "/staging/inputs/" + notebook,
+            os.getcwd() + "/snapshot/inputs/" + notebook
+        )
+
+        # Add Notebook config file
+        set_file_str(
+            file_location=os.path.join(
+                os.path.dirname("./snapshot/inputs/" + notebook),
+                'config.json'
+            ),
+            output=json.dumps(
+                {
+                    'subscription_id': ws_subscription_id,
+                    'resource_group': ws_resource_group,
+                    'workspace_name': ws_name
+                }
             )
-        else:
-            raise Exception("./staging/inputs/" + notebook + " was not found!\n"+str(os.listdir("./staging/")) + "\n"+str(os.listdir("./staging/inputs/"))+ "\n"+str(os.listdir("./staging/inputs/notebooks/how-to-use-azureml")))
+        )
+
     for dependency in dependencies:
         os.rename(
             "./staging/inputs/" + dependency,
