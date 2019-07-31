@@ -3,6 +3,7 @@ from azureml.core import Workspace, Experiment, ScriptRunConfig, Run
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import RunConfiguration, DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 from azureml.contrib.notebook import NotebookRunConfig
+import os
 
 # States of runs
 FAILED_RUN = "Failed"
