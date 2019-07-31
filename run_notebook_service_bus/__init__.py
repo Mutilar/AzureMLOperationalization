@@ -51,6 +51,7 @@ def start_build_pipeline(params):
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
 
+    # To be supplied by the "get changed notebooks" script
     changed_notebooks = [
         "notebooks\\how-to-use-azureml\\automated-machine-learning\\classification\\auto-ml-classification.ipynb",
         "notebooks\\how-to-use-azureml\\automated-machine-learning\\regression-concrete-strength\\auto-ml-regression-concrete-strength.ipynb"

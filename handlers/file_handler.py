@@ -229,9 +229,7 @@ def fetch_repo(repo, version):
 
     # Moves to snapshot directory
     os.chdir(
-        os.path.dirname(
-            "./staging/"
-        )
+        "./staging/"
     )
 
     # Downloads version of a repository
@@ -333,7 +331,7 @@ def build_snapshot(changed_notebooks, dependencies):
                 "./snapshot/inputs/" + notebook
             )
         else:
-            raise Exception("./staging/inputs/" + notebook + " was not found!")
+            raise Exception("./staging/inputs/" + notebook + " was not found!\n"+str(os.listdir("./staging/")) + "\n"+str(os.listdir("./staging/inputs/")))
     for dependency in dependencies:
         os.rename(
             "./staging/inputs/" + dependency,
