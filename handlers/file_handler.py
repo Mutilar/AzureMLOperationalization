@@ -223,7 +223,6 @@ def fetch_repo(repo, version):
         shutil.rmtree(os.getcwd() + "/staging/")
 
     # Recreates snapshot and staging folders
-    os.makedirs(os.getcwd() + "/snapshot/")
     os.makedirs(os.getcwd() + "/snapshot/inputs/")
     os.makedirs(os.getcwd() + "/staging/")
 
@@ -327,11 +326,15 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
     for notebook in changed_notebooks:
         
         staging_file = os.path.join(
-            "./staging/inputs/",
+            os.getcwd(),
+            "/staging/inputs/",
             notebook
         )
+        if not os.path.exists(staging_file):
+            raise Exception(staging_file + " is not a file...?\n" + os.listdir(os.dirname(staging_file)))
         snapshot_path = os.path.join(
-            "./snapshot/inputs/",
+            os.getcwd(),
+            "/snapshot/inputs/",
             os.path.dirname(notebook)
         )
 
