@@ -51,18 +51,30 @@ def start_build_pipeline(params):
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
 
-    # Downloads repo to snapshot folder and adds SB pip dependency for callback
+    changed_notebooks = [
+        "notebooks\\how-to-use-azureml\\automated-machine-learning\\classification\\auto-ml-classification.ipynb",
+        "notebooks\\how-to-use-azureml\\automated-machine-learning\\regression-concrete-strength\\auto-ml-regression-concrete-strength.ipynb"
+    ]
+
+    # Downloads repo to staging folder
     fh.fetch_repo(
         repo=rc_params["repo"],
         version=rc_params["version"]
     )
-    fh.add_pip_dependencies(
+    
+    # Collects required pip packages and associated files
+    rq_params = fh.fetch_requirements(changed_notebooks)
+
+    # Moves necessary files into snapshot directory
+    fh.build_snapshot(
+        changed_notebooks=changed_notebooks,
+        dependencies=rq_params["dependencies"] + ["environment.yml"]
+    )
+
+    # Injects necessary packages in conda file    
+    fh.add_pip_packages(
         conda_file=rc_params["conda_file"],
-        dependencies=[
-            "azure-servicebus",
-            "azureml",
-            "azureml-sdk"
-        ]
+        requirements=rq_params["requirements"] + ["azure-servicebus", "azureml", "azureml-sdk"]
     )
 
     # Fetches Experiment to submit runs on
@@ -77,8 +89,7 @@ def start_build_pipeline(params):
     )
 
     # Submits notebook runs to Experiment, delimiting by commas
-    notebooks = fh.fetch_notebooks("notebooks", "aml-pipelines-use-databricks-as-compute-target")
-    for notebook in notebooks: # rc_params["notebooks"].split(","):
+    for notebook in changed_notebooks:
 
         # Creates new DevOps Test Run
         response = dh.post_new_run(
@@ -94,7 +105,9 @@ def start_build_pipeline(params):
         fh.add_notebook_callback(
             notebook=notebook, 
             params=params, 
-            run_id=run_id
+            run_id=run_id,
+            postexecs=rq_params["postexecs"],
+            preexecs=rq_params["preexecs"]
         )
 
         # Submits notebook Run to Experiment
