@@ -255,7 +255,6 @@ def fetch_repo(repo, version):
     os.chdir("..")
 
 
-
 def fetch_requirements(changed_notebooks):
 
     rq_params = {
@@ -326,15 +325,13 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
     for notebook in changed_notebooks:
         
         staging_file = os.path.join(
-            os.getcwd(),
-            "/staging/inputs/",
+            "./staging/inputs/",
             notebook
         )
         if not os.path.exists(staging_file):
-            raise Exception(staging_file + " is not a file...?\n" + os.listdir(os.dirname(staging_file)))
+            raise Exception(staging_file + " is not a file...?\n" + str(os.listdir(os.path.dirname(staging_file))) + "\n" + notebook)
         snapshot_path = os.path.join(
-            os.getcwd(),
-            "/snapshot/inputs/",
+            "./snapshot/inputs/",
             os.path.dirname(notebook)
         )
 
