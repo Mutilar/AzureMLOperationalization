@@ -333,7 +333,7 @@ def build_snapshot(changed_notebooks, dependencies):
                 "./snapshot/inputs/" + notebook
             )
         else:
-            raise Exception("./staging/inputs/" + notebook " was not found!")
+            raise Exception("./staging/inputs/" + notebook + " was not found!")
     for dependency in dependencies:
         os.rename(
             "./staging/inputs/" + dependency,
