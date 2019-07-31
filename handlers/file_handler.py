@@ -39,7 +39,7 @@ def add_pip_packages(conda_file, requirements):
 
     # Inject the azure servicebus pip dependency for callbacks
     for requirement in requirements:
-        conda_str = inject_pip_dependency(conda_str, requirement)
+        conda_str = inject_pip_package(conda_str, requirement)
 
     # Writes changes to file
     set_file_str(conda_file_location, conda_str)
