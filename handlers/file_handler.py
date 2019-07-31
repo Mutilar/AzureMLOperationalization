@@ -28,7 +28,7 @@ def set_file_str(file_location, output):
     return False
 
 
-def add_pip_dependencies(conda_file, dependencies):
+def add_pip_packages(conda_file, requirements):
     """ Adds a new pip dependency to a given conda file.
     """
 
@@ -38,21 +38,21 @@ def add_pip_dependencies(conda_file, dependencies):
     conda_str = get_file_str(conda_file_location)
 
     # Inject the azure servicebus pip dependency for callbacks
-    for dependency in dependencies:
-        conda_str = inject_pip_dependency(conda_str, dependency)
+    for requirement in requirements:
+        conda_str = inject_pip_dependency(conda_str, requirement)
 
     # Writes changes to file
     set_file_str(conda_file_location, conda_str)
 
 
-def inject_pip_dependency(file_str, dependency):
+def inject_pip_package(file_str, requirement):
     return file_str.replace(
         "- pip:\n",
-        "- pip:\n  - " + dependency + "\n"
+        "- pip:\n  - " + requirement + "\n"
     )
 
 
-def add_notebook_callback(params, notebook, run_id):
+def add_notebook_callback(params, notebook, run_id, postexecs, preexecs):
     """ Enables notebooks to call back to the Azure Function.
     This is done to update the Pipeline based on Run results.
     """
@@ -122,20 +122,20 @@ def add_notebook_callback(params, notebook, run_id):
     )
 
     # Injecting post-execution code
-    notebook.inject_cell(
-        position=nh.LAST_CELL,
-        code=[
-            "print(\"world\")"
-        ]
-    )
+    if notebook in postexecs:
+        code = get_file_str("./staging/inputs/" + postexecs[notebook]).split("\n")
+        notebook.inject_cell(
+            position=nh.LAST_CELL,
+            code=code
+        )
 
     # Injecting pre-execution code
-    notebook.inject_cell(
-        position=nh.FIRST_CELL,
-        code=[
-            "print(\"hello\")"
-        ]
-    )
+    if notebook in preexecs:
+        code = get_file_str("./staging/inputs/" + preexecs[notebook]).split("\n")
+        notebook.inject_cell(
+            position=nh.FIRST_CELL,
+            code=code
+        )
 
     # Injects callback parameters
     notebook_str = inject_notebook_params(
@@ -209,17 +209,21 @@ def fetch_repo(repo, version):
     """ Clones a GitHub repository locally into the snapshot folder.
     """
     
-    # Wipes snapshot directory, clearing out old files
+    # Wipes snapshot and staging directories, clearing out old files
     if os.path.exists(os.getcwd() + "/snapshot/"):
         shutil.rmtree(os.getcwd() + "/snapshot/")
+    if os.path.exists(os.getcwd() + "/staging/"):
+        shutil.rmtree(os.getcwd() + "/staging/")
 
-    # Recreates snapshot folder
+    # Recreates snapshot and staging folders
     os.makedirs(os.getcwd() + "/snapshot/")
+    os.makedirs(os.getcwd() + "/snapshot/inputs/")
+    os.makedirs(os.getcwd() + "/staging/")
 
     # Moves to snapshot directory
     os.chdir(
         os.path.dirname(
-            "./snapshot/"
+            "./staging/"
         )
     )
 
@@ -247,14 +251,20 @@ def fetch_repo(repo, version):
     os.chdir("..")
 
 
-def fetch_notebooks(folder, channel):
-    """ Recursively step through file structure looking for release.json files.
-    Then, look for notebooks pertaining to the specified channel.
-    """
 
-    notebooks = []
+def fetch_requirements(changed_notebooks)
 
-    for root, dirs, files in os.walk("./snapshot/inputs/" + folder):
+    rq_params = {
+        "requirements": [],
+        "dependencies": [],
+        "postexec": {},
+        "preexec": {}
+    }
+
+    requirements = set([])
+    dependencies = set([])
+
+    for root, dirs, files in os.walk("./staging/inputs/"):
         for file in files:
             if file == "release.json":
                 release_json = json.loads(
@@ -262,17 +272,59 @@ def fetch_notebooks(folder, channel):
                         os.path.join(root, file)
                     )
                 )
-                if channel in release_json["notebooks"]:
-                    notebook_path = "/".join(
-                        os.path.join(
-                            root,
+                for channel in release_json["notebooks"]:
+                    channel_notebook = release_json["notebooks"][channel]
+                    notebook_path = ""
+                    if "path" in channel_notebook:
+                        notebook_path = "/".join(
                             os.path.join(
-                                release_json["notebooks"][channel]["path"],
-                                release_json["notebooks"][channel]["name"]
-                            )
-                        ).split("/")[3:]
-                    )
+                                root,
+                                os.path.join(
+                                    channel_notebook["path"],
+                                    channel_notebook["name"]
+                                )
+                            ).split("/")[3:]
+                        )
+                    else:
+                        notebook_path = "/".join(
+                            os.path.join(
+                                root,
+                                channel_notebook["name"]
+                            ).split("/")[3:]
+                        )
+                    if notebook_path in changed_notebooks:
 
-                    notebooks += [notebook_path]
+                        # Add pip package requirements to set
+                        if "requirements" in release_json["notebooks"][channel]:
+                            for requirement in release_json["notebooks"][channel]["requirements"]:
+                                requirements.add(requirement)
 
-    return notebooks
+                        # Add local file dependencies to set
+                        if "dependencies" in release_json["notebooks"][channel]:
+                            for dependency in release_json["notebooks"][channel]["dependencies"]:
+                                dependencies.add(os.path.dirname(notebook_path) + dependency)
+
+                        # Manage post- and pre-execution code preparation
+                        if "postexec" in release_json["notebooks"][channel]:
+                            rq_params["postexec"][notebook_path] = os.path.dirname(notebook_path) + release_json["notebooks"][channel]["postexec"]
+                        if "preexec" in release_json["notebooks"][channel]:
+                            rq_params["preexec"][notebook_path] = os.path.dirname(notebook_path) + release_json["notebooks"][channel]["preexec"]
+    
+    rq_params["requirements"] = list(requirements)
+    rq_params["dependencies"] = list(dependencies)
+
+    return rq_params
+
+
+    def build_snapshot(changed_notebooks, dependencies):
+        
+        for notebook in changed_notebooks:
+            os.rename(
+                "./staging/inputs/" + notebook,
+                "./snapshot/inputs/" + notebook
+            )
+        for dependency in dependencies:
+            os.rename(
+                "./staging/inputs/" + dependency,
+                "./snapshot/inputs/" + dependency
+            )
