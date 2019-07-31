@@ -110,8 +110,8 @@ def start_build_pipeline(params):
             notebook=notebook, 
             params=params, 
             run_id=run_id,
-            postexecs=rq_params["postexecs"],
-            preexecs=rq_params["preexecs"]
+            postexec=rq_params["postexec"],
+            preexec=rq_params["preexec"]
         )
 
         # Submits notebook Run to Experiment

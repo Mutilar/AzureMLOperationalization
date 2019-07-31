@@ -59,7 +59,7 @@ def inject_pip_package(file_str, requirement):
     )
 
 
-def add_notebook_callback(params, notebook, run_id, postexecs, preexecs):
+def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     """ Enables notebooks to call back to the Azure Function.
     This is done to update the Pipeline based on Run results.
     """
@@ -129,16 +129,16 @@ def add_notebook_callback(params, notebook, run_id, postexecs, preexecs):
     )
 
     # Injecting post-execution code
-    if notebook in postexecs:
-        code = get_file_str("./staging/inputs/" + postexecs[notebook]).split("\n")
+    if notebook in postexec:
+        code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
         notebook.inject_cell(
             position=nh.LAST_CELL,
             code=code
         )
 
     # Injecting pre-execution code
-    if notebook in preexecs:
-        code = get_file_str("./staging/inputs/" + preexecs[notebook]).split("\n")
+    if notebook in preexec:
+        code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
         notebook.inject_cell(
             position=nh.FIRST_CELL,
             code=code
@@ -320,7 +320,9 @@ def fetch_requirements(changed_notebooks):
 
 
 def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id, ws_resource_group):
-    
+    """ Moves files-of-interest into snapshot folder to be run on Azure ML Compute.
+    Also generates config files for "from_config" ML Workspaces. 
+    """
 
     for notebook in changed_notebooks:
         
@@ -328,13 +330,14 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
             "./staging/inputs/",
             notebook
         )
-        if not os.path.exists(staging_file):
-            raise Exception(staging_file + " is not a file...?\n" + str(os.listdir(os.path.dirname(staging_file))) + "\n" + notebook)
         snapshot_path = os.path.join(
             "./snapshot/inputs/",
             os.path.dirname(notebook)
         )
 
+        # Add directory in snapshot folder if not present
+        #   Since config and dependency files always live in same directory as notebook,
+        #   It's only necessary to check if path exists for the notebook's path.
         if not os.path.exists(snapshot_path):
             os.makedirs(snapshot_path)
 
