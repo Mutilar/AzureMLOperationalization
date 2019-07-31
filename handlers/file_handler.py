@@ -252,7 +252,7 @@ def fetch_repo(repo, version):
 
 
 
-def fetch_requirements(changed_notebooks)
+def fetch_requirements(changed_notebooks):
 
     rq_params = {
         "requirements": [],
