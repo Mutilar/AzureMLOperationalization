@@ -126,7 +126,7 @@ class Notebook:
         # Removes injected cells
         for position in cells:
             if self.notebook_json["cells"][position]["cell_type"] == "code":
-                for line in self.notebook_json["cells"][position]["source"]
+                for line in self.notebook_json["cells"][position]["source"]:
                     if INJECTED_CELL in line:
                         del self.notebook_json["cells"][position]
 
