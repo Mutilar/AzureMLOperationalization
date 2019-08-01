@@ -106,7 +106,7 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
         code=[
             "except Exception as e:",
             nh.TAB + "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)",
-            nh.TAB + "_msg = Message(_params.replace(\"default_error_message\", str(e).replace(\"\\\'\",\"\\\"\")))",
+            nh.TAB + "_msg = Message(_params.replace(\"default_error_message\", str(e).replace(\"\\\'\",\"\\\"\").replace(\"\\\"\",\"\\\"\")))",
             nh.TAB + "_queue_client.send(_msg)",
             nh.TAB + "raise Exception(e)"
         ]
