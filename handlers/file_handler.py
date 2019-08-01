@@ -84,7 +84,10 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
         code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
         notebook_obj.inject_cell(
             position=nh.FIRST_CELL,
-            code=code
+            code=[
+                "import os",
+                "os.chdir(os.path.join(os.getcwd(),\"inputs\",os.path.dirname("+notebook+")))" 
+            ] + code
         )
 
     # Indents code to prepare for try catches

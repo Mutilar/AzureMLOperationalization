@@ -69,7 +69,7 @@ def start_build_pipeline(params):
     # Moves necessary files into snapshot directory
     fh.build_snapshot(
         changed_notebooks=changed_notebooks,
-        dependencies=rq_params["dependencies"] + ["environment.yml"],
+        dependencies=rq_params["dependencies"] + [rc_params["conda_file"]],
         ws_name=ws_params["name"],
         ws_subscription_id=ws_params["subscription_id"],
         ws_resource_group=ws_params["resource_group"]
