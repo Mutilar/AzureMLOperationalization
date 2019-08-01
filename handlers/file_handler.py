@@ -67,25 +67,41 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     notebook_file_location = "./snapshot/inputs/" + notebook
 
     # Opens the notebook
-    notebook = nh.Notebook(
+    notebook_obj = nh.Notebook(
         get_file_str(notebook_file_location)
     )
     
+    # Injecting post-execution code
+    if notebook in postexec:
+        code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
+        notebook_obj.inject_cell(
+            position=nh.LAST_CELL,
+            code=code
+        )
+
+    # Injecting pre-execution code
+    if notebook in preexec:
+        code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
+        notebook_obj.inject_cell(
+            position=nh.FIRST_CELL,
+            code=code
+        )
+
     # Indents code to prepare for try catches
-    notebook.indent_code(
-        cells=notebook.get_cells(nh.EVERY_CELL)
+    notebook_obj.indent_code(
+        cells=notebook_obj.get_cells(nh.EVERY_CELL)
     )
 
     # Injects try catches with failure callbacks
-    notebook.inject_code(
-        cells=notebook.get_cells(nh.EVERY_CELL),
+    notebook_obj.inject_code(
+        cells=notebook_obj.get_cells(nh.EVERY_CELL),
         position=nh.BEGINNING_OF_CELL,
         code=[
             "try:"
         ]
     )
-    notebook.inject_code(
-        cells=notebook.get_cells(nh.EVERY_CELL),
+    notebook_obj.inject_code(
+        cells=notebook_obj.get_cells(nh.EVERY_CELL),
         position=nh.END_OF_CELL,
         code=[
             "except Exception as e:",
@@ -97,8 +113,8 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     )
     
     # Injects callback parameters
-    notebook.inject_code(
-        cells=notebook.get_cells(nh.FIRST_CELL),
+    notebook_obj.inject_code(
+        cells=notebook_obj.get_cells(nh.FIRST_CELL),
         position=nh.BEGINNING_OF_CELL,
         code=[
             "#SP AUTHENTICATION",
@@ -118,8 +134,8 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     )
 
     # Injects success callback
-    notebook.inject_code(
-        cells=notebook.get_cells(nh.LAST_CELL),
+    notebook_obj.inject_code(
+        cells=notebook_obj.get_cells(nh.LAST_CELL),
         position=nh.END_OF_CELL,
         code=[
             "_queue_client = QueueClient.from_connection_string(_connection_string, _queue_name)",
@@ -128,25 +144,9 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
         ]
     )
 
-    # Injecting post-execution code
-    if notebook in postexec:
-        code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
-        notebook.inject_cell(
-            position=nh.LAST_CELL,
-            code=code
-        )
-
-    # Injecting pre-execution code
-    if notebook in preexec:
-        code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
-        notebook.inject_cell(
-            position=nh.FIRST_CELL,
-            code=code
-        )
-
     # Injects callback parameters
     notebook_str = inject_notebook_params(
-        str(notebook),
+        str(notebook_obj),
         params,
         run_id
     )
