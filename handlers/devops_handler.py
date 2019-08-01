@@ -116,5 +116,5 @@ def get_run_results_json(error_message, run_details):
 
 def get_auth_header(auth_token):
     return {
-        'Authorization': f'Bearer {auth_token}'
+        # 'Authorization': f'Bearer {auth_token}'
     }

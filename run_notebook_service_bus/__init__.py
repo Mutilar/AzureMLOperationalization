@@ -53,8 +53,9 @@ def start_build_pipeline(params):
 
     # To be supplied by the "get changed notebooks" script
     changed_notebooks = [
-        "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
-        "notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb"
+        "test.ipynb"
+        # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
+        # "notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb"
     ]
 
     # Downloads repo to staging folder
