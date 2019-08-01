@@ -117,7 +117,6 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
         cells=notebook_obj.get_cells(nh.FIRST_CELL),
         position=nh.BEGINNING_OF_CELL,
         code=[
-            "#CWD FIX",
             "import os",
             "os.chdir(os.path.join(os.getcwd(),\"inputs\",os.path.dirname(\""+notebook+"\")))",
             "#SP AUTHENTICATION",
