@@ -309,9 +309,15 @@ def fetch_requirements(changed_notebooks):
 
                         # Manage post- and pre-execution code preparation
                         if "postexec" in release_json["notebooks"][channel]:
-                            rq_params["postexec"][notebook_path] = os.path.dirname(notebook_path) + release_json["notebooks"][channel]["postexec"]
+                            rq_params["postexec"][notebook_path] = os.path.join(
+                                os.path.dirname(notebook_path),
+                                release_json["notebooks"][channel]["postexec"]
+                            )
                         if "preexec" in release_json["notebooks"][channel]:
-                            rq_params["preexec"][notebook_path] = os.path.dirname(notebook_path) + release_json["notebooks"][channel]["preexec"]
+                            rq_params["preexec"][notebook_path] = os.path.join(
+                                os.path.dirname(notebook_path),
+                                release_json["notebooks"][channel]["preexec"]
+                            )
     
     rq_params["requirements"] = list(requirements)
     rq_params["dependencies"] = list(dependencies)
