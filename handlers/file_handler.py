@@ -120,8 +120,8 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
         cells=notebook_obj.get_cells(nh.FIRST_CELL),
         position=nh.BEGINNING_OF_CELL,
         code=[
-            "import os",
-            "os.chdir(os.path.join(os.getcwd(),\"inputs\",os.path.dirname(\""+notebook+"\")))",
+            # "import os",
+            # "os.chdir(os.path.join(os.getcwd(),\"inputs\",os.path.dirname(\""+notebook+"\")))",
             "#SP AUTHENTICATION",
             "from azureml._base_sdk_common.common import perform_interactive_login",
             "perform_interactive_login(",
@@ -340,13 +340,12 @@ def fetch_requirements(changed_notebooks):
     return rq_params
 
 
-def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id, ws_resource_group):
+def build_snapshot(changed_notebooks, dependencies, postexec, ws_name, ws_subscription_id, ws_resource_group):
     """ Moves files-of-interest into snapshot folder to be run on Azure ML Compute.
     Also generates config files for "from_config" ML Workspaces. 
     """
 
     for notebook in changed_notebooks:
-        
         staging_file = os.path.join(
             "./staging/inputs/",
             notebook
@@ -384,7 +383,6 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
         )
 
     for dependency in dependencies:
-
         staging_file = os.path.join(
             "./staging/inputs/",
             dependency
@@ -399,3 +397,30 @@ def build_snapshot(changed_notebooks, dependencies, ws_name, ws_subscription_id,
             staging_file,
             snapshot_path
         )
+
+    if notebook in postexec:
+        check_notebook_staging_file = os.path.join(
+            "./staging/inputs/",
+            os.path.dirname(notebook),
+            "checknotebookoutput.py"
+        )
+        check_experiment_staging_file = os.path.join(
+            "./staging/inputs/",
+            os.path.dirname(notebook),
+            "checkexperimentresult.py"
+        )
+        snapshot_path = os.path.join(
+            "./snapshot/inputs/",
+            os.path.dirname(notebook)
+        )
+
+        # Moves postexec scripts
+        shutil.move(
+            check_notebook_staging_file,
+            snapshot_path
+        )
+        shutil.move(
+            check_experiment_staging_file,
+            snapshot_path
+        )
+
