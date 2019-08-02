@@ -81,7 +81,7 @@ def submit_run(notebook, exp, conda_file, compute_target, base_image):
             handler=AzureMLNotebookHandler(
                 timeout=1200, # make dynamic based on release.json
                 cwd="inputs/" + os.path.dirname(notebook)
-            )
+            ),
             run_config=fetch_run_config(
                 conda_file=conda_file,
                 compute_target=compute_target,
