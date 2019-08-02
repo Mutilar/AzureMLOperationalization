@@ -158,11 +158,12 @@ class Notebook:
                     counter += 1
 
         # Removes injected cells
-        for position in cells:
-            if self.notebook_json["cells"][position]["cell_type"] == "code":
-                for line in self.notebook_json["cells"][position]["source"]:
+        cells = self.get_cells(EVERY_CELL)
+        for cell in cells:
+            if self.notebook_json["cells"][cell]["cell_type"] == "code":
+                for line in self.notebook_json["cells"][cell]["source"]:
                     if INJECTED_CELL in line:
-                        del self.notebook_json["cells"][position]
+                        del self.notebook_json["cells"][cell]
 
 
     def inject_cell(self, position, code):
