@@ -53,9 +53,10 @@ def start_build_pipeline(params):
 
     # To be supplied by the "get changed notebooks" script
     changed_notebooks = [
-        "test.ipynb"
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb"
+        "notebooks/how-to-use-azureml/automated-machine-learning/subsampling/auto-ml-subsampling-local.ipynb",
+        "notebooks/how-to-use-azureml/automated-machine-learning/forecasting-bike-share/auto-ml-forecasting-bike-share.ipynb",
+        "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
+        "notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb"
     ]
 
     # Downloads repo to staging folder
@@ -156,7 +157,7 @@ def update_build_pipeline(params):
     # Closes pipeline if all Runs are finished
     if exp_status["finished"] is True:
         result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
-        res = dh.post_pipeline_callback(
+        dh.post_pipeline_callback(
             result=result,
             organization=az_params["organization"],
             project_id=cb_params["project_id"],
@@ -166,7 +167,6 @@ def update_build_pipeline(params):
             job_id=cb_params["job_id"],
             auth_token=params["auth_token"]
         )
-        raise Exception(str(res) + "\n" + str(res.status_code))
 
     # Allows for finalization of current Run
     sleep(45) 

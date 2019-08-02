@@ -4,8 +4,8 @@ import requests
 def post_pipeline_callback(result, organization, project_id, hub_name, plan_id, task_id, job_id, auth_token):
     return requests.post(
         get_pipeline_callback_url(organization, project_id, hub_name, plan_id),
-        json=get_pipeline_callback_json(result, task_id, job_id)#,
-        # headers=get_auth_header(auth_token)
+        json=get_pipeline_callback_json(result, task_id, job_id),
+        headers=get_auth_header(auth_token)
     )
 
 
