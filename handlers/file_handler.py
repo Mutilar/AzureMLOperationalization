@@ -312,7 +312,10 @@ def fetch_requirements(changed_notebooks):
                         # Add local file dependencies to set
                         if "dependencies" in release_json["notebooks"][channel]:
                             for dependency in release_json["notebooks"][channel]["dependencies"]:
-                                dependencies.add(os.path.dirname(notebook_path) + dependency)
+                                dependencies.add(os.path.join(
+                                    os.path.dirname(notebook_path),
+                                    dependency
+                                )
 
                         # Manage post- and pre-execution code preparation
                         if "postexec" in release_json["notebooks"][channel]:
