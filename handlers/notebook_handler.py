@@ -172,11 +172,11 @@ class Notebook:
         while counter < cell_count:
             if self.notebook_json["cells"][counter]["cell_type"] == "code":
                 is_injected = False
-                for line in self.notebook_json["cells"][cell]["source"]:
+                for line in self.notebook_json["cells"][counter]["source"]:
                     if INJECTED_CELL in line:
                         is_injected = True
                 if is_injected:
-                    del self.notebook_json["cells"][cell]
+                    del self.notebook_json["cells"][counter]
                     cell_count -= 1
                 else:
                     counter += 1
