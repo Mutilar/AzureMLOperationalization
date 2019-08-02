@@ -113,9 +113,9 @@ class Notebook:
         counter = 0
         cell_count = len(self.notebook_json["cells"])
         while counter < cell_count:
-            if self.notebook_json["cells"][count]["cell_type"] == "code":
-                if self.notebook_json["cells"][count]["source"] == []:
-                    del self.notebook_json["cells"][count]
+            if self.notebook_json["cells"][counter]["cell_type"] == "code":
+                if self.notebook_json["cells"][counter]["source"] == []:
+                    del self.notebook_json["cells"][counter]
                     cell_count -= 1
                 else:
                     counter += 1
