@@ -13,6 +13,10 @@ INJECTED_CODE_START = "#INJECTED CODE START\n"
 INJECTED_CODE_END = "#INJECTED CODE END\n"
 INJECTED_CELL = "#INJECTED CELL\n"
 
+MAGIC_FUNCTIONS = [
+    "\%\%writefile"
+]
+
 
 class Notebook:
 
@@ -101,6 +105,19 @@ class Notebook:
                 self.notebook_json["cells"][cell]["source"][-1] = self.notebook_json["cells"][cell]["source"][-1] + "\n"
                 self.notebook_json["cells"][cell]["source"] = self.notebook_json["cells"][cell]["source"] + [INJECTED_CODE_START] + code + [INJECTED_CODE_END]
 
+
+    def scrub_magic_functions(self, cells):
+        """ Removing magic functions.
+        """
+        for cell in cells:
+            counter = 0
+            cell_size = len(self.notebook_json["cells"][cell]["source"])
+            while counter < cell_size:
+                if any(magic in self.notebook_json["cells"][cell]["source"][counter] for magic in MAGIC_FUNCTIONS):
+                    del self.notebook_json["cells"][cell]["source"][counter]
+                    cell_size -= 1
+                else:
+                    counter += 1
 
     def scrub_code(self, cells):
         """ Removes all lines of code injected by inject_code from a collection of specified code cells.

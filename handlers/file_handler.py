@@ -146,6 +146,11 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
         ]
     )
 
+    # Scrub magic functions
+    notebook_obj.scrub_magic_functions(
+        cells=notebook_obj.get_cells(nh.EVERY_CELL)
+    )
+
     # Injects callback parameters
     notebook_str = inject_notebook_params(
         str(notebook_obj),
