@@ -14,7 +14,7 @@ INJECTED_CODE_END = "#INJECTED CODE END\n"
 INJECTED_CELL = "#INJECTED CELL\n"
 
 MAGIC_FUNCTIONS = [
-    "\%\%writefile"
+    "%%writefile"
 ]
 
 
