@@ -381,6 +381,28 @@ def build_snapshot(changed_notebooks, dependencies, postexec, ws_name, ws_subscr
                 }
             )
         )
+        if notebook in postexec:
+            check_notebook_staging_file = os.path.join(
+                "./staging/inputs/",
+                os.path.dirname(notebook),
+                "checknotebookoutput.py"
+            )
+            check_experiment_staging_file = os.path.join(
+                "./staging/inputs/",
+                os.path.dirname(notebook),
+                "checkexperimentresult.py"
+            )
+
+            # Moves postexec scripts
+            shutil.move(
+                check_notebook_staging_file,
+                snapshot_path
+            )
+            shutil.move(
+                check_experiment_staging_file,
+                snapshot_path
+            )
+
 
     for dependency in dependencies:
         staging_file = os.path.join(
@@ -397,30 +419,3 @@ def build_snapshot(changed_notebooks, dependencies, postexec, ws_name, ws_subscr
             staging_file,
             snapshot_path
         )
-
-    if notebook in postexec:
-        check_notebook_staging_file = os.path.join(
-            "./staging/inputs/",
-            os.path.dirname(notebook),
-            "checknotebookoutput.py"
-        )
-        check_experiment_staging_file = os.path.join(
-            "./staging/inputs/",
-            os.path.dirname(notebook),
-            "checkexperimentresult.py"
-        )
-        snapshot_path = os.path.join(
-            "./snapshot/inputs/",
-            os.path.dirname(notebook)
-        )
-
-        # Moves postexec scripts
-        shutil.move(
-            check_notebook_staging_file,
-            snapshot_path
-        )
-        shutil.move(
-            check_experiment_staging_file,
-            snapshot_path
-        )
-
