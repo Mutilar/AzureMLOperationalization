@@ -166,7 +166,7 @@ def update_build_pipeline(params):
             job_id=cb_params["job_id"],
             auth_token=params["auth_token"]
         )
-        raise Exception(str(res) + "\n" + res.status_code)
+        raise Exception(str(res) + "\n" + str(res.status_code))
 
     # Allows for finalization of current Run
     sleep(45) 
