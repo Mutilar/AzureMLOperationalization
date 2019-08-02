@@ -70,7 +70,10 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     notebook_obj = nh.Notebook(
         get_file_str(notebook_file_location)
     )
-    
+
+    # Removes empty code cells
+    notebook_obj.scrub_empty_cells()
+
     # Injecting post-execution code
     if notebook in postexec:
         code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")

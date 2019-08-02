@@ -106,6 +106,23 @@ class Notebook:
                 self.notebook_json["cells"][cell]["source"] = self.notebook_json["cells"][cell]["source"] + [INJECTED_CODE_START] + code + [INJECTED_CODE_END]
 
 
+    def scrub_empty_cells(self):
+        """ Removes random, empty cells.
+        """
+
+        counter = 0
+        cell_count = len(self.notebook_json["cells"])
+        while counter < cell_count:
+            if self.notebook_json["cells"][count]["cell_type"] == "code":
+                if self.notebook_json["cells"][count]["source"] == []:
+                    del self.notebook_json["cells"][count]
+                    cell_count -= 1
+                else:
+                    counter += 1
+            else: 
+                counter += 1
+
+
     def scrub_magic_functions(self, cells):
         """ Removing magic functions.
         """

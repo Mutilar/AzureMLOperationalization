@@ -47,6 +47,7 @@ stages:
   - job: 
     displayName: End-to-End Testing Job
     pool: server
+    timeoutInMinutes: 0 # Defining Max Runtime
     steps:
     # E2E TESTING
     - task: PublishToAzureServiceBus@1
