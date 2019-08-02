@@ -118,7 +118,16 @@ class Notebook:
                     del self.notebook_json["cells"][counter]
                     cell_count -= 1
                 else:
-                    counter += 1
+                    all_lines_non_code = True
+                    for line in self.notebook_json["cells"][counter]["source"]:
+                        line_no_whitespace = "".join(line.split())
+                        if not line_no_whitespace == "" and not line_no_whitespace[0] == "#":
+                            all_lines_non_code = False
+                    if all_lines_non_code:
+                        del self.notebook_json["cells"][counter]
+                        cell_count -= 1
+                    else:
+                        counter += 1
             else: 
                 counter += 1
 
