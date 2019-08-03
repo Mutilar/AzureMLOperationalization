@@ -52,7 +52,7 @@ def start_build_pipeline(params):
     ws_params = az_params["workspace"]
 
     changed_notebooks = rc_params["notebooks"].split(",")
-
+    #notebooks\how-to-use-azureml\monitor-models\data-drift\azure-ml-datadraft.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb
     # To be supplied by the "get changed notebooks" script
     # changed_notebooks = [
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
@@ -221,8 +221,8 @@ def update_build_pipeline(params):
     # Attaches Run's output logs
     logs = run.get_all_logs("snapshot/outputs/")
     for log in logs:
-        r = dh.post_run_attachment(
-            file_name=log.split("/")[-1],
+        dh.post_run_attachment(
+            file_name=os.path.basename(log),
             stream=encode(fh.get_file_str(log).encode("utf-8")),
             organization=az_params["organization"],
             project=az_params["project"],
