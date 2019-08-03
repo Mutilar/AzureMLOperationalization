@@ -59,7 +59,7 @@ def inject_pip_package(file_str, requirement):
     )
 
 
-def add_notebook_callback(params, notebook, run_id, postexec, preexec):
+def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None):
     """ Enables notebooks to call back to the Azure Function.
     This is done to update the Pipeline based on Run results.
     """
@@ -74,21 +74,23 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     # Removes empty code cells
     notebook_obj.scrub_empty_cells()
 
-    # Injecting post-execution code
-    # if notebook in postexec:
-    #     code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
-    #     notebook_obj.inject_cell(
-    #         position=nh.LAST_CELL,
-    #         code=code
-    #     )
+    Injecting post-execution code
+    if postexec:
+        if notebook in postexec:
+            code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
+            notebook_obj.inject_cell(
+                position=nh.LAST_CELL,
+                code=code
+            )
 
     # Injecting pre-execution code
-    if notebook in preexec:
-        code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
-        notebook_obj.inject_cell(
-            position=nh.FIRST_CELL,
-            code=code
-        )
+    if preexec:
+        if notebook in preexec:
+            code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
+            notebook_obj.inject_cell(
+                position=nh.FIRST_CELL,
+                code=code
+            )
 
     # Indents code to prepare for try catches
     notebook_obj.indent_code(
