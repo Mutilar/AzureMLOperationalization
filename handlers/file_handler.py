@@ -75,12 +75,12 @@ def add_notebook_callback(params, notebook, run_id, postexec, preexec):
     notebook_obj.scrub_empty_cells()
 
     # Injecting post-execution code
-    if notebook in postexec:
-        code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
-        notebook_obj.inject_cell(
-            position=nh.LAST_CELL,
-            code=code
-        )
+    # if notebook in postexec:
+    #     code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
+    #     notebook_obj.inject_cell(
+    #         position=nh.LAST_CELL,
+    #         code=code
+    #     )
 
     # Injecting pre-execution code
     if notebook in preexec:
