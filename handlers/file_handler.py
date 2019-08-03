@@ -232,8 +232,7 @@ def fetch_repo(repo, version):
     if os.path.exists(os.getcwd() + "/staging/"):
         shutil.rmtree(os.getcwd() + "/staging/")
 
-    # Recreates snapshot and staging folders
-    os.makedirs(os.getcwd() + "/snapshot/inputs/")
+    # Recreates staging folder
     os.makedirs(os.getcwd() + "/staging/")
 
     # Moves to snapshot directory
