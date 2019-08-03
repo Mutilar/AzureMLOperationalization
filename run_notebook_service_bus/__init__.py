@@ -115,9 +115,9 @@ def start_build_pipeline(params):
         # Moves necessary files into snapshot directory
         fh.build_snapshot(
             notebook=notebook,
-            dependencies=rq_params["dependencies"],
-            requirements=rq_params["requirements"] + ["azure-servicebus", "azureml", "azureml-sdk"],
-            postexec=rq_params["postexec"],
+            dependencies=rq_params.get("dependencies"),
+            requirements=rq_params.get("requirements") + ["azure-servicebus", "azureml", "azureml-sdk"],
+            postexec=rq_params.get("postexec"),
             conda_file=rc_params["conda_file"],
             ws_name=ws_params["name"],
             ws_subscription_id=ws_params["subscription_id"],
@@ -129,15 +129,14 @@ def start_build_pipeline(params):
             notebook=notebook, 
             params=params, 
             run_id=run_id,
-            postexec=rq_params["postexec"],
-            preexec=rq_params["preexec"]
+            postexec=rq_params.get("postexec")
         )
 
         # Submits notebook Run to Experiment
         run = ah.submit_run(
             notebook=notebook,
             exp=exp,
-            timeout=rq_params["celltimeout"],
+            timeout=rq_params.get("celltimeout"),
             conda_file=rc_params["conda_file"],
             compute_target=rc_params["compute_target"],
             base_image=rc_params["base_image"]
