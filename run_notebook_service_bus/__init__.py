@@ -51,8 +51,10 @@ def start_build_pipeline(params):
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
 
+    changed_notebooks = rc_params["notebooks"].split(",")
+
     # To be supplied by the "get changed notebooks" script
-    changed_notebooks = [
+    # changed_notebooks = [
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb", # NO MODULE NAMED CHECKCELLOUTPUT
         # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute/auto-ml-remote-amlcompute.ipynb",
@@ -61,7 +63,7 @@ def start_build_pipeline(params):
         # "notebooks/how-to-use-azureml/automated-machine-learning/sparse-data-train-test-split/auto-ml-sparse-data-train-test-split.ipynb", # MODULE PANDAS COMPAT HAS NO ATTRIBUTE ITERITEMS
         # "notebooks/how-to-use-azureml/automated-machine-learning/exploring-previous-runs/auto-ml-exploring-previous-runs.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-deployment/auto-ml-classification-with-deployment.ipynb",
-        "notebooks/how-to-use-azureml/automated-machine-learning/sample-weight/auto-ml-sample-weight.ipynb"
+        # "notebooks/how-to-use-azureml/automated-machine-learning/sample-weight/auto-ml-sample-weight.ipynb"
         # "notebooks/how-to-use-azureml/automated-machine-learning/subsampling/auto-ml-subsampling-local.ipynb", # RUN SUCCESSFULLY
         # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep/auto-ml-dataprep.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep-remote-execution/auto-ml-dataprep-remote-execution.ipynb",
@@ -75,7 +77,7 @@ def start_build_pipeline(params):
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification-bank-marketing/auto-ml-classification-bank-marketing.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/regression-hardware-performance/auto-ml-regression-hardware-performance.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb" # COULD NOT FIND MODEL WITH VALID SCORE FOR METRIC SPEARMAN CORRELATION
-    ]
+    # ]
 
     # Downloads repo to staging folder
     fh.fetch_repo(
