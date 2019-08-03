@@ -128,8 +128,8 @@ def start_build_pipeline(params):
         fh.add_notebook_callback(
             notebook=notebook, 
             params=params, 
-            run_id=run_id,
-            postexec=rq_params.get("postexec")
+            run_id=run_id
+            # postexec=rq_params.get("postexec")
         )
 
         # Submits notebook Run to Experiment
