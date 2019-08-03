@@ -74,7 +74,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     # Removes empty code cells
     notebook_obj.scrub_empty_cells()
 
-    Injecting post-execution code
+    # Injecting post-execution code
     if postexec:
         if notebook in postexec:
             code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
@@ -266,16 +266,8 @@ def fetch_repo(repo, version):
 
 
 def fetch_requirements(notebook):
-
-    rq_params = {
-        "requirements": [],
-        "dependencies": [],
-        "postexec": {},
-        "preexec": {}
-    }
-
-    requirements = set([])
-    dependencies = set([])
+    """ Finds notebook's definition in a release.json file to determine dependencies and requirements. 
+    """
 
     for root, dirs, files in os.walk("./staging/inputs/"):
         for file in files:
@@ -308,40 +300,7 @@ def fetch_requirements(notebook):
 
                     if notebook_path == notebook:
                         return release_json["notebooks"][channel]
-
-                        # # Add pip package requirements to set
-                        # if "requirements" in release_json["notebooks"][channel]:
-                        #     for requirement in release_json["notebooks"][channel]["requirements"]:
-                        #         requirements.add(requirement)
-
-                        # # Add local file dependencies to set
-                        # if "dependencies" in release_json["notebooks"][channel]:
-                        #     for dependency in release_json["notebooks"][channel]["dependencies"]:
-                        #         dependencies.add(
-                        #             os.path.join(
-                        #                 os.path.dirname(notebook_path),
-                        #                 dependency
-                        #             )
-                        #         )
-
-                        # # Manage post- and pre-execution code preparation
-                        # if "postexec" in release_json["notebooks"][channel]:
-                        #     rq_params["postexec"][notebook_path] = os.path.join(
-                        #         os.path.dirname(notebook_path),
-                        #         release_json["notebooks"][channel]["postexec"]
-                        #     )
-                        # if "preexec" in release_json["notebooks"][channel]:
-                        #     rq_params["preexec"][notebook_path] = os.path.join(
-                        #         os.path.dirname(notebook_path),
-                        #         release_json["notebooks"][channel]["preexec"]
-                        #     )
-    
     return {}
-
-    # rq_params["requirements"] = list(requirements)
-    # rq_params["dependencies"] = list(dependencies)
-
-    # return rq_params
 
 
 def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, ws_name, ws_subscription_id, ws_resource_group):
@@ -386,7 +345,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         )
     )
 
-    # Move Conda File
+    # Moves and populates Conda File
     conda_staging_file = os.path.join(
         "./staging/inputs/",
         conda_file

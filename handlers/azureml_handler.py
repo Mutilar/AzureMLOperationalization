@@ -79,8 +79,11 @@ def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image):
             notebook="inputs/" + notebook,
             output_notebook="outputs/output.ipynb",
             handler=AzureMLNotebookHandler(
-                timeout=timeout, # make dynamic based on release.json
-                cwd="inputs/" + os.path.dirname(notebook)
+                timeout=timeout,
+                cwd=os.path.join(
+                    "inputs/",
+                    os.path.dirname(notebook)
+                )
             ),
             run_config=fetch_run_config(
                 conda_file=conda_file,
