@@ -312,11 +312,11 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         shutil.rmtree(os.getcwd() + "/snapshot/")
 
     staging_file = os.path.join(
-        "./staging/inputs/",
+        "./staging/inputs",
         notebook
     )
     snapshot_path = os.path.join(
-        "./snapshot/inputs/",
+        "./snapshot/inputs",
         os.path.dirname(notebook)
     )
 
@@ -346,11 +346,11 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
 
     # Moves and populates Conda File
     conda_staging_file = os.path.join(
-        "./staging/inputs/",
+        "./staging/inputs",
         conda_file
     )
     conda_snapshot_path = os.path.join(
-        "./snapshot/inputs/",
+        "./snapshot/inputs",
         os.path.dirname(conda_file)
     )
     shutil.copy(
@@ -368,12 +368,12 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
 
     if postexec:
         check_notebook_staging_file = os.path.join(
-            "./staging/inputs/",
+            "./staging/inputs",
             os.path.dirname(notebook),
             "checknotebookoutput.py"
         )
         check_experiment_staging_file = os.path.join(
-            "./staging/inputs/",
+            "./staging/inputs",
             os.path.dirname(notebook),
             "checkexperimentresult.py"
         )
@@ -389,7 +389,8 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
     if dependencies:
         for dependency in dependencies:
             staging_file = os.path.join(
-                "./staging/inputs/",
+                "./staging/inputs",
+                os.path.dirname(notebook),
                 dependency
             )
             shutil.copy(

@@ -61,7 +61,10 @@ def fetch_run_config(conda_file, compute_target, base_image):
 
     # Specifies Conda file location
     run_config.environment.python.conda_dependencies = CondaDependencies(
-        "snapshot/inputs/" + conda_file
+        os.path.join(
+            "snapshot/inputs",
+            conda_file
+        )
     )
 
     # Returns configuration
@@ -76,12 +79,15 @@ def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image):
     run = exp.submit(
         NotebookRunConfig(
             source_directory="snapshot/",
-            notebook="inputs/" + notebook,
+            notebook=os.path.join(
+                "inputs",
+                notebook
+            ),
             output_notebook="outputs/output.ipynb",
             handler=AzureMLNotebookHandler(
                 timeout=timeout,
                 cwd=os.path.join(
-                    "inputs/",
+                    "inputs",
                     os.path.dirname(notebook)
                 )
             ),
