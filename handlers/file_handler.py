@@ -360,9 +360,6 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         os.path.dirname(notebook)
     )
 
-    # Add directory in snapshot folder if not present
-    #   Since config and dependency files always live in same directory as notebook,
-    #   It's only necessary to check if path exists for the notebook's path.
     if not os.path.exists(snapshot_path):
         os.makedirs(snapshot_path)
 
@@ -386,7 +383,8 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
             }
         )
     )
-    
+
+    # Move Conda File
     conda_staging_file = os.path.join(
         "./staging/inputs/",
         conda_file
@@ -395,8 +393,6 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         "./snapshot/inputs/",
         os.path.dirname(conda_file)
     )
-
-    # Moves dependency
     shutil.copy(
         conda_staging_file,
         conda_snapshot_path
@@ -407,7 +403,6 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
     )
 
     if postexec:
-        
         check_notebook_staging_file = os.path.join(
             "./staging/inputs/",
             os.path.dirname(notebook),
@@ -418,8 +413,6 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
             os.path.dirname(notebook),
             "checkexperimentresult.py"
         )
-
-        # Moves postexec scripts
         shutil.copy(
             check_notebook_staging_file,
             snapshot_path
@@ -429,15 +422,13 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
             snapshot_path
         )
 
-    for dependency in dependencies:
-
-        staging_file = os.path.join(
-            "./staging/inputs/",
-            dependency
-        )
-
-        # Moves dependency
-        shutil.copy(
-            staging_file,
-            snapshot_path
-        )
+    if dependencies:
+        for dependency in dependencies:
+            staging_file = os.path.join(
+                "./staging/inputs/",
+                dependency
+            )
+            shutil.copy(
+                staging_file,
+                snapshot_path
+            )
