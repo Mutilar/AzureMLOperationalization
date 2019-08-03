@@ -68,7 +68,7 @@ def fetch_run_config(conda_file, compute_target, base_image):
     return run_config
 
 
-def submit_run(notebook, exp, conda_file, compute_target, base_image):
+def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image):
     """ Submits a new Run with configurations based on the pipeline parameters.
     """
 
@@ -79,7 +79,7 @@ def submit_run(notebook, exp, conda_file, compute_target, base_image):
             notebook="inputs/" + notebook,
             output_notebook="outputs/output.ipynb",
             handler=AzureMLNotebookHandler(
-                timeout=1200, # make dynamic based on release.json
+                timeout=timeout, # make dynamic based on release.json
                 cwd="inputs/" + os.path.dirname(notebook)
             ),
             run_config=fetch_run_config(

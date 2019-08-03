@@ -63,9 +63,9 @@ def start_build_pipeline(params):
         # "notebooks/how-to-use-azureml/automated-machine-learning/sparse-data-train-test-split/auto-ml-sparse-data-train-test-split.ipynb", # MODULE PANDAS COMPAT HAS NO ATTRIBUTE ITERITEMS
         # "notebooks/how-to-use-azureml/automated-machine-learning/exploring-previous-runs/auto-ml-exploring-previous-runs.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-deployment/auto-ml-classification-with-deployment.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/sample-weight/auto-ml-sample-weight.ipynb"
+        # "notebooks/how-to-use-azureml/automated-machine-learning/sample-weight/auto-ml-sample-weight.ipynb", # WEIRD POSTEXEC ERROR
         # "notebooks/how-to-use-azureml/automated-machine-learning/subsampling/auto-ml-subsampling-local.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep/auto-ml-dataprep.ipynb",
+        # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep/auto-ml-dataprep.ipynb", # MODULE PANDAS COMPAT HAS NO ATTRIBUTE ITERITEMS
         # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep-remote-execution/auto-ml-dataprep-remote-execution.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/model-explanation/auto-ml-model-explanation.ipynb", # RUN SUCCESSFULLY
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-whitelisting/auto-ml-classification-with-whitelisting.ipynb",
@@ -83,25 +83,6 @@ def start_build_pipeline(params):
     fh.fetch_repo(
         repo=rc_params["repo"],
         version=rc_params["version"]
-    )
-    
-    # Collects required pip packages and associated files
-    rq_params = fh.fetch_requirements(changed_notebooks)
-
-    # Moves necessary files into snapshot directory
-    fh.build_snapshot(
-        changed_notebooks=changed_notebooks,
-        dependencies=rq_params["dependencies"] + [rc_params["conda_file"]],
-        postexec=rq_params["postexec"],
-        ws_name=ws_params["name"],
-        ws_subscription_id=ws_params["subscription_id"],
-        ws_resource_group=ws_params["resource_group"]
-    )
-
-    # Injects necessary packages in conda file    
-    fh.add_pip_packages(
-        conda_file=rc_params["conda_file"],
-        requirements=rq_params["requirements"] + ["azure-servicebus", "azureml", "azureml-sdk"]
     )
 
     # Fetches Experiment to submit runs on
@@ -128,6 +109,21 @@ def start_build_pipeline(params):
         )
         run_id = response.json()["id"]
 
+        # Collects required pip packages and associated files
+        rq_params = fh.fetch_requirements(notebook)
+
+        # Moves necessary files into snapshot directory
+        fh.build_snapshot(
+            notebook=notebook,
+            dependencies=rq_params["dependencies"],
+            requirements=rq_params["requirements"] + ["azure-servicebus", "azureml", "azureml-sdk"],
+            postexec=rq_params["postexec"],
+            conda_file=rc_params["conda_file"],
+            ws_name=ws_params["name"],
+            ws_subscription_id=ws_params["subscription_id"],
+            ws_resource_group=ws_params["resource_group"]
+        )
+
         # Adds try-catch callback mechanism to notebook
         fh.add_notebook_callback(
             notebook=notebook, 
@@ -141,6 +137,7 @@ def start_build_pipeline(params):
         run = ah.submit_run(
             notebook=notebook,
             exp=exp,
+            timeout=rq_params["celltimeout"],
             conda_file=rc_params["conda_file"],
             compute_target=rc_params["compute_target"],
             base_image=rc_params["base_image"]

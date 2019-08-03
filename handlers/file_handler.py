@@ -226,9 +226,7 @@ def fetch_repo(repo, version):
     """ Clones a GitHub repository locally into the snapshot folder.
     """
     
-    # Wipes snapshot and staging directories, clearing out old files
-    if os.path.exists(os.getcwd() + "/snapshot/"):
-        shutil.rmtree(os.getcwd() + "/snapshot/")
+    # Wipes staging directories, clearing out old files
     if os.path.exists(os.getcwd() + "/staging/"):
         shutil.rmtree(os.getcwd() + "/staging/")
 
@@ -265,7 +263,7 @@ def fetch_repo(repo, version):
     os.chdir("..")
 
 
-def fetch_requirements(changed_notebooks):
+def fetch_requirements(notebook):
 
     rq_params = {
         "requirements": [],
@@ -305,117 +303,141 @@ def fetch_requirements(changed_notebooks):
                                 channel_notebook["name"]
                             ).split("/")[3:]
                         )
-                    if notebook_path in changed_notebooks:
 
-                        # Add pip package requirements to set
-                        if "requirements" in release_json["notebooks"][channel]:
-                            for requirement in release_json["notebooks"][channel]["requirements"]:
-                                requirements.add(requirement)
+                    if notebook_path == notebook:
+                        return release_json["notebooks"][channel]
 
-                        # Add local file dependencies to set
-                        if "dependencies" in release_json["notebooks"][channel]:
-                            for dependency in release_json["notebooks"][channel]["dependencies"]:
-                                dependencies.add(
-                                    os.path.join(
-                                        os.path.dirname(notebook_path),
-                                        dependency
-                                    )
-                                )
+                        # # Add pip package requirements to set
+                        # if "requirements" in release_json["notebooks"][channel]:
+                        #     for requirement in release_json["notebooks"][channel]["requirements"]:
+                        #         requirements.add(requirement)
 
-                        # Manage post- and pre-execution code preparation
-                        if "postexec" in release_json["notebooks"][channel]:
-                            rq_params["postexec"][notebook_path] = os.path.join(
-                                os.path.dirname(notebook_path),
-                                release_json["notebooks"][channel]["postexec"]
-                            )
-                        if "preexec" in release_json["notebooks"][channel]:
-                            rq_params["preexec"][notebook_path] = os.path.join(
-                                os.path.dirname(notebook_path),
-                                release_json["notebooks"][channel]["preexec"]
-                            )
+                        # # Add local file dependencies to set
+                        # if "dependencies" in release_json["notebooks"][channel]:
+                        #     for dependency in release_json["notebooks"][channel]["dependencies"]:
+                        #         dependencies.add(
+                        #             os.path.join(
+                        #                 os.path.dirname(notebook_path),
+                        #                 dependency
+                        #             )
+                        #         )
+
+                        # # Manage post- and pre-execution code preparation
+                        # if "postexec" in release_json["notebooks"][channel]:
+                        #     rq_params["postexec"][notebook_path] = os.path.join(
+                        #         os.path.dirname(notebook_path),
+                        #         release_json["notebooks"][channel]["postexec"]
+                        #     )
+                        # if "preexec" in release_json["notebooks"][channel]:
+                        #     rq_params["preexec"][notebook_path] = os.path.join(
+                        #         os.path.dirname(notebook_path),
+                        #         release_json["notebooks"][channel]["preexec"]
+                        #     )
     
-    rq_params["requirements"] = list(requirements)
-    rq_params["dependencies"] = list(dependencies)
+    return {}
 
-    return rq_params
+    # rq_params["requirements"] = list(requirements)
+    # rq_params["dependencies"] = list(dependencies)
+
+    # return rq_params
 
 
-def build_snapshot(changed_notebooks, dependencies, postexec, ws_name, ws_subscription_id, ws_resource_group):
+def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, ws_name, ws_subscription_id, ws_resource_group):
     """ Moves files-of-interest into snapshot folder to be run on Azure ML Compute.
     Also generates config files for "from_config" ML Workspaces. 
     """
 
-    for notebook in changed_notebooks:
-        staging_file = os.path.join(
+    # Wipe any previous snapshot builds
+    if os.path.exists(os.getcwd() + "/snapshot/"):
+        shutil.rmtree(os.getcwd() + "/snapshot/")
+
+    staging_file = os.path.join(
+        "./staging/inputs/",
+        notebook
+    )
+    snapshot_path = os.path.join(
+        "./snapshot/inputs/",
+        os.path.dirname(notebook)
+    )
+
+    # Add directory in snapshot folder if not present
+    #   Since config and dependency files always live in same directory as notebook,
+    #   It's only necessary to check if path exists for the notebook's path.
+    if not os.path.exists(snapshot_path):
+        os.makedirs(snapshot_path)
+
+    # Moves notebook
+    shutil.copy(
+        staging_file,
+        snapshot_path
+    )
+
+    # Adds notebook config file
+    set_file_str(
+        file_location=os.path.join(
+            snapshot_path,
+            'config.json'
+        ),
+        output=json.dumps(
+            {
+                'subscription_id': ws_subscription_id,
+                'resource_group': ws_resource_group,
+                'workspace_name': ws_name
+            }
+        )
+    )
+    
+    conda_staging_file = os.path.join(
+        "./staging/inputs/",
+        conda_file
+    )
+    conda_snapshot_path = os.path.join(
+        "./snapshot/inputs/",
+        os.path.dirname(conda_file)
+    )
+
+    # Moves dependency
+    shutil.copy(
+        conda_staging_file,
+        conda_snapshot_path
+    )
+    add_pip_packages(
+        conda_file,
+        requirements
+    )
+
+    if postexec:
+        
+        check_notebook_staging_file = os.path.join(
             "./staging/inputs/",
-            notebook
+            os.path.dirname(notebook),
+            "checknotebookoutput.py"
         )
-        snapshot_path = os.path.join(
-            "./snapshot/inputs/",
-            os.path.dirname(notebook)
+        check_experiment_staging_file = os.path.join(
+            "./staging/inputs/",
+            os.path.dirname(notebook),
+            "checkexperimentresult.py"
         )
 
-        # Add directory in snapshot folder if not present
-        #   Since config and dependency files always live in same directory as notebook,
-        #   It's only necessary to check if path exists for the notebook's path.
-        if not os.path.exists(snapshot_path):
-            os.makedirs(snapshot_path)
-
-        # Moves notebook
-        shutil.move(
-            staging_file,
+        # Moves postexec scripts
+        shutil.copy(
+            check_notebook_staging_file,
+            snapshot_path
+        )
+        shutil.copy(
+            check_experiment_staging_file,
             snapshot_path
         )
 
-        # Adds notebook config file
-        set_file_str(
-            file_location=os.path.join(
-                snapshot_path,
-                'config.json'
-            ),
-            output=json.dumps(
-                {
-                    'subscription_id': ws_subscription_id,
-                    'resource_group': ws_resource_group,
-                    'workspace_name': ws_name
-                }
-            )
-        )
-        if notebook in postexec:
-            check_notebook_staging_file = os.path.join(
-                "./staging/inputs/",
-                os.path.dirname(notebook),
-                "checknotebookoutput.py"
-            )
-            check_experiment_staging_file = os.path.join(
-                "./staging/inputs/",
-                os.path.dirname(notebook),
-                "checkexperimentresult.py"
-            )
-
-            # Moves postexec scripts
-            shutil.move(
-                check_notebook_staging_file,
-                snapshot_path
-            )
-            shutil.move(
-                check_experiment_staging_file,
-                snapshot_path
-            )
-
-
     for dependency in dependencies:
+
         staging_file = os.path.join(
             "./staging/inputs/",
             dependency
         )
-        snapshot_path = os.path.join(
-            "./snapshot/inputs/",
-            os.path.dirname(dependency)
-        )
 
         # Moves dependency
-        shutil.move(
+        shutil.copy(
             staging_file,
             snapshot_path
         )
