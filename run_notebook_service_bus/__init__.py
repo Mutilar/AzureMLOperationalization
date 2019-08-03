@@ -116,7 +116,7 @@ def start_build_pipeline(params):
         fh.build_snapshot(
             notebook=notebook,
             dependencies=rq_params.get("dependencies"),
-            requirements=rq_params.get("requirements") + ["azure-servicebus", "azureml", "azureml-sdk"],
+            requirements=rq_params.get("requirements"),
             postexec=rq_params.get("postexec"),
             conda_file=rc_params["conda_file"],
             ws_name=ws_params["name"],

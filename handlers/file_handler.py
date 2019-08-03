@@ -358,6 +358,10 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         conda_staging_file,
         conda_snapshot_path
     )
+    if not requirements:
+        requirements = ["azure-servicebus", "azureml", "azureml-sdk"]
+    else:
+        requirements += ["azure-servicebus", "azureml", "azureml-sdk"]
     add_pip_packages(
         conda_file,
         requirements
