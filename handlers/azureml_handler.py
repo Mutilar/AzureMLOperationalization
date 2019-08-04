@@ -91,7 +91,7 @@ def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image, s
                     os.path.dirname(notebook)
                 )
             ),
-            params={
+            parameters={
                 "SP_USERNAME": sp_username,
                 "SP_TENANT": sp_tenant,
                 "SP_PASSWORD": sp_password
