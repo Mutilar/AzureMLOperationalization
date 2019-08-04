@@ -82,6 +82,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
         code = get_file_str(
             os.path.join(
                 "./staging/inputs",
+                os.path.dirname(notebook),
                 postexec
             )
         )
@@ -95,6 +96,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
         code = get_file_str(
             os.path.join(
                 "./staging/inputs/",
+                os.path.dirname(notebook),
                 preexec
             )
         )
