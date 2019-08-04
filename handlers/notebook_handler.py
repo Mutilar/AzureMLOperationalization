@@ -140,6 +140,10 @@ class Notebook:
             cell_size = len(self.notebook_json["cells"][cell]["source"])
             while counter < cell_size:
                 if any(magic in self.notebook_json["cells"][cell]["source"][counter] for magic in MAGIC_FUNCTIONS):
+                    file = open(
+                        self.notebook_json["cells"][cell]["source"][counter].split(" ")[-1], 
+                        "w+"
+                    )
                     del self.notebook_json["cells"][cell]["source"][counter]
                     cell_size -= 1
                 else:
