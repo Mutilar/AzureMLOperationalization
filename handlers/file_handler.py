@@ -85,7 +85,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
                 os.path.dirname(notebook),
                 postexec
             )
-        )
+        ).split("\n")
         notebook_obj.inject_cell(
             position=nh.LAST_CELL,
             code=code
@@ -99,7 +99,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
                 os.path.dirname(notebook),
                 preexec
             )
-        )
+        ).split("\n")
         notebook_obj.inject_cell(
             position=nh.FIRST_CELL,
             code=code
