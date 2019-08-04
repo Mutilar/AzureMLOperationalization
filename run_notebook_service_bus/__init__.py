@@ -126,8 +126,8 @@ def start_build_pipeline(params):
 
         # Adds try-catch callback mechanism to notebook
         fh.add_notebook_callback(
-            notebook=notebook, 
-            params=params, 
+            notebook=notebook,
+            params=params,
             run_id=run_id
             # postexec=rq_params.get("postexec")
         )

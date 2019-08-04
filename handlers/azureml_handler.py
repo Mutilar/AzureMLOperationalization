@@ -91,11 +91,11 @@ def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image, s
                     os.path.dirname(notebook)
                 )
             ),
-            parameters={
-                "SP_USERNAME": sp_username,
-                "SP_TENANT": sp_tenant,
-                "SP_PASSWORD": sp_password
-            },
+            # parameters={
+            #     "SP_USERNAME": sp_username,
+            #     "SP_TENANT": sp_tenant,
+            #     "SP_PASSWORD": sp_password
+            # },
             run_config=fetch_run_config(
                 conda_file=conda_file,
                 compute_target=compute_target,
