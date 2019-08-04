@@ -55,6 +55,7 @@ def start_build_pipeline(params):
     #notebooks\how-to-use-azureml\monitor-models\data-drift\azure-ml-datadraft.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb
     # To be supplied by the "get changed notebooks" script
     # changed_notebooks = [
+        # "notebooks/how-to-use-azureml/training-with-deep-learning/train-tensorflow-resume-training/train-tensorflow-resume-training.ipynb", # Ran successfully, no teletry?
         # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb", # NO MODULE NAMED CHECKCELLOUTPUT
         # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute/auto-ml-remote-amlcompute.ipynb",
@@ -128,8 +129,8 @@ def start_build_pipeline(params):
         fh.add_notebook_callback(
             notebook=notebook,
             params=params,
-            run_id=run_id
-            # postexec=rq_params.get("postexec")
+            run_id=run_id,
+            postexec=rq_params.get("postexec")
         )
 
         # Submits notebook Run to Experiment

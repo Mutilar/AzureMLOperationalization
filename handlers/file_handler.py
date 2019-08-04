@@ -64,7 +64,10 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     This is done to update the Pipeline based on Run results.
     """
     
-    notebook_file_location = "./snapshot/inputs/" + notebook
+    notebook_file_location = os.path.join(
+        "./snapshot/inputs",
+        notebook
+    )
 
     # Opens the notebook
     notebook_obj = nh.Notebook(
@@ -77,7 +80,12 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     # Injecting post-execution code
     if postexec:
         if notebook in postexec:
-            code = get_file_str("./staging/inputs/" + postexec[notebook]).split("\n")
+            code = get_file_str(
+                os.path.join(
+                    "./staging/inputs",
+                    postexec[notebook]
+                ).split("\n")
+            )
             notebook_obj.inject_cell(
                 position=nh.LAST_CELL,
                 code=code
@@ -86,7 +94,12 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     # Injecting pre-execution code
     if preexec:
         if notebook in preexec:
-            code = get_file_str("./staging/inputs/" + preexec[notebook]).split("\n")
+            code = get_file_str(
+                os.path.join(
+                    "./staging/inputs/",
+                    preexec[notebook]
+                ).split("\n")
+            )
             notebook_obj.inject_cell(
                 position=nh.FIRST_CELL,
                 code=code
