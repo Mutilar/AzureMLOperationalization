@@ -83,7 +83,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
             os.path.join(
                 "./staging/inputs",
                 postexec
-            ).split("\n")
+            )
         )
         notebook_obj.inject_cell(
             position=nh.LAST_CELL,
@@ -96,7 +96,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
             os.path.join(
                 "./staging/inputs/",
                 preexec
-            ).split("\n")
+            )
         )
         notebook_obj.inject_cell(
             position=nh.FIRST_CELL,
