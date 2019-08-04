@@ -79,31 +79,29 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
 
     # Injecting post-execution code
     if postexec:
-        if notebook in postexec:
-            code = get_file_str(
-                os.path.join(
-                    "./staging/inputs",
-                    postexec[notebook]
-                ).split("\n")
-            )
-            notebook_obj.inject_cell(
-                position=nh.LAST_CELL,
-                code=code
-            )
+        code = get_file_str(
+            os.path.join(
+                "./staging/inputs",
+                postexec
+            ).split("\n")
+        )
+        notebook_obj.inject_cell(
+            position=nh.LAST_CELL,
+            code=code
+        )
 
     # Injecting pre-execution code
     if preexec:
-        if notebook in preexec:
-            code = get_file_str(
-                os.path.join(
-                    "./staging/inputs/",
-                    preexec[notebook]
-                ).split("\n")
-            )
-            notebook_obj.inject_cell(
-                position=nh.FIRST_CELL,
-                code=code
-            )
+        code = get_file_str(
+            os.path.join(
+                "./staging/inputs/",
+                preexec
+            ).split("\n")
+        )
+        notebook_obj.inject_cell(
+            position=nh.FIRST_CELL,
+            code=code
+        )
 
     # Indents code to prepare for try catches
     notebook_obj.indent_code(
