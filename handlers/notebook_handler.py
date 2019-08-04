@@ -1,4 +1,6 @@
 import json
+import shutil
+import os
 
 TAB = "    "
 
@@ -132,7 +134,7 @@ class Notebook:
                 counter += 1
 
 
-    def scrub_magic_functions(self, cells):
+    def scrub_magic_functions(self, cells, folder):
         """ Removing magic functions.
         """
         for cell in cells:
@@ -140,9 +142,14 @@ class Notebook:
             cell_size = len(self.notebook_json["cells"][cell]["source"])
             while counter < cell_size:
                 if any(magic in self.notebook_json["cells"][cell]["source"][counter] for magic in MAGIC_FUNCTIONS):
+                    file_name = self.notebook_json["cells"][cell]["source"][counter].split(" ")[-1]
                     file = open(
-                        self.notebook_json["cells"][cell]["source"][counter].split(" ")[-1], 
+                        file_name, 
                         "w+"
+                    )
+                    shutil.move(
+                        file_name,
+                        os.path.dirname(folder)
                     )
                     del self.notebook_json["cells"][cell]["source"][counter]
                     cell_size -= 1

@@ -155,6 +155,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     # Scrub magic functions
     notebook_obj.scrub_magic_functions(
         cells=notebook_obj.get_cells(nh.EVERY_CELL)
+        folder=notebook_file_location
     )
 
     # Injects callback parameters
