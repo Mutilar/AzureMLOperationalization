@@ -392,12 +392,21 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
             os.path.dirname(notebook),
             "checkexperimentresult.py"
         )
+        check_cell_staging_file = os.path.join(
+            "./staging/inputs",
+            os.path.dirname(notebook),
+            "checkcelloutput.py"
+        )
         shutil.copy(
             check_notebook_staging_file,
             snapshot_path
         )
         shutil.copy(
             check_experiment_staging_file,
+            snapshot_path
+        )
+        shutil.copy(
+            check_cell_staging_file,
             snapshot_path
         )
 
