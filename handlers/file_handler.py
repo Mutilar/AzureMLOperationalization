@@ -78,7 +78,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     notebook_obj.scrub_empty_cells()
 
     # Injecting post-execution code
-    if postexec:
+    if postexec is not None:
         code = get_file_str(
             os.path.join(
                 "./staging/inputs",
