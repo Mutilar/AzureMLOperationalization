@@ -88,7 +88,7 @@ def start_build_pipeline(params):
     fh.prepare_staging(
         repo=dh.get_repository(
             root="notebooks",
-            version="brhung/fix-automl-release-json-duplicates"
+            version="brhung/fix-automl-release-json-duplicates",
             auth_token=params["auth_token"]
         )
     )
