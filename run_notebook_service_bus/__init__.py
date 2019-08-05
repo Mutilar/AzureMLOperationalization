@@ -31,7 +31,7 @@ def main(msg: func.ServiceBusMessage):
         msg.get_body().decode("utf-8")
     )
 
-    raise Exception(str(params))
+    # raise Exception(str(params))
 
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     if params["job"] == START_BUILD:
@@ -106,6 +106,7 @@ def start_build_pipeline(params):
         # Creates new DevOps Test Run
         response = dh.post_new_run(
             notebook=notebook,
+            plan_url=cb_params["plan_url"],
             organization=az_params["organization"],
             project=az_params["project"],
             build_id=params["build_id"],
@@ -183,6 +184,7 @@ def update_build_pipeline(params):
         result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
         dh.post_pipeline_callback(
             result=result,
+            plan_url=cb_params["plan_url"],
             organization=az_params["organization"],
             project_id=cb_params["project_id"],
             hub_name=cb_params["hub_name"],
@@ -211,6 +213,7 @@ def update_build_pipeline(params):
     dh.post_run_attachment(
         file_name="output.ipynb",
         stream=output_notebook_stream,
+        plan_url=cb_params["plan_url"],
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"],
@@ -219,6 +222,7 @@ def update_build_pipeline(params):
     dh.post_run_attachment(
         file_name="output.txt",
         stream=output_notebook_stream,
+        plan_url=cb_params["plan_url"],
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"],
@@ -231,6 +235,7 @@ def update_build_pipeline(params):
         dh.post_run_attachment(
             file_name=os.path.basename(log),
             stream=encode(fh.get_file_str(log).encode("utf-8")),
+            plan_url=cb_params["plan_url"],
             organization=az_params["organization"],
             project=az_params["project"],
             run_id=az_params["run_id"],
@@ -239,6 +244,7 @@ def update_build_pipeline(params):
     dh.post_run_results(
         error_message=cb_params["error_message"],
         run_details=run.get_details(),
+        plan_url=cb_params["plan_url"],
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"], 
@@ -246,6 +252,7 @@ def update_build_pipeline(params):
     )
     dh.patch_run_update(
         error_message=cb_params["error_message"],
+        plan_url=cb_params["plan_url"],
         organization=az_params["organization"],
         project=az_params["project"],
         run_id=az_params["run_id"], 
