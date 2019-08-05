@@ -87,6 +87,7 @@ def start_build_pipeline(params):
     # Downloads repo to staging folder
     fh.prepare_staging(
         repo=dh.get_repository(
+            project_url=cb_params["project_url"],
             root="notebooks",
             version="brhung/fix-automl-release-json-duplicates",
             auth_token=params["auth_token"]
@@ -110,8 +111,7 @@ def start_build_pipeline(params):
         # Creates new DevOps Test Run
         response = dh.post_new_run(
             notebook=notebook,
-            plan_url=cb_params["plan_url"],
-            organization=az_params["organization"],
+            project_url=cb_params["project_url"],
             project=az_params["project"],
             build_id=params["build_id"],
             auth_token=params["auth_token"]
@@ -188,8 +188,7 @@ def update_build_pipeline(params):
         result = FAILED_PIPELINE if (exp_status["failed"] is True and params["run_condition"] == ALL_NOTEBOOKS_MUST_PASS) else PASSED_PIPELINE
         dh.post_pipeline_callback(
             result=result,
-            plan_url=cb_params["plan_url"],
-            organization=az_params["organization"],
+            project_url=cb_params["project_url"],
             project_id=cb_params["project_id"],
             hub_name=cb_params["hub_name"],
             plan_id=cb_params["plan_id"],
@@ -217,8 +216,7 @@ def update_build_pipeline(params):
     dh.post_run_attachment(
         file_name="output.ipynb",
         stream=output_notebook_stream,
-        plan_url=cb_params["plan_url"],
-        organization=az_params["organization"],
+        project_url=cb_params["project_url"],
         project=az_params["project"],
         run_id=az_params["run_id"],
         auth_token=params["auth_token"]
@@ -226,8 +224,7 @@ def update_build_pipeline(params):
     dh.post_run_attachment(
         file_name="output.txt",
         stream=output_notebook_stream,
-        plan_url=cb_params["plan_url"],
-        organization=az_params["organization"],
+        project_url=cb_params["project_url"],
         project=az_params["project"],
         run_id=az_params["run_id"],
         auth_token=params["auth_token"]
@@ -239,8 +236,7 @@ def update_build_pipeline(params):
         dh.post_run_attachment(
             file_name=os.path.basename(log),
             stream=encode(fh.get_file_str(log).encode("utf-8")),
-            plan_url=cb_params["plan_url"],
-            organization=az_params["organization"],
+            project_url=cb_params["project_url"],
             project=az_params["project"],
             run_id=az_params["run_id"],
             auth_token=params["auth_token"]
@@ -248,16 +244,14 @@ def update_build_pipeline(params):
     dh.post_run_results(
         error_message=cb_params["error_message"],
         run_details=run.get_details(),
-        plan_url=cb_params["plan_url"],
-        organization=az_params["organization"],
+        project_url=cb_params["project_url"],
         project=az_params["project"],
         run_id=az_params["run_id"], 
         auth_token=params["auth_token"]
     )
     dh.patch_run_update(
         error_message=cb_params["error_message"],
-        plan_url=cb_params["plan_url"],
-        organization=az_params["organization"],
+        project_url=cb_params["project_url"],
         project=az_params["project"],
         run_id=az_params["run_id"], 
         auth_token=params["auth_token"]

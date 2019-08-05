@@ -89,7 +89,7 @@ stages:
               },
               "call_back": {
                 "error_message": "default_error_message",
-                "plan_url": "$(system.CollectionUri)",
+                "project_url": "$(System.TeamFoundationCollectionUri)",
                 "project_id": "$(system.TeamProjectId)",
                 "hub_name": "$(system.HostType)",
                 "plan_id": "$(system.PlanId)",
