@@ -89,7 +89,8 @@ stages:
               },
               "call_back": {
                 "error_message": "default_error_message",
-                "project_id": "$(system.TeamProjectId)", 
+                "plan_url": "$(system.CollectionUri)"
+                "project_id": "$(system.TeamProjectId)",
                 "hub_name": "$(system.HostType)",
                 "plan_id": "$(system.PlanId)",
                 "job_id": "$(system.JobId)",
