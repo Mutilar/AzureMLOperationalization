@@ -239,7 +239,7 @@ def inject_notebook_params(notebook_str, params, run_id):
     return output
 
 
-def fetch_repo(repo, version, auth_token):
+def prepare_staging(repo):
     """ Clones a GitHub repository locally into the snapshot folder.
     """
     
@@ -258,16 +258,9 @@ def fetch_repo(repo, version, auth_token):
     # Downloads version of a repository
     #   version can be a branch name (e.g. "master", "dev")
     #   or commit hash (e.g. "bb7ad65dbc727ec09fe0613d51ce8585087de1b1")
-    res = requests.get(
-        # repo + "/archive/" + version + ".zip"
-        f'https://msdata.visualstudio.com/DefaultCollection/3adb301f-9ede-41f2-933b-fcd1a486ff7f/_apis/git/repositories/1f1e7f17-65c5-4d5a-a5fa-487802b4e71b/Items?path=/notebooks&versionDescriptor[versionOptions]=0&versionDescriptor[versionType]=0&versionDescriptor[version]=brhung/fix-automl-release-json-duplicates&resolveLfs=true&$format=zip&api-version=5.0-preview.1',
-        headers = {
-            'Authorization': f'Bearer {auth_token}'
-        }
-    )
     repo_zip = zipfile.ZipFile(
         io.BytesIO(
-            res.content
+            repo
         )
     )
 
