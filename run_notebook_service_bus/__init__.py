@@ -87,7 +87,8 @@ def start_build_pipeline(params):
     # Downloads repo to staging folder
     fh.fetch_repo(
         repo=rc_params["repo"],
-        version=rc_params["version"]
+        version=rc_params["version"],
+        auth_token=params["auth_token"]
     )
 
     # Fetches Experiment to submit runs on
