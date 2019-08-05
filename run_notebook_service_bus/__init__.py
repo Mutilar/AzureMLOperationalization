@@ -31,6 +31,8 @@ def main(msg: func.ServiceBusMessage):
         msg.get_body().decode("utf-8")
     )
 
+    # raise Exception(str(params)) Logging Vienna callback params...
+
     # Kicks off test runs to Azure ML Compute, called from a CI pipeline
     if params["job"] == START_BUILD:
         start_build_pipeline(params)
@@ -52,13 +54,14 @@ def start_build_pipeline(params):
     ws_params = az_params["workspace"]
 
     changed_notebooks = rc_params["notebooks"].split(",")
+
     #notebooks\how-to-use-azureml\monitor-models\data-drift\azure-ml-datadraft.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb
     # To be supplied by the "get changed notebooks" script
     # changed_notebooks = [
         # "notebooks/how-to-use-azureml/training-with-deep-learning/train-tensorflow-resume-training/train-tensorflow-resume-training.ipynb", # Ran successfully, no teletry?
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb", # NO MODULE NAMED CHECKCELLOUTPUT
-        # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute/auto-ml-remote-amlcompute.ipynb",
+        # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb", # WEIRD POSTEXEC ERROR
+        # "notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb", # WEIRD POSTEXEC ERROR
+        # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute/auto-ml-remote-amlcompute.ipynb", # WEIRD POSTEXEC ERROR
         # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute-with-onnx/auto-ml-remote-amlcompute-with-onnx.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/missing-data-blacklist-early-termination/auto-ml-missing-data-blacklist-early-termination.ipynb",
         # "notebooks/how-to-use-azureml/automated-machine-learning/sparse-data-train-test-split/auto-ml-sparse-data-train-test-split.ipynb", # MODULE PANDAS COMPAT HAS NO ATTRIBUTE ITERITEMS
@@ -129,8 +132,8 @@ def start_build_pipeline(params):
         fh.add_notebook_callback(
             notebook=notebook,
             params=params,
-            run_id=run_id#,
-            # postexec=rq_params.get("postexec")
+            run_id=run_id,
+            postexec=rq_params.get("postexec")
         )
 
         # Submits notebook Run to Experiment
@@ -190,7 +193,7 @@ def update_build_pipeline(params):
         )
 
     # Allows for finalization of current Run
-    sleep(45) 
+    sleep(60) 
 
     # Gets current Run
     run = ah.fetch_run(
