@@ -48,8 +48,9 @@ def start_build_pipeline(params):
     to facilitate callbacks to the DevOps pipeline.
     """
 
-    rc_params = params["run_config"]
     az_params = params["azure_resources"]
+    cb_params = params["wrap_up"]["call_back"]
+    rc_params = params["run_config"]
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
 
