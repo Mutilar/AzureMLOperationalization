@@ -265,7 +265,6 @@ def fetch_repo(repo, version, auth_token):
             'Authorization': f'Bearer {auth_token}'
         }
     )
-    raise Exception (str(res))
     repo_zip = zipfile.ZipFile(
         io.BytesIO(
             res.content
