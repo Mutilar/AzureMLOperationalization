@@ -258,12 +258,14 @@ def fetch_repo(repo, version):
     # Downloads version of a repository
     #   version can be a branch name (e.g. "master", "dev")
     #   or commit hash (e.g. "bb7ad65dbc727ec09fe0613d51ce8585087de1b1")
-    repo_zip = zipfile.ZipFile(
-        io.BytesIO(
-            requests.get(
+    res = requests.get(
                 f'https://msdata.visualstudio.com/DefaultCollection/3adb301f-9ede-41f2-933b-fcd1a486ff7f/_apis/git/repositories/1f1e7f17-65c5-4d5a-a5fa-487802b4e71b/Items?path=/&versionDescriptor[versionOptions]=0&versionDescriptor[versionType]=0&versionDescriptor[version]=brhung/fix-automl-release-json-duplicates&resolveLfs=true&$format=zip&api-version=5.0-preview.1'
                 # repo + "/archive/" + version + ".zip"
-            ).content
+            )
+    raise Exception (str(res))
+    repo_zip = zipfile.ZipFile(
+        io.BytesIO(
+            res.content
         )
     )
 
