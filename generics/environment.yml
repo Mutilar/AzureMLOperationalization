@@ -16,7 +16,7 @@ dependencies:
 - pytest>=3.6.4
 - numba>=0.38.1
 - pip:
-  - azureml-sdk[notebooks,tensorboard]==1.0.18
+  - azureml-sdk[notebooks,automl,tensorboard]==1.0.18
   - papermill==0.18.2
   - pandas
   - scikit-learn

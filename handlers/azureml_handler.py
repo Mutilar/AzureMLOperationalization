@@ -81,7 +81,6 @@ def submit_run(notebook, exp, timeout, compute_target, base_image, sp_username, 
     """ Submits a new Run with configurations based on the pipeline parameters.
     """
 
-    # Dispatches job with associated parameters to Azure ML Compute
     run = exp.submit(
         NotebookRunConfig(
             source_directory="snapshot/",

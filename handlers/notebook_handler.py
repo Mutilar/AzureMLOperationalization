@@ -135,7 +135,7 @@ class Notebook:
 
 
     def scrub_magic_functions(self, cells, folder):
-        """ Removing magic functions.
+        """ Removes magic functions.
         """
         for cell in cells:
             counter = 0

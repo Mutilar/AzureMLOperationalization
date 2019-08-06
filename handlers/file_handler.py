@@ -317,7 +317,9 @@ def fetch_requirements(notebook):
 
                     if notebook_path == notebook:
                         return release_json["notebooks"][channel]
-    return {}
+    return {
+        "celltimeout": 1200
+    }
 
 
 def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, ws_name, ws_subscription_id, ws_resource_group):
