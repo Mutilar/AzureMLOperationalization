@@ -365,17 +365,17 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         )
     )
 
-    if postexec:
-        for post_exec_script in ["checknotebookoutput.py", "checkexperimentresult.py", "checkcelloutput.py"]:
-            post_exec_file = os.path.join(
-                "staging",
-                os.path.dirname(notebook),
-                post_exec_script
-            )
-            shutil.copy(
-                post_exec_file,
-                snapshot_path
-            )
+    # if postexec:
+    #     for post_exec_script in ["checknotebookoutput.py", "checkexperimentresult.py", "checkcelloutput.py"]:
+    #         post_exec_file = os.path.join(
+    #             "staging",
+    #             os.path.dirname(notebook),
+    #             post_exec_script
+    #         )
+    #         shutil.copy(
+    #             post_exec_file,
+    #             snapshot_path
+    #         )
 
     if dependencies:
         for dependency in dependencies:
