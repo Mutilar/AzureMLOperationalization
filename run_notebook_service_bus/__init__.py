@@ -106,6 +106,8 @@ def start_build_pipeline(params):
         build_id=params["build_id"]
     )
 
+    all_runs_params = []
+
     # Submits notebook runs to Experiment, delimiting by commas
     for notebook in changed_notebooks:
 
@@ -121,6 +123,8 @@ def start_build_pipeline(params):
 
         # Collects required pip packages and associated files
         rq_params = fh.fetch_requirements(notebook)
+
+        all_runs_params += [rq_params]
 
         # Moves necessary files into snapshot directory
         fh.build_snapshot(

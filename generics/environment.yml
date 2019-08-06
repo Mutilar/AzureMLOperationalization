@@ -16,9 +16,6 @@ dependencies:
 - pytest>=3.6.4
 - numba>=0.38.1
 - pip:
-  - azureml-explain-model
-  - azureml-widgets
-  - azureml-train-automl
   - azureml-sdk[notebooks,automl,tensorboard]==1.0.18
   - papermill==0.18.2
   - pandas

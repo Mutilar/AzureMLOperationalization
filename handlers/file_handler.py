@@ -305,14 +305,14 @@ def fetch_requirements(notebook):
                                     channel_notebook["path"],
                                     channel_notebook["name"]
                                 )
-                            ).split("/")[3:]
+                            ).split("/")[2:]
                         )
                     else:
                         notebook_path = "/".join(
                             os.path.join(
                                 root,
                                 channel_notebook["name"]
-                            ).split("/")[3:]
+                            ).split("/")[2:]
                         )
 
                     if notebook_path == notebook:
@@ -388,7 +388,6 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
                 staging_file,
                 snapshot_path
             )
-            raise Exception (dependency + "\n" + snapshot_path + "\n" + staging_file)
 
     # Moves and populates Conda File
     if conda_file:
