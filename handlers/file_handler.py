@@ -67,6 +67,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     
     notebook_file_location = os.path.join(
         "snapshot",
+        "inputs",
         notebook
     )
 
