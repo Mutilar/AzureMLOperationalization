@@ -195,62 +195,68 @@ def update_build_pipeline(params):
             auth_token=params["auth_token"]
         )
 
+
     # Allows for finalization of current Run
-    sleep(60) 
+    retries = 3
+    while retries > 0:
+        try:
+            # Gets current Run
+            run = ah.fetch_run(
+                exp=exp,
+                run_id=az_params["run_id"]
+            )
 
-    # Gets current Run
-    run = ah.fetch_run(
-        exp=exp,
-        run_id=az_params["run_id"]
-    )
+            # Scrubs and attachments output notebook
+            run.download_file(
+                name="outputs/output.ipynb",
+                output_file_path="snapshot/outputs/output.ipynb"
+            )
+            output_notebook_string = fh.remove_notebook_callback("snapshot/outputs/output.ipynb")
+            output_notebook_stream = encode(output_notebook_string.encode("utf-8"))
+            dh.post_run_attachment(
+                file_name="output.ipynb",
+                stream=output_notebook_stream,
+                project_url=cb_params["project_url"],
+                project=az_params["project"],
+                run_id=az_params["run_id"],
+                auth_token=params["auth_token"]
+            )
+            dh.post_run_attachment(
+                file_name="output.txt",
+                stream=output_notebook_stream,
+                project_url=cb_params["project_url"],
+                project=az_params["project"],
+                run_id=az_params["run_id"],
+                auth_token=params["auth_token"]
+            )
 
-    # Scrubs and attachments output notebook
-    run.download_file(
-        name="outputs/output.ipynb",
-        output_file_path="snapshot/outputs/output.ipynb"
-    )
-    output_notebook_string = fh.remove_notebook_callback("snapshot/outputs/output.ipynb")
-    output_notebook_stream = encode(output_notebook_string.encode("utf-8"))
-    dh.post_run_attachment(
-        file_name="output.ipynb",
-        stream=output_notebook_stream,
-        project_url=cb_params["project_url"],
-        project=az_params["project"],
-        run_id=az_params["run_id"],
-        auth_token=params["auth_token"]
-    )
-    dh.post_run_attachment(
-        file_name="output.txt",
-        stream=output_notebook_stream,
-        project_url=cb_params["project_url"],
-        project=az_params["project"],
-        run_id=az_params["run_id"],
-        auth_token=params["auth_token"]
-    )
-
-    # Attaches Run's output logs
-    logs = run.get_all_logs("snapshot/outputs/")
-    for log in logs:
-        dh.post_run_attachment(
-            file_name=os.path.basename(log),
-            stream=encode(fh.get_file_str(log).encode("utf-8")),
-            project_url=cb_params["project_url"],
-            project=az_params["project"],
-            run_id=az_params["run_id"],
-            auth_token=params["auth_token"]
-        )
-    dh.post_run_results(
-        error_message=cb_params["error_message"],
-        run_details=run.get_details(),
-        project_url=cb_params["project_url"],
-        project=az_params["project"],
-        run_id=az_params["run_id"], 
-        auth_token=params["auth_token"]
-    )
-    dh.patch_run_update(
-        error_message=cb_params["error_message"],
-        project_url=cb_params["project_url"],
-        project=az_params["project"],
-        run_id=az_params["run_id"], 
-        auth_token=params["auth_token"]
-    )
+            # Attaches Run's output logs
+            logs = run.get_all_logs("snapshot/outputs/")
+            for log in logs:
+                dh.post_run_attachment(
+                    file_name=os.path.basename(log),
+                    stream=encode(fh.get_file_str(log).encode("utf-8")),
+                    project_url=cb_params["project_url"],
+                    project=az_params["project"],
+                    run_id=az_params["run_id"],
+                    auth_token=params["auth_token"]
+                )
+            dh.post_run_results(
+                error_message=cb_params["error_message"],
+                run_details=run.get_details(),
+                project_url=cb_params["project_url"],
+                project=az_params["project"],
+                run_id=az_params["run_id"], 
+                auth_token=params["auth_token"]
+            )
+            dh.patch_run_update(
+                error_message=cb_params["error_message"],
+                project_url=cb_params["project_url"],
+                project=az_params["project"],
+                run_id=az_params["run_id"], 
+                auth_token=params["auth_token"]
+            )
+            retries = 0
+        except Exception as e:
+            retries -= 1
+            sleep(60)
