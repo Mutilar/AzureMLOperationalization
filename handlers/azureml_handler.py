@@ -99,7 +99,10 @@ def submit_run(notebook, exp, timeout, compute_target, base_image, sp_username, 
             ),
             run_config=fetch_run_config(
                 compute_target=compute_target,
-                base_image=base_image
+                base_image=base_image,
+                sp_username=sp_username,
+                sp_tenant=sp_tenant,
+                sp_password=sp_password
             )
         )
     )
