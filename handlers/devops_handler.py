@@ -46,7 +46,7 @@ def get_repository(project_url, root, version, auth_token):
         headers=get_auth_header(auth_token)
     )
     if res.status_code == 200:
-        return res
+        return res.content
     else:
         raise Exception("Couldn't fetch repository")
 
