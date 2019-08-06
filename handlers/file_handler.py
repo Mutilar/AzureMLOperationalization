@@ -9,6 +9,9 @@ import zipfile
 import notebook_handler as nh
 
 
+CONDA_FILE_LOCATION = "snapshot/inputs/environment.yml"
+
+
 def get_file_str(file_location):
     """ Reads a file
     """
@@ -32,20 +35,15 @@ def add_pip_packages(conda_file, requirements):
     """ Adds a new pip dependency to a given conda file.
     """
 
-    conda_file_location = os.path.join(
-        "snapshot",
-        conda_file
-    )
-
     # Open the Conda file
-    conda_str = get_file_str(conda_file_location)
+    conda_str = get_file_str(conda_file)
 
     # Inject the azure servicebus pip dependency for callbacks
     for requirement in requirements:
         conda_str = inject_pip_package(conda_str, requirement)
 
     # Writes changes to file
-    set_file_str(conda_file_location, conda_str)
+    set_file_str(conda_file, conda_str)
 
 
 def inject_pip_package(file_str, requirement):
@@ -144,9 +142,9 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
             "import os",
             "from azureml._base_sdk_common.common import perform_interactive_login",
             "perform_interactive_login(",
-            nh.TAB + "username=\"" + params["azure_resources"]["service_principal"]["username"] + "\",",  #os.environ[\"SP_USERNAME\"],",
-            nh.TAB + "tenant=\"" + params["azure_resources"]["service_principal"]["tenant"]   + "\",",    #os.environ[\"SP_TENANT\"],",
-            nh.TAB + "password=\"" + params["azure_resources"]["service_principal"]["password"] + "\",", #os.environ[\"SP_PASSWORD\"],",
+            nh.TAB + "username=os.environ[\"SP_USERNAME\"],",
+            nh.TAB + "tenant=os.environ[\"SP_TENANT\"],",
+            nh.TAB + "password=os.environ[\"SP_PASSWORD\"],",
             nh.TAB + "service_principal=True",
             ")",
             "#CALLBACK PARAMETERS",
@@ -266,17 +264,12 @@ def prepare_staging(repo, root):
         )
     )
 
-    # Downloads version of a repository
-    #   version can be a branch name (e.g. "master", "dev")
-    #   or commit hash (e.g. "bb7ad65dbc727ec09fe0613d51ce8585087de1b1")
-    repo_zip = zipfile.ZipFile(
+    # Unzips repository
+    zipfile.ZipFile(
         io.BytesIO(
             repo
         )
-    )
-
-    # Extracts repository
-    repo_zip.extractall()
+    ).extractall()
 
     # Renames repository to "inputs"
     os.rename(
@@ -336,11 +329,12 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         shutil.rmtree(os.getcwd() + "/snapshot/")
 
     staging_file = os.path.join(
-        "./staging/",
+        "staging",
         notebook
     )
     snapshot_path = os.path.join(
-        "./snapshot/inputs",
+        "snapshot",
+        "inputs",
         os.path.dirname(notebook)
     )
 
@@ -369,14 +363,13 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
     )
 
     # Moves and populates Conda File
-    conda_staging_file = ""
     if conda_file:
         shutil.copy(
             os.path.join(
                 "staging",
                 conda_file
             ),
-            "snapshot/inputs/environment.yml"
+            CONDA_FILE_LOCATION
         )
     else:
         shutil.copy(
@@ -384,18 +377,18 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
                 "generics",
                 "environment.yml"
             ),
-            "snapshot/inputs/environment.yml"
+            CONDA_FILE_LOCATION
         )
     if not requirements:
         requirements = ["azure-servicebus", "azureml", "azureml-sdk"]
     else:
         requirements += ["azure-servicebus", "azureml", "azureml-sdk"]
+    
     add_pip_packages(
-        conda_file,
+        CONDA_FILE_LOCATION,
         requirements
     )
         
-
     if postexec:
         for post_exec_script in ["checknotebookoutput.py", "checkexperimentresult.py", "checkcelloutput.py"]:
             post_exec_file = os.path.join(
@@ -407,7 +400,6 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
                 post_exec_file,
                 snapshot_path
             )
-
 
     if dependencies:
         for dependency in dependencies:

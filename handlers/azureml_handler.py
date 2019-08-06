@@ -44,7 +44,7 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
     return exp
 
 
-def fetch_run_config(conda_file, compute_target, base_image):
+def fetch_run_config(compute_target, base_image, sp_username, sp_tenant, sp_password):
     """ Generates a Run Configuration based on the pipeline parameters,
     specifying such things as the Compute Target and Conda Dependencies. 
     """
@@ -55,15 +55,21 @@ def fetch_run_config(conda_file, compute_target, base_image):
     # Specifies compute target
     run_config.target = compute_target
 
-    # Configures Docker parameters
+    # Configures Docker/Image/Environment Variable parameters
     run_config.environment.docker.enabled = True
     run_config.environment.docker.base_image = base_image
+    run_config.environment.environment_variables = {
+        "SP_USERNAME": sp_username,
+        "SP_TENANT": sp_tenant,
+        "SP_PASSWORD": sp_password
+    }
 
-    # Specifies Conda file location
+    # Specifies Conda file location (Auto-injected from preparing staging)
     run_config.environment.python.conda_dependencies = CondaDependencies(
         os.path.join(
-            "snapshot/inputs",
-            conda_file
+            "snapshot",
+            "inputs",
+            "environment.yml"
         )
     )
 
@@ -71,7 +77,7 @@ def fetch_run_config(conda_file, compute_target, base_image):
     return run_config
 
 
-def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image, sp_username, sp_tenant, sp_password):
+def submit_run(notebook, exp, timeout, compute_target, base_image, sp_username, sp_tenant, sp_password):
     """ Submits a new Run with configurations based on the pipeline parameters.
     """
 
@@ -91,13 +97,7 @@ def submit_run(notebook, exp, timeout, conda_file, compute_target, base_image, s
                     os.path.dirname(notebook)
                 )
             ),
-            # parameters={
-            #     "SP_USERNAME": sp_username,
-            #     "SP_TENANT": sp_tenant,
-            #     "SP_PASSWORD": sp_password
-            # },
             run_config=fetch_run_config(
-                conda_file=conda_file,
                 compute_target=compute_target,
                 base_image=base_image
             )
