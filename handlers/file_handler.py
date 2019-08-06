@@ -239,20 +239,30 @@ def inject_notebook_params(notebook_str, params, run_id):
     return output
 
 
-def prepare_staging(repo):
+def prepare_staging(repo, root):
     """ Clones a GitHub repository locally into the snapshot folder.
     """
     
+    base_directory = os.getcwd()
+
     # Wipes staging directories, clearing out old files
-    if os.path.exists(os.getcwd() + "/staging/"):
-        shutil.rmtree(os.getcwd() + "/staging/")
+    if os.path.exists(base_directory + "/staging/"):
+        shutil.rmtree(base_directory + "/staging/")
 
-    # Recreates staging folder
-    os.makedirs(os.getcwd() + "/staging/")
-
-    # Moves to snapshot directory
+    # Recreates and enters staging folder
+    os.makedirs(
+        os.path.join(
+            base_directory,
+            "staging",
+            root
+        )
+    )
     os.chdir(
-        os.getcwd() + "/staging/"
+        os.path.join(
+            base_directory,
+            "staging",
+            root
+        )
     )
 
     # Downloads version of a repository
@@ -274,7 +284,7 @@ def prepare_staging(repo):
     )
 
     # Returns to main directory
-    os.chdir("..")
+    os.chdir(base_directory)
 
 
 def fetch_requirements(notebook):

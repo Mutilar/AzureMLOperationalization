@@ -89,7 +89,8 @@ def start_build_pipeline(params):
             root="notebooks",
             version="brhung/fix-automl-release-json-duplicates",
             auth_token=params["auth_token"]
-        )
+        ),
+        root="notebooks"
     )
 
     # Fetches Experiment to submit runs on
