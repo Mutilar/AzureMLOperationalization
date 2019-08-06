@@ -149,7 +149,7 @@ class Notebook:
                     )
                     shutil.move(
                         file_name,
-                        os.path.dirname(folder)
+                        folder
                     )
                     del self.notebook_json["cells"][cell]["source"][counter]
                     cell_size -= 1
