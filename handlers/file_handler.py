@@ -32,7 +32,10 @@ def add_pip_packages(conda_file, requirements):
     """ Adds a new pip dependency to a given conda file.
     """
 
-    conda_file_location = "snapshot" + conda_file
+    conda_file_location = os.path.join(
+        "snapshot",
+        conda_file
+    )
 
     # Open the Conda file
     conda_str = get_file_str(conda_file_location)
@@ -277,7 +280,7 @@ def prepare_staging(repo, root):
 
     # Renames repository to "inputs"
     os.rename(
-        os.listdir(os.getcwd())[0],
+        os.listdir()[0],
         root
     )
 
@@ -328,7 +331,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
     Also generates config files for "from_config" ML Workspaces. 
     """
 
-    # Wipe any previous snapshot builds
+    # Wipes any previous snapshot builds
     if os.path.exists(os.getcwd() + "/snapshot/"):
         shutil.rmtree(os.getcwd() + "/snapshot/")
 
@@ -366,18 +369,23 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
     )
 
     # Moves and populates Conda File
-    conda_staging_file = os.path.join(
-        "./staging/",
-        conda_file
-    )
-    conda_snapshot_path = os.path.join(
-        "./snapshot/inputs",
-        os.path.dirname(conda_file)
-    )
-    shutil.copy(
-        conda_staging_file,
-        conda_snapshot_path
-    )
+    conda_staging_file = ""
+    if conda_file:
+        shutil.copy(
+            os.path.join(
+                "staging",
+                conda_file
+            ),
+            "snapshot/inputs/environment.yml"
+        )
+    else:
+        shutil.copy(
+            os.path.join(
+                "generics",
+                "environment.yml"
+            ),
+            "snapshot/inputs/environment.yml"
+        )
     if not requirements:
         requirements = ["azure-servicebus", "azureml", "azureml-sdk"]
     else:
@@ -386,35 +394,20 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         conda_file,
         requirements
     )
+        
 
     if postexec:
-        check_notebook_staging_file = os.path.join(
-            "staging",
-            os.path.dirname(notebook),
-            "checknotebookoutput.py"
-        )
-        check_experiment_staging_file = os.path.join(
-            "staging",
-            os.path.dirname(notebook),
-            "checkexperimentresult.py"
-        )
-        check_cell_staging_file = os.path.join(
-            "staging",
-            os.path.dirname(notebook),
-            "checkcelloutput.py"
-        )
-        shutil.copy(
-            check_notebook_staging_file,
-            snapshot_path
-        )
-        shutil.copy(
-            check_experiment_staging_file,
-            snapshot_path
-        )
-        shutil.copy(
-            check_cell_staging_file,
-            snapshot_path
-        )
+        for post_exec_script in ["checknotebookoutput.py", "checkexperimentresult.py", "checkcelloutput.py"]:
+            post_exec_file = os.path.join(
+                "staging",
+                os.path.dirname(notebook),
+                post_exec_script
+            )
+            shutil.copy(
+                post_exec_file,
+                snapshot_path
+            )
+
 
     if dependencies:
         for dependency in dependencies:
