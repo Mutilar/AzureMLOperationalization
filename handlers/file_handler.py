@@ -32,7 +32,7 @@ def add_pip_packages(conda_file, requirements):
     """ Adds a new pip dependency to a given conda file.
     """
 
-    conda_file_location = "./snapshot/inputs/" + conda_file
+    conda_file_location = "snapshot" + conda_file
 
     # Open the Conda file
     conda_str = get_file_str(conda_file_location)
@@ -65,7 +65,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     """
     
     notebook_file_location = os.path.join(
-        "./snapshot/inputs",
+        "snapshot",
         notebook
     )
 
@@ -81,7 +81,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     if postexec is not None:
         code = get_file_str(
             os.path.join(
-                "./staging/inputs",
+                "staging",
                 os.path.dirname(notebook),
                 postexec
             )
@@ -95,7 +95,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     if preexec:
         code = get_file_str(
             os.path.join(
-                "./staging/inputs/",
+                "staging",
                 os.path.dirname(notebook),
                 preexec
             )
@@ -253,15 +253,13 @@ def prepare_staging(repo, root):
     os.makedirs(
         os.path.join(
             base_directory,
-            "staging",
-            root
+            "staging"
         )
     )
     os.chdir(
         os.path.join(
             base_directory,
-            "staging",
-            root
+            "staging"
         )
     )
 
@@ -280,18 +278,18 @@ def prepare_staging(repo, root):
     # Renames repository to "inputs"
     os.rename(
         os.listdir(os.getcwd())[0],
-        "inputs"
+        root
     )
 
     # Returns to main directory
-    os.chdir(base_directory)
+    os.chdir("..")
 
 
 def fetch_requirements(notebook):
     """ Finds notebook's definition in a release.json file to determine dependencies and requirements. 
     """
 
-    for root, dirs, files in os.walk("./staging/inputs/"):
+    for root, dirs, files in os.walk("./staging/"):
         for file in files:
             if file == "release.json":
                 release_json = json.loads(
@@ -335,7 +333,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         shutil.rmtree(os.getcwd() + "/snapshot/")
 
     staging_file = os.path.join(
-        "./staging/inputs",
+        "./staging/",
         notebook
     )
     snapshot_path = os.path.join(
@@ -369,7 +367,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
 
     # Moves and populates Conda File
     conda_staging_file = os.path.join(
-        "./staging/inputs",
+        "./staging/",
         conda_file
     )
     conda_snapshot_path = os.path.join(
@@ -391,17 +389,17 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
 
     if postexec:
         check_notebook_staging_file = os.path.join(
-            "./staging/inputs",
+            "staging",
             os.path.dirname(notebook),
             "checknotebookoutput.py"
         )
         check_experiment_staging_file = os.path.join(
-            "./staging/inputs",
+            "staging",
             os.path.dirname(notebook),
             "checkexperimentresult.py"
         )
         check_cell_staging_file = os.path.join(
-            "./staging/inputs",
+            "staging",
             os.path.dirname(notebook),
             "checkcelloutput.py"
         )
@@ -421,7 +419,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
     if dependencies:
         for dependency in dependencies:
             staging_file = os.path.join(
-                "./staging/inputs",
+                "staging",
                 os.path.dirname(notebook),
                 dependency
             )
