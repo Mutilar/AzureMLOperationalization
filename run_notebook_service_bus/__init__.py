@@ -114,19 +114,19 @@ def start_build_pipeline(params):
             run_id = response.json()["id"]
 
             # Collects required pip packages and associated files
-            rq_params = fh.fetch_requirements(notebook)
+            # rq_params = fh.fetch_requirements(notebook)
 
             # Moves necessary files into snapshot directory
-            fh.build_snapshot(
-                notebook=notebook,
-                dependencies=rq_params.get("dependencies"),
-                requirements=rq_params.get("requirements"),
-                postexec=rq_params.get("postexec"),
-                conda_file=rc_params["conda_file"],
-                ws_name=ws_params["name"],
-                ws_subscription_id=ws_params["subscription_id"],
-                ws_resource_group=ws_params["resource_group"]
-            )
+            # fh.build_snapshot(
+            #     notebook=notebook,
+            #     dependencies=rq_params.get("dependencies"),
+            #     requirements=rq_params.get("requirements"),
+            #     postexec=rq_params.get("postexec"),
+            #     conda_file=rc_params["conda_file"],
+            #     ws_name=ws_params["name"],
+            #     ws_subscription_id=ws_params["subscription_id"],
+            #     ws_resource_group=ws_params["resource_group"]
+            # )
 
             # Adds try-catch callback mechanism to notebook
             fh.add_notebook_callback(

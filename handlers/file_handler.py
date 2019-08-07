@@ -248,20 +248,20 @@ def prepare_staging(repo, root):
     base_directory = os.getcwd()
 
     # Wipes staging directories, clearing out old files
-    if os.path.exists(base_directory + "/staging/"):
-        shutil.rmtree(base_directory + "/staging/")
+    if os.path.exists(base_directory + "/snapshot/"):
+        shutil.rmtree(base_directory + "/snapshot/")
 
     # Recreates and enters staging folder
     os.makedirs(
         os.path.join(
             base_directory,
-            "staging"
+            "snapshot/
         )
     )
     os.chdir(
         os.path.join(
             base_directory,
-            "staging"
+            "snapshot/
         )
     )
 
@@ -274,7 +274,7 @@ def prepare_staging(repo, root):
 
     os.rename(
         os.listdir()[0],
-        root
+        "inputs"
     )
 
     # Returns to main directory
