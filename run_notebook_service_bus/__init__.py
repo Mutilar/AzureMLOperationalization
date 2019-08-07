@@ -14,8 +14,8 @@ START_BUILD = "!START"
 UPDATE_BUILD = "!UPDATE"
 
 # States of pipelines
-PASSED_PIPELINE = "Succeeded"
-FAILED_PIPELINE = "Failed"
+PASSED_PIPELINE = "succeeded"
+FAILED_PIPELINE = "failed"
 
 # Run Conditions for pipelines
 ALL_NOTEBOOKS_MUST_PASS = "all_pass"
@@ -70,15 +70,24 @@ def start_build_pipeline(params):
         changed_notebooks = rc_params["notebooks"].split(",")
 
         # Downloads repo to staging folder
-        fh.prepare_staging(
-            repo=dh.get_repository(
-                project_url=cb_params["project_url"],
-                root="notebooks",
-                version="brhung/fix-automl-release-json-duplicates",
-                auth_token=params["auth_token"]
-            ),
-            root="notebooks"
-        )
+        if rc_params["repo"]:
+            fh.prepare_staging(
+                repo=dh.get_github_repository(
+                    repository_url=rc_params["repo"],
+                    version=rc_params["version"],
+                ),
+                root=rc_params["root"]
+            )
+        else:
+            fh.prepare_staging(
+                repo=dh.get_repository(
+                    project_url=cb_params["project_url"],
+                    root=rc_params["root"],
+                    version=rc_params["version"],
+                    auth_token=params["auth_token"]
+                ),
+                root=rc_params["root"]
+            )
 
         # Fetches Experiment to submit runs on
         exp = ah.fetch_exp(
@@ -182,7 +191,6 @@ def update_build_pipeline(params):
             auth_token=params["auth_token"]
         )
 
-
     # Allows for finalization of current Run
     retries = 3
     while retries > 0:
@@ -249,8 +257,6 @@ def update_build_pipeline(params):
             sleep(60)
 
 
-
-# notebooks/how-to-use-azureml/automated-machine-learning/classification-with-whitelisting/auto-ml-classification-with-whitelisting.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/forecasting-energy-demand/auto-ml-forecasting-energy-demand.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/forecasting-orange-juice-sales/auto-ml-forecasting-orange-juice-sales.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/forecasting-bike-share/auto-ml-forecasting-bike-share.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/classification-with-onnx/auto-ml-classification-with-onnx.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/classification-credit-card-fraud/auto-ml-classification-credit-card-fraud.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/classification-bank-marketing/auto-ml-classification-bank-marketing.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-hardware-performance/auto-ml-regression-hardware-performance.ipynb
 
     #notebooks\how-to-use-azureml\monitor-models\data-drift\azure-ml-datadraft.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb
     # To be supplied by the "get changed notebooks" script
