@@ -272,58 +272,13 @@ def prepare_staging(repo, root):
         )
     ).extractall()
 
-    # Renames repository to "inputs"
-    if root:
-        os.rename(
-            os.listdir()[0],
-            root
-        )
-        os.chdir("..")
-    else:
-        os.chdir("..")
-        root_src_dir = base_directory + "/staging/" + os.listdir()[0]
-        root_target_dir = base_directory + "/temp_staging/"
-
-        for src_dir, dirs, files in os.walk(root_src_dir):
-            dst_dir = src_dir.replace(root_src_dir, root_target_dir)
-            if not os.path.exists(dst_dir):
-                os.mkdir(dst_dir)
-            for file_ in files:
-                src_file = os.path.join(src_dir, file_)
-                dst_file = os.path.join(dst_dir, file_)
-                if os.path.exists(dst_file):
-                    os.remove(dst_file)
-                shutil.move(src_file, dst_dir)
-
-        if os.path.exists(base_directory + "/staging/"):
-            shutil.rmtree(base_directory + "/staging/")
-
-        os.makedirs(
-            os.path.join(
-                base_directory,
-                "staging"
-            )
-        )
-
-        root_src_dir = base_directory + "/temp_staging/"
-        root_target_dir = base_directory + "/staging/"
-
-        for src_dir, dirs, files in os.walk(root_src_dir):
-            dst_dir = src_dir.replace(root_src_dir, root_target_dir)
-            if not os.path.exists(dst_dir):
-                os.mkdir(dst_dir)
-            for file_ in files:
-                src_file = os.path.join(src_dir, file_)
-                dst_file = os.path.join(dst_dir, file_)
-                if os.path.exists(dst_file):
-                    os.remove(dst_file)
-                shutil.move(src_file, dst_dir)
-
-        if os.path.exists(base_directory + "/temp_staging/"):
-            shutil.rmtree(base_directory + "/temp_staging/")
+    os.rename(
+        os.listdir()[0],
+        root
+    )
 
     # Returns to main directory
-
+    os.chdir("..")
 
 def fetch_requirements(notebook):
     """ Finds notebook's definition in a release.json file to determine dependencies and requirements. 
