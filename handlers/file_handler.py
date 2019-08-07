@@ -277,16 +277,18 @@ def prepare_staging(repo, root):
         "inputs"
     )
 
-    shutil.copy(
-        os.path.join(
-        "generics",
-        "environment.yml"
-        ),
-        CONDA_FILE_LOCATION
-    )
+
 
     # Returns to main directory
     os.chdir("..")
+
+    shutil.copy(
+        os.path.join(
+            "generics",
+            "environment.yml"
+        ),
+        CONDA_FILE_LOCATION
+    )
 
 def fetch_requirements(notebook):
     """ Finds notebook's definition in a release.json file to determine dependencies and requirements. 
