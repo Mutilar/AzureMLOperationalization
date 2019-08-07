@@ -73,11 +73,11 @@ def start_build_pipeline(params):
         fh.prepare_staging(
             repo=dh.get_repository(
                 project_url=cb_params["project_url"],
-                root="notebooks",
-                version="brhung/fix-automl-release-json-duplicates",
+                root=rc_params["root"],
+                version=rc_params["version"],
                 auth_token=params["auth_token"]
             ),
-            root="notebooks"
+            root=rc_params["root"]
         )
 
         # Fetches Experiment to submit runs on
