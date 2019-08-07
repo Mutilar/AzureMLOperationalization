@@ -277,6 +277,14 @@ def prepare_staging(repo, root):
         "inputs"
     )
 
+    shutil.copy(
+        os.path.join(
+        "generics",
+        "environment.yml"
+        ),
+        CONDA_FILE_LOCATION
+    )
+
     # Returns to main directory
     os.chdir("..")
 
