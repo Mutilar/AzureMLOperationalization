@@ -140,7 +140,7 @@ def start_build_pipeline(params):
             run = ah.submit_run(
                 notebook=notebook,
                 exp=exp,
-                timeout=rq_params["celltimeout"],
+                timeout=1200#rq_params["celltimeout"],
                 compute_target=rc_params["compute_target"],
                 base_image=rc_params["base_image"],
                 sp_username=sp_params["username"],
