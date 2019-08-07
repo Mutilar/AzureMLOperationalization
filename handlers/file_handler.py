@@ -248,20 +248,20 @@ def prepare_staging(repo, root):
     base_directory = os.getcwd()
 
     # Wipes staging directories, clearing out old files
-    if os.path.exists(base_directory + "/snapshot/"):
-        shutil.rmtree(base_directory + "/snapshot/")
+    if os.path.exists(base_directory + "/staging/"):
+        shutil.rmtree(base_directory + "/staging/")
 
     # Recreates and enters staging folder
     os.makedirs(
         os.path.join(
             base_directory,
-            "snapshot/"
+            "staging"
         )
     )
     os.chdir(
         os.path.join(
             base_directory,
-            "snapshot/"
+            "staging"
         )
     )
 
@@ -272,23 +272,15 @@ def prepare_staging(repo, root):
         )
     ).extractall()
 
+    # Renames repository to "inputs"
     os.rename(
         os.listdir()[0],
-        "inputs"
+        root
     )
-
-
 
     # Returns to main directory
     os.chdir("..")
 
-    shutil.copy(
-        os.path.join(
-            "generics",
-            "environment.yml"
-        ),
-        CONDA_FILE_LOCATION
-    )
 
 def fetch_requirements(notebook):
     """ Finds notebook's definition in a release.json file to determine dependencies and requirements. 
