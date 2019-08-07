@@ -53,21 +53,6 @@ def start_build_pipeline(params):
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
 
-    raise Exception(rc_params["notebooks"])
-
-    # If no notebooks to run, close.
-    # if rc_params["notebooks"] is None or rc_params["notebooks"] == "$(nonMarkdownPaths)":
-    #     dh.post_pipeline_callback(
-    #         result=PASSED_PIPELINE,
-    #         project_url=cb_params["project_url"],
-    #         project_id=cb_params["project_id"],
-    #         hub_name=cb_params["hub_name"],
-    #         plan_id=cb_params["plan_id"],
-    #         task_id=cb_params["task_id"],
-    #         job_id=cb_params["job_id"],
-    #         auth_token=params["auth_token"]
-    #     )
-    # else:
     # Notebooks passed in as a comma seperated list
     changed_notebooks = rc_params["notebooks"].split(",")
 
