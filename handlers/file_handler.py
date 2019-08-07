@@ -255,13 +255,13 @@ def prepare_staging(repo, root):
     os.makedirs(
         os.path.join(
             base_directory,
-            "snapshot/
+            "snapshot/"
         )
     )
     os.chdir(
         os.path.join(
             base_directory,
-            "snapshot/
+            "snapshot/"
         )
     )
 
