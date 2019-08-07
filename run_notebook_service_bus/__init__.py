@@ -54,7 +54,7 @@ def start_build_pipeline(params):
     ws_params = az_params["workspace"]
 
     # Notebooks passed in as a comma seperated list
-    changed_notebooks = rc_params["notebooks"].split(",")
+    changed_notebooks = ["notebooks/how-to-use-azureml/automated-machine-learning/classification-with-onnx/auto-ml-classification-with-onnx.ipynb"]
 
     # Downloads repo to staging folder
     fh.prepare_staging(
