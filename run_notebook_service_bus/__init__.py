@@ -53,95 +53,97 @@ def start_build_pipeline(params):
     sp_params = az_params["service_principal"]
     ws_params = az_params["workspace"]
 
+    raise Exception(rc_params["notebooks"])
+
     # If no notebooks to run, close.
-    if rc_params["notebooks"] is None or rc_params["notebooks"] == "$(nonMarkdownPaths)":
-        dh.post_pipeline_callback(
-            result=PASSED_PIPELINE,
+    # if rc_params["notebooks"] is None or rc_params["notebooks"] == "$(nonMarkdownPaths)":
+    #     dh.post_pipeline_callback(
+    #         result=PASSED_PIPELINE,
+    #         project_url=cb_params["project_url"],
+    #         project_id=cb_params["project_id"],
+    #         hub_name=cb_params["hub_name"],
+    #         plan_id=cb_params["plan_id"],
+    #         task_id=cb_params["task_id"],
+    #         job_id=cb_params["job_id"],
+    #         auth_token=params["auth_token"]
+    #     )
+    # else:
+    # Notebooks passed in as a comma seperated list
+    changed_notebooks = rc_params["notebooks"].split(",")
+
+    # Downloads repo to staging folder
+    fh.prepare_staging(
+        repo=dh.get_repository(
             project_url=cb_params["project_url"],
-            project_id=cb_params["project_id"],
-            hub_name=cb_params["hub_name"],
-            plan_id=cb_params["plan_id"],
-            task_id=cb_params["task_id"],
-            job_id=cb_params["job_id"],
+            root=rc_params["root"],
+            version=rc_params["version"],
+            auth_token=params["auth_token"]
+        ),
+        root=rc_params["root"]
+    )
+
+    # Fetches Experiment to submit runs on
+    exp = ah.fetch_exp(
+        sp_username=sp_params["username"],
+        sp_tenant=sp_params["tenant"],
+        sp_password=sp_params["password"],
+        ws_name=ws_params["name"],
+        ws_subscription_id=ws_params["subscription_id"],
+        ws_resource_group=ws_params["resource_group"],
+        build_id=params["build_id"]
+    )
+
+    # Submits notebook runs to Experiment, delimiting by commas
+    for notebook in changed_notebooks:
+
+        # Creates new DevOps Test Run
+        response = dh.post_new_run(
+            notebook=notebook,
+            project_url=cb_params["project_url"],
+            project=az_params["project"],
+            build_id=params["build_id"],
             auth_token=params["auth_token"]
         )
-    else:
-        # Notebooks passed in as a comma seperated list
-        changed_notebooks = rc_params["notebooks"].split(",")
+        run_id = response.json()["id"]
 
-        # Downloads repo to staging folder
-        fh.prepare_staging(
-            repo=dh.get_repository(
-                project_url=cb_params["project_url"],
-                root=rc_params["root"],
-                version=rc_params["version"],
-                auth_token=params["auth_token"]
-            ),
-            root=rc_params["root"]
-        )
+        # Collects required pip packages and associated files
+        rq_params = fh.fetch_requirements(notebook)
 
-        # Fetches Experiment to submit runs on
-        exp = ah.fetch_exp(
-            sp_username=sp_params["username"],
-            sp_tenant=sp_params["tenant"],
-            sp_password=sp_params["password"],
+        # Moves necessary files into snapshot directory
+        fh.build_snapshot(
+            notebook=notebook,
+            dependencies=rq_params.get("dependencies"),
+            requirements=rq_params.get("requirements"),
+            postexec=rq_params.get("postexec"),
+            conda_file=rc_params["conda_file"],
             ws_name=ws_params["name"],
             ws_subscription_id=ws_params["subscription_id"],
-            ws_resource_group=ws_params["resource_group"],
-            build_id=params["build_id"]
+            ws_resource_group=ws_params["resource_group"]
         )
 
-        # Submits notebook runs to Experiment, delimiting by commas
-        for notebook in changed_notebooks:
+        # Adds try-catch callback mechanism to notebook
+        fh.add_notebook_callback(
+            notebook=notebook,
+            params=params,
+            run_id=run_id#,
+            # postexec=rq_params.get("postexec")
+        )
 
-            # Creates new DevOps Test Run
-            response = dh.post_new_run(
-                notebook=notebook,
-                project_url=cb_params["project_url"],
-                project=az_params["project"],
-                build_id=params["build_id"],
-                auth_token=params["auth_token"]
-            )
-            run_id = response.json()["id"]
-
-            # Collects required pip packages and associated files
-            rq_params = fh.fetch_requirements(notebook)
-
-            # Moves necessary files into snapshot directory
-            fh.build_snapshot(
-                notebook=notebook,
-                dependencies=rq_params.get("dependencies"),
-                requirements=rq_params.get("requirements"),
-                postexec=rq_params.get("postexec"),
-                conda_file=rc_params["conda_file"],
-                ws_name=ws_params["name"],
-                ws_subscription_id=ws_params["subscription_id"],
-                ws_resource_group=ws_params["resource_group"]
-            )
-
-            # Adds try-catch callback mechanism to notebook
-            fh.add_notebook_callback(
-                notebook=notebook,
-                params=params,
-                run_id=run_id#,
-                # postexec=rq_params.get("postexec")
-            )
-
-            # Submits notebook Run to Experiment
-            run = ah.submit_run(
-                notebook=notebook,
-                exp=exp,
-                timeout=rq_params["celltimeout"],
-                compute_target=rc_params["compute_target"],
-                base_image=rc_params["base_image"],
-                sp_username=sp_params["username"],
-                sp_tenant=sp_params["tenant"],
-                sp_password=sp_params["password"]
-            )
-            
-            # Marks Run with relevant properties
-            run.tag("file", notebook)
-            run.tag("run_id", run_id)
+        # Submits notebook Run to Experiment
+        run = ah.submit_run(
+            notebook=notebook,
+            exp=exp,
+            timeout=rq_params["celltimeout"],
+            compute_target=rc_params["compute_target"],
+            base_image=rc_params["base_image"],
+            sp_username=sp_params["username"],
+            sp_tenant=sp_params["tenant"],
+            sp_password=sp_params["password"]
+        )
+        
+        # Marks Run with relevant properties
+        run.tag("file", notebook)
+        run.tag("run_id", run_id)
 
 
 def update_build_pipeline(params):
