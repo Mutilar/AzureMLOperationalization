@@ -89,7 +89,7 @@ def start_build_pipeline(params):
             build_id=params["build_id"],
             auth_token=params["auth_token"]
         )
-        run_id = response.json()["id"]
+        devops_run_id = response.json()["id"]
 
         # Collects required pip packages and associated files
         rq_params = fh.fetch_requirements(notebook)
@@ -97,9 +97,9 @@ def start_build_pipeline(params):
         # Moves necessary files into snapshot directory
         fh.build_snapshot(
             notebook=notebook,
-            dependencies=rq_params.get("dependencies"),
-            requirements=rq_params.get("requirements"),
-            postexec=rq_params.get("postexec"),
+            dependencies=rq_params["dependencies"],
+            requirements=rq_params["requirements"],
+            postexec=rq_params["postexec"],
             conda_file=rc_params["conda_file"],
             ws_name=ws_params["name"],
             ws_subscription_id=ws_params["subscription_id"],
@@ -110,8 +110,9 @@ def start_build_pipeline(params):
         fh.add_notebook_callback(
             notebook=notebook,
             params=params,
-            run_id=run_id#,
-            # postexec=rq_params.get("postexec")
+            devops_run_id=devops_run_id,
+            postexec=rq_params["postexec"],
+            preexec=rq_params["preexec"]
         )
 
         # Submits notebook Run to Experiment
@@ -128,7 +129,7 @@ def start_build_pipeline(params):
         
         # Marks Run with relevant properties
         run.tag("file", notebook)
-        run.tag("run_id", run_id)
+        run.tag("devops_run_id", devops_run_id)
 
 
 def update_build_pipeline(params):
@@ -177,7 +178,7 @@ def update_build_pipeline(params):
             # Gets current Run
             run = ah.fetch_run(
                 exp=exp,
-                run_id=az_params["run_id"]
+                devops_run_id=az_params["devops_run_id"]
             )
 
             # Scrubs and attachments output notebook
@@ -192,7 +193,7 @@ def update_build_pipeline(params):
                 stream=output_notebook_stream,
                 project_url=cb_params["project_url"],
                 project=az_params["project"],
-                run_id=az_params["run_id"],
+                devops_run_id=az_params["devops_run_id"],
                 auth_token=params["auth_token"]
             )
             dh.post_run_attachment(
@@ -200,7 +201,7 @@ def update_build_pipeline(params):
                 stream=output_notebook_stream,
                 project_url=cb_params["project_url"],
                 project=az_params["project"],
-                run_id=az_params["run_id"],
+                devops_run_id=az_params["devops_run_id"],
                 auth_token=params["auth_token"]
             )
 
@@ -212,7 +213,7 @@ def update_build_pipeline(params):
                     stream=encode(fh.get_file_str(log).encode("utf-8")),
                     project_url=cb_params["project_url"],
                     project=az_params["project"],
-                    run_id=az_params["run_id"],
+                    devops_run_id=az_params["devops_run_id"],
                     auth_token=params["auth_token"]
                 )
             dh.post_run_results(
@@ -220,49 +221,17 @@ def update_build_pipeline(params):
                 run_details=run.get_details(),
                 project_url=cb_params["project_url"],
                 project=az_params["project"],
-                run_id=az_params["run_id"], 
+                devops_run_id=az_params["devops_run_id"], 
                 auth_token=params["auth_token"]
             )
             dh.patch_run_update(
                 error_message=cb_params["error_message"],
                 project_url=cb_params["project_url"],
                 project=az_params["project"],
-                run_id=az_params["run_id"], 
+                devops_run_id=az_params["devops_run_id"], 
                 auth_token=params["auth_token"]
             )
             retries = 0
         except Exception as e:
             retries -= 1
             sleep(60)
-
-
-
-# notebooks/how-to-use-azureml/automated-machine-learning/classification-with-whitelisting/auto-ml-classification-with-whitelisting.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/forecasting-energy-demand/auto-ml-forecasting-energy-demand.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/forecasting-orange-juice-sales/auto-ml-forecasting-orange-juice-sales.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/forecasting-bike-share/auto-ml-forecasting-bike-share.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/classification-with-onnx/auto-ml-classification-with-onnx.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/classification-credit-card-fraud/auto-ml-classification-credit-card-fraud.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/classification-bank-marketing/auto-ml-classification-bank-marketing.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-hardware-performance/auto-ml-regression-hardware-performance.ipynb
-
-    #notebooks\how-to-use-azureml\monitor-models\data-drift\azure-ml-datadraft.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb,notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb
-    # To be supplied by the "get changed notebooks" script
-    # changed_notebooks = [
-        # "notebooks/how-to-use-azureml/training-with-deep-learning/train-tensorflow-resume-training/train-tensorflow-resume-training.ipynb", # Ran successfully, no teletry?
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification/auto-ml-classification.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/regression/auto-ml-regression.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute/auto-ml-remote-amlcompute.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/remote-amlcompute-with-onnx/auto-ml-remote-amlcompute-with-onnx.ipynb", # RAN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/missing-data-blacklist-early-termination/auto-ml-missing-data-blacklist-early-termination.ipynb", # RAN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/sparse-data-train-test-split/auto-ml-sparse-data-train-test-split.ipynb", # MODULE PANDAS COMPAT HAS NO ATTRIBUTE ITERITEMS
-        # "notebooks/how-to-use-azureml/automated-machine-learning/exploring-previous-runs/auto-ml-exploring-previous-runs.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-deployment/auto-ml-classification-with-deployment.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/sample-weight/auto-ml-sample-weight.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/subsampling/auto-ml-subsampling-local.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep/auto-ml-dataprep.ipynb", # MODULE PANDAS COMPAT HAS NO ATTRIBUTE ITERITEMS
-        # "notebooks/how-to-use-azureml/automated-machine-learning/dataprep-remote-execution/auto-ml-dataprep-remote-execution.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/model-explanation/auto-ml-model-explanation.ipynb", # RUN SUCCESSFULLY
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-whitelisting/auto-ml-classification-with-whitelisting.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/forecasting-energy-demand/auto-ml-forecasting-energy-demand.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/forecasting-orange-juice-sales/auto-ml-forecasting-orange-juice-sales.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/forecasting-bike-share/auto-ml-forecasting-bike-share.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-onnx/auto-ml-classification-with-onnx.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification-credit-card-fraud/auto-ml-classification-credit-card-fraud.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/classification-bank-marketing/auto-ml-classification-bank-marketing.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/regression-hardware-performance/auto-ml-regression-hardware-performance.ipynb",
-        # "notebooks/how-to-use-azureml/automated-machine-learning/regression-concrete-strength/auto-ml-regression-concrete-strength.ipynb" # COULD NOT FIND MODEL WITH VALID SCORE FOR METRIC SPEARMAN CORRELATION
-    # ]

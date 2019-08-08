@@ -16,8 +16,6 @@ def fetch_exp(sp_username, sp_tenant, sp_password, ws_name, ws_subscription_id, 
     """
 
     # Gets Service Principal connection
-    #   AuthenticationException, error: "unauthorized client"
-    #       Service Principal credentials are incorrectly set up
     perform_interactive_login(
         username=sp_username,
         tenant=sp_tenant,
@@ -109,13 +107,13 @@ def submit_run(notebook, exp, timeout, compute_target, base_image, sp_username, 
     # Returns reference to run
     return run
 
-def fetch_run(exp, run_id):
+def fetch_run(exp, devops_run_id):
     """ Fetches a Run by its Run ID tag specified by the DevOps Test Run.
     """
 
-    # Finds Run with matching RunID
+    # Finds Run with matching DevOps Run ID
     for run in exp.get_runs(tags = {
-        "run_id": run_id
+        "devops_run_id": devops_run_id
     }):
         return run
     return None

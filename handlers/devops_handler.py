@@ -17,25 +17,25 @@ def post_new_run(notebook, project_url, project, build_id,  auth_token):
     )
 
 
-def patch_run_update(error_message, project_url, project, run_id, auth_token):
+def patch_run_update(error_message, project_url, project, devops_run_id, auth_token):
     return requests.patch(
-        get_run_update_url(project_url, project, run_id),
+        get_run_update_url(project_url, project, devops_run_id),
         json=get_run_update_json(error_message),
         headers=get_auth_header(auth_token)
     )
 
 
-def post_run_attachment(file_name, stream, project_url, project, run_id, auth_token):
+def post_run_attachment(file_name, stream, project_url, project, devops_run_id, auth_token):
     return requests.post(
-        get_run_attachment_url(project_url, project, run_id),
+        get_run_attachment_url(project_url, project, devops_run_id),
         json=get_run_attachment_json(file_name, stream),
         headers=get_auth_header(auth_token)
     )
 
 
-def post_run_results(error_message, run_details, project_url, project, run_id, auth_token):
+def post_run_results(error_message, run_details, project_url, project, devops_run_id, auth_token):
     return requests.post(
-        get_run_results_url(project_url, project, run_id),
+        get_run_results_url(project_url, project, devops_run_id),
         json=get_run_results_json(error_message, run_details),
         headers=get_auth_header(auth_token)
     )
@@ -59,16 +59,16 @@ def get_new_run_url(project_url, project):
     return f'{project_url}{project}/_apis/test/runs?api-version=5.0'
 
 
-def get_run_update_url(project_url, project, run_id):
-    return f'{project_url}{project}/_apis/test/runs/{run_id}?api-version=5.0' 
+def get_run_update_url(project_url, project, devops_run_id):
+    return f'{project_url}{project}/_apis/test/runs/{devops_run_id}?api-version=5.0' 
 
 
-def get_run_attachment_url(project_url, project, run_id):
-    return f'{project_url}{project}/_apis/test/Runs/{run_id}/attachments?api-version=5.0-preview.1'
+def get_run_attachment_url(project_url, project, devops_run_id):
+    return f'{project_url}{project}/_apis/test/Runs/{devops_run_id}/attachments?api-version=5.0-preview.1'
 
 
-def get_run_results_url(project_url, project, run_id):
-    return f'{project_url}{project}/_apis/test/Runs/{run_id}/results?api-version=5.0'
+def get_run_results_url(project_url, project, devops_run_id):
+    return f'{project_url}{project}/_apis/test/Runs/{devops_run_id}/results?api-version=5.0'
 
 
 def get_repository_url(project_url, root, version):

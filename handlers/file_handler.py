@@ -60,7 +60,7 @@ def inject_pip_package(file_str, requirement):
     )
 
 
-def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None):
+def add_notebook_callback(params, notebook, devops_run_id, postexec, preexec):
     """ Enables notebooks to call back to the Azure Function.
     This is done to update the Pipeline based on Run results.
     """
@@ -80,7 +80,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     notebook_obj.scrub_empty_cells()
 
     # Injecting post-execution code
-    if postexec is not None:
+    if postexec:
         code = get_file_str(
             os.path.join(
                 "staging",
@@ -177,7 +177,7 @@ def add_notebook_callback(params, notebook, run_id, postexec=None, preexec=None)
     notebook_str = inject_notebook_params(
         str(notebook_obj),
         params,
-        run_id
+        devops_run_id
     )
     
     # Writes changes to file
@@ -207,7 +207,7 @@ def remove_notebook_callback(notebook_file_location):
     return str(notebook)
 
 
-def inject_notebook_params(notebook_str, params, run_id): 
+def inject_notebook_params(notebook_str, params, devops_run_id): 
     """ Overrides placeholder string snippets with necessary parameters for callbacks.
     """
 
@@ -229,7 +229,7 @@ def inject_notebook_params(notebook_str, params, run_id):
         "!UPDATE"
     ).replace(
         "default_run_id",
-        str(run_id)
+        str(devops_run_id)
     )
 
     # Injects parameters, updating relevant fields
@@ -283,8 +283,16 @@ def prepare_staging(repo, root):
 
 
 def fetch_requirements(notebook):
-    """ Finds notebook's definition in a release.json file to determine dependencies and requirements. 
+    """ Finds notebook's definition in a release.json file to determine dependencies, requirements, etc. 
     """
+
+    requirements_template = {
+        "celltimeout": 1200,
+        "dependencies": [],
+        "requirements": [],
+        "postexec": "",
+        "preexec": "",
+    }
 
     for root, dirs, files in os.walk("./staging/"):
         for file in files:
@@ -316,10 +324,12 @@ def fetch_requirements(notebook):
                         )
 
                     if notebook_path == notebook:
-                        return release_json["notebooks"][channel]
-    return {
-        "celltimeout": 1200
-    }
+                        for param in ["celltimeout", "dependencies", "requirements", "postexec", "preexec"]:
+                            if param in release_json["notebooks"][channel]:
+                                requirements_template[param] = release_json["notebooks"][channel][param]
+                        return requirements_template
+
+    return requirements_template
 
 
 def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, ws_name, ws_subscription_id, ws_resource_group):
@@ -365,18 +375,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
         )
     )
 
-    # if postexec:
-    #     for post_exec_script in ["checknotebookoutput.py", "checkexperimentresult.py", "checkcelloutput.py"]:
-    #         post_exec_file = os.path.join(
-    #             "staging",
-    #             os.path.dirname(notebook),
-    #             post_exec_script
-    #         )
-    #         shutil.copy(
-    #             post_exec_file,
-    #             snapshot_path
-    #         )
-
+    # Adds relevant files used by notebook 
     if dependencies:
         for dependency in dependencies:
             staging_file = os.path.join(
@@ -389,7 +388,7 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
                 snapshot_path
             )
 
-    # Moves and populates Conda File
+    # Moves and populates Conda File, adding pip dependencies required for auth and callback
     if conda_file:
         shutil.copy(
             os.path.join(
