@@ -1,0 +1,72 @@
+#Your build pipeline references a secret variable named ‘sp.password’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references a secret variable named ‘sb.connection’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+variables:
+  # See the README for specifics on this variables
+  gh.repo: ''
+  rp.version: 'demo_changed_notebooks'
+  rp.root: 'notebooks'
+  rp.condaFile: ''
+  ex.compute: 'brhung-cpu-demo'
+  ex.image: 'mcr.microsoft.com/azureml/base:intelmpi2018.3-ubuntu16.04'
+  do.organization: 'msdata'
+  do.project: 'Vienna'
+  sp.client: 'a1371676-65af-4420-a9f2-fee38388a4e1'
+  sp.tenant: '72f988bf-86f1-41af-91ab-2d7cd011db47'
+  ws.name: 'brhung-ml'
+  ws.subscription: 'bc69d98c-7d2b-4542-88a4-f86eb4aea4a5'
+  ws.resourceGroup: 'brhung-testing'
+  sb.name: 'function-queue'
+
+steps:
+- task: PublishToAzureServiceBus@1
+  displayName: 'Trigger Notebook Execution Azure Function'
+  inputs:
+    azureSubscription: 'Notebook_Validation_Queue'
+    messageBody: |
+     {
+         "job": "!START",
+         "auth_token": "$(system.AccessToken)",
+         "build_id": "$(Build.BuildId)",
+         "run_condition": "all_pass",
+         "run_config": {
+             "repo": "$(gh.repo)",
+             "version": "$(rp.version)",
+             "root": "$(rp.root)",
+             "notebooks": "notebooks/how-to-use-azureml/automated-machine-learning/classification-with-onnx/auto-ml-classification-with-onnx.ipynb",
+             "conda_file": "$(rp.condaFile)",
+             "compute_target": "$(ex.compute)",
+             "base_image": "$(ex.image)"
+         },
+         "azure_resources": {
+             "organization": "$(do.organization)",
+             "project": "$(do.project)",
+             "run_id": "default_run_id",
+             "service_principal": {
+                 "username": "$(sp.client)",
+                 "tenant": "$(sp.tenant)",
+                 "password": "$(sp.password)"
+             },
+             "workspace": {
+                 "name": "$(ws.name)",
+                 "subscription_id": "$(ws.subscription)",
+                 "resource_group": "$(ws.resourceGroup)"
+             }
+         },
+         "wrap_up": {
+             "queue": {
+                 "connection_string": "$(sb.connection)",
+                 "name": "$(sb.name)"
+             },
+             "call_back": {
+                 "error_message": "default_error_message",
+                 "project_url": "$(system.TeamFoundationCollectionUri)",
+                 "plan_url": "$(system.CollectionUri)",
+                 "project_id": "$(system.TeamProjectId)", 
+                 "hub_name": "$(system.HostType)",
+                 "plan_id": "$(system.PlanId)",
+                 "job_id": "$(system.JobId)",
+                 "task_id": "$(system.TaskInstanceId)"
+             }
+         }
+     }
+    waitForCompletion: true

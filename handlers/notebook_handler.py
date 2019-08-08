@@ -137,20 +137,22 @@ class Notebook:
     def scrub_magic_functions(self, cells, folder):
         """ Removes magic functions.
         """
+
         for cell in cells:
             counter = 0
             cell_size = len(self.notebook_json["cells"][cell]["source"])
             while counter < cell_size:
                 if any(magic in self.notebook_json["cells"][cell]["source"][counter] for magic in MAGIC_FUNCTIONS):
-                    file_name = self.notebook_json["cells"][cell]["source"][counter].split(" ")[-1]
-                    file = open(
-                        file_name, 
-                        "w+"
-                    )
-                    shutil.move(
-                        file_name,
-                        folder
-                    )
+                    if magic == "%%writefile":
+                        file_name = self.notebook_json["cells"][cell]["source"][counter].split(" ")[-1]
+                        file = open(
+                            file_name, 
+                            "w+"
+                        )
+                        shutil.move(
+                            file_name,
+                            folder
+                        )
                     del self.notebook_json["cells"][cell]["source"][counter]
                     cell_size -= 1
                 else:

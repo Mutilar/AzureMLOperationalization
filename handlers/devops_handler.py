@@ -42,7 +42,7 @@ def post_run_results(error_message, run_details, project_url, project, devops_ru
 
 def get_repository(project_url, root, version, auth_token):
     res = requests.get(
-        get_repository_url(project_url, root,version),
+        get_repository_url(project_url, root, version),
         headers=get_auth_header(auth_token)
     )
     if res.status_code == 200:
@@ -72,6 +72,7 @@ def get_run_results_url(project_url, project, devops_run_id):
 
 
 def get_repository_url(project_url, root, version):
+    # Currently hard-coded to Vienna && AzureMLCLI repository's GUID
     return f'{project_url}DefaultCollection/3adb301f-9ede-41f2-933b-fcd1a486ff7f/_apis/git/repositories/1f1e7f17-65c5-4d5a-a5fa-487802b4e71b/Items?path=/{root}&versionDescriptor[versionOptions]=0&versionDescriptor[versionType]=0&versionDescriptor[version]={version}&resolveLfs=true&$format=zip&api-version=5.0-preview.1'
 
 

@@ -272,7 +272,7 @@ def prepare_staging(repo, root):
         )
     ).extractall()
 
-    # Renames repository to "inputs"
+    # Sets root folder name
     os.rename(
         os.listdir()[0],
         root
@@ -405,10 +405,10 @@ def build_snapshot(notebook, dependencies, requirements, postexec, conda_file, w
             ),
             CONDA_FILE_LOCATION
         )
-    if not requirements:
-        requirements = ["azure-servicebus", "azureml", "azureml-sdk"]
-    else:
+    if requirements:
         requirements += ["azure-servicebus", "azureml", "azureml-sdk"]
+    else:
+        requirements = ["azure-servicebus", "azureml", "azureml-sdk"]
     
     add_pip_packages(
         CONDA_FILE_LOCATION,
