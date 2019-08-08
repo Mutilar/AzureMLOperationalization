@@ -324,7 +324,7 @@ def fetch_requirements(notebook):
                         )
 
                     if notebook_path == notebook:
-                        for param in ["celltimeout", "dependencies", "requirements", "postexec", "preexec"]:
+                        for param in ["celltimeout", "dependencies", "requirements"]: # "postexec", "preexec" can be added here, but are currently questionably functional
                             if param in release_json["notebooks"][channel]:
                                 requirements_template[param] = release_json["notebooks"][channel][param]
                         return requirements_template
