@@ -2,6 +2,9 @@ import requests
 
 
 def post_pipeline_callback(result, project_url, project_id, hub_name, plan_id, task_id, job_id, auth_token):
+    """ Closes the DevOps Pipeline: https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/http-rest-api?view=azure-devops#where-should-a-task-signal-completion-when-callback-is-chosen-as-the-completion-event
+    """
+
     return requests.post(
         get_pipeline_callback_url(project_url, project_id, hub_name, plan_id),
         json=get_pipeline_callback_json(result, task_id, job_id),
@@ -10,6 +13,9 @@ def post_pipeline_callback(result, project_url, project_id, hub_name, plan_id, t
 
 
 def post_new_run(notebook, project_url, project, build_id,  auth_token):
+    """ Creates a new DevOps Test Run: https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/create?view=azure-devops-rest-5.0
+    """
+
     return requests.post(
         get_new_run_url(project_url, project),
         json=get_new_run_json(build_id, notebook),
@@ -18,6 +24,9 @@ def post_new_run(notebook, project_url, project, build_id,  auth_token):
 
 
 def patch_run_update(error_message, project_url, project, devops_run_id, auth_token):
+    """ Updates a DevOps Test Run: https://docs.microsoft.com/en-us/rest/api/azure/devops/test/runs/update?view=azure-devops-rest-5.0
+    """
+
     return requests.patch(
         get_run_update_url(project_url, project, devops_run_id),
         json=get_run_update_json(error_message),
@@ -26,6 +35,9 @@ def patch_run_update(error_message, project_url, project, devops_run_id, auth_to
 
 
 def post_run_attachment(file_name, stream, project_url, project, devops_run_id, auth_token):
+    """ Uploads a DevOps Test Run Attachment: https://docs.microsoft.com/en-us/rest/api/azure/devops/test/Attachments/Create%20Test%20Run%20Attachment?view=azure-devops-rest-5.0
+    """
+
     return requests.post(
         get_run_attachment_url(project_url, project, devops_run_id),
         json=get_run_attachment_json(file_name, stream),
@@ -34,6 +46,9 @@ def post_run_attachment(file_name, stream, project_url, project, devops_run_id, 
 
 
 def post_run_results(error_message, run_details, project_url, project, devops_run_id, auth_token):
+    """ Adds a DevOps Test Run Result: https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0
+    """
+
     return requests.post(
         get_run_results_url(project_url, project, devops_run_id),
         json=get_run_results_json(error_message, run_details),
@@ -41,6 +56,9 @@ def post_run_results(error_message, run_details, project_url, project, devops_ru
     )
 
 def get_repository(project_url, root, version, auth_token):
+    """ Downloads a zip of a specified DevOps repository and a specific branch and subfolder: https://docs.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-5.1
+    """
+
     res = requests.get(
         get_repository_url(project_url, root, version),
         headers=get_auth_header(auth_token)

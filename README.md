@@ -3,7 +3,7 @@
 
 [![Build Status](https://dev.azure.com/t-brhung/brhung-test-pipeline/_apis/build/status/Mutilar.brhung-deployment-testing?branchName=master)](https://dev.azure.com/t-brhung/brhung-test-pipeline/_build/latest?definitionId=8&branchName=master)
 
-Streamlining and expediting a data scientist's CI/CD workflow leveraging prebaked functionalities of Azure DevOps Pipelines, Azure Functions, and Azure Service Bus Queues.
+Streamlining and expediting a data scientist's CI/CD workflow leveraging prebaked functionalities of agentless Azure DevOps Pipelines, Azure Functions, and Azure Service Bus Queues.
 
 ### Key aspects:
 - [Azure DevOps Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/)
@@ -11,13 +11,23 @@ Streamlining and expediting a data scientist's CI/CD workflow leveraging prebake
 - [Azure Functions](https://azure.microsoft.com/en-us/services/functions/)
 - [Azure Machine Learning](https://azure.microsoft.com/en-us/services/machine-learning-service/)
 
-Azure Python Functions can cleanly interact with the Azure ML SDK and can be easily integrated into Azure DevOps Pipelines. 
-
 ### Core dependencies:
 - [Python 3.6.8][download-python]
 - [Azure Functions Core Tools][functions-run-local]
 - [Azure CLI][install-azure-cli]
 - [Azure ML SDK + Contrib][install-azure-ml-sdk]
+
+### Main benefits:
+- Avoiding relying on build agents that might be preoccupied to run notebooks
+- Improved telemetry in the DevOps UI to debug notebook failures
+- Support for testing and validating against custom images
+- Quicker run-times from avoiding slow-downs associated with build agents
+
+### Looking forward:
+- Azure ML Pipelines are an alternative to the Service Bus + Azure Function combination. There is more of a story around shipping this module with an ML Workspace. There have been concerns over how third parties would have to initialize the Azure Function Application and Service Bus Queue with the current implementation.
+- Event Grid or a similar event-driven trigger on completion of a Run would allow for a more integrated, platform-level replacement to the current code-injection method.
+- Making this a more agnostic solution will require thought on our current, in-house ```release.json``` solution and how a more generally applicable solution might be achieved. Other aspects like Git Integration can be streamlined by requiring all repositories to be imported into Azure DevOps to allow DevOps to handle authentication.
+- The benefits of agentlessness are felt most when all phases in a pipeline are agentless. Therefore, phases like [Get Changed Notebooks](https://msdata.visualstudio.com/Vienna/_apps/hub/ms.vss-ciworkflow.build-ci-hub?_a=edit-build-definition&id=7483) should also be moved to an agentless architecture whenever possible. 
 
 # The File Directory
 
@@ -30,19 +40,14 @@ Azure Python Functions can cleanly interact with the Azure ML SDK and can be eas
 > > > - ```devops_handler.py```
 > > > - ```file_handler.py```
 > > > - ```notebook_handler.py```
-> > - unit_testing
-> > > - ```test_handlers.py```
 > > - ```deployment_pipeline.yml```
+> > - ```automlcli_example_pipeline.yml```
 > > - ```requirements.txt``` 
 
 ## ```deployment_pipeline.yml```
 
-This file controls the CD pipeline for the Function App. It functions with two main stages: 
+This agent-based pipeline prepares the deployment environment, unit-tests, bundles, and finally deploys the Azure Function Application:
 
-> #### ```Deployment```
-> 
-> This agent-based stage prepares the deployment environment, unit-tests, bundles, and  finally deploys the Azure Function Application. Simplified, it looks like this:
->
 > ```yml
 > - stage: Deployment
 >   jobs:
@@ -57,17 +62,17 @@ This file controls the CD pipeline for the Function App. It functions with two m
 >     - task: AzureFunctionApp@1
 > ```
  
-> #### ```Validation```
->
-> This agentless stage validates the changes by running a controlled job through the new deployment of the application to ensure everything is functioning as expected. Simplified, it looks like this:
-> 
+## ```automlcli_example_pipeline.yml```
+
+This agentless pipeline runs a given notebook with a given imagine on a specified compute target, and provides telemetry results as test runs in the DevOps UI.
+ 
 > ```yml
 > - stage: Validation
 >   jobs:
 >   - job: 
 >     pool: server
 >     steps:
->     - task: RunNotebookTest@1
+>     - task: PublishToAzureServiceBus@1
 > ```
 
 
@@ -97,7 +102,7 @@ This file specifies the location of main function (e.g. ```__init__.py```), as w
 
 ## ```run_notebook_service_bus/__init__.py```
 
-This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the distinct job types: ```start_build_pipeline()``` and ```update_build_pipeline()```. 
+This script holds all the pythonic logic of the application. The main function is short, favoring a helper function to handle the distinct job types:
 
 > #### ```start_build_pipeline()```
 > 
@@ -109,9 +114,9 @@ This script holds all the pythonic logic of the application. The main function i
 
 ## ```handlers/azureml_handler.py```
 
-This script handles all Azure ML SDK-related logic, including ```fetch_exp()```, ```fetch_run_config()```, and ```submit_run()```, which all manage Azure ML Workspace-related tasks.
+This script handles all Azure ML SDK-related logic, managing Azure ML Workspace-related tasks:
 
-> #### ```fetch_experiment()```
+> #### ```fetch_exp()```
 > 
 > This function authenticates with the ML Workspace with a Service Principal connection, fetches the [Workspace](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.workspace(class)?view=azure-ml-py), and then fetches and returns a new [Experiment](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.experiment.experiment?view=azure-ml-py).
 
@@ -133,7 +138,7 @@ This script handles all Azure ML SDK-related logic, including ```fetch_exp()```,
 
 ## ```handlers/devops_handler.py```
 
-This script handles all DevOps related tasks, including ```post_pipeline_callback()```, ```post_new_run()```, ```patch_run_update()```, and ```post_run_results()```.
+This script handles all DevOps related tasks:
 
 > #### ```post_pipeline_callback()```
 > 
@@ -155,13 +160,17 @@ This script handles all DevOps related tasks, including ```post_pipeline_callbac
 >
 > This function, along with its helper functions, [adds a DevOps Test Run Result](https://docs.microsoft.com/en-us/rest/api/azure/devops/test/results/add?view=azure-devops-rest-5.0) with result telemetry via the DevOps API.
 
+> #### ```get_repository()```
+>
+> This function, along with its helper functions, [downloads a zip of a specified DevOps repository and a specific branch and subfolder](https://docs.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-5.1). 
+
 ## ```handlers/file_handler.py```
 
-This script handles all file IO related tasks, including ```fetch_repo()```, ```add_pip_dependency()```, and ```add_notebook_callback()```.
+This script handles all file IO related tasks:
 
-> #### ```fetch_repo()```
+> #### ```prepare_staging()```
 >
-> This function pulls and extracts repositories from GitHub to be submitted in a Run's snapshot folder.
+> This function unzips a repository archive and places it in the staging directory for ```build_snapshot()``` to access.
 
 > #### ```add_pip_dependency()```
 >
@@ -177,9 +186,17 @@ This script handles all file IO related tasks, including ```fetch_repo()```, ```
 >
 > This function removes try-catches around each code-block of a notebook after the notebook has been executed in Azure ML Compute so that results can be displayed cleanly in Azure DevOps. 
 
+> #### ```fetch_requirements()```
+>
+> This function finds a notebook's release.json file to determine dependencies, requirements, and other run parameters.
+
+> #### ```build_snapshot()```
+>
+> This function moves repository files from the staging directory into the snapshot directory, keeping the snapshot directory as small and light-weight as possible to run a specific notebook.
+
 ## ```handlers/notebook_handler.py```
 
-This class, ```Notebook```, handles all code manipulation for notebooks to be fed to Azure ML Compute, including ```inject_code()```, ```inject_cell()```, and ```scrub_code()```.
+This class, ```Notebook```, handles all code manipulation for notebooks to be fed to Azure ML Compute:
 
 > #### ```inject_code()```
 >
@@ -192,10 +209,6 @@ This class, ```Notebook```, handles all code manipulation for notebooks to be fe
 > #### ```scrub_code()```
 >
 > This function removes all lines of code injected by inject_code from a collection of specified code cells. It also removes injected code cells from the beginning and end of the notebook.
-
-## ```unit_testing/test_handlers.py```
-
-This script handles all unit-testing of the Function App before it is deployed.
 
 # Glossary
 
