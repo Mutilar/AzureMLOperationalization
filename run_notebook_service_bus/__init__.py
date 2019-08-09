@@ -5,6 +5,9 @@ from time import sleep
 import sys
 import os
 sys.path.append("handlers")
+
+raise Exception(os.listdir())
+
 import file_handler as fh
 import azureml_handler as ah
 import devops_handler as dh
