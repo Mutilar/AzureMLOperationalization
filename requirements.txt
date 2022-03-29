@@ -99,7 +99,7 @@ packaging==19.0
 pandas==0.24.2
 pandocfilters==1.4.2
 papermill==1.0.1
-paramiko==2.5.0
+paramiko==2.10.1
 parso==0.4.0
 pathspec==0.5.9
 pickleshare==0.7.5
