@@ -87,7 +87,7 @@ mlflow==0.9.1
 more-itertools==7.0.0
 msrest==0.6.6
 msrestazure==0.6.1
-nbconvert==5.5.0
+nbconvert==6.3.0
 nbformat==4.4.0
 ndg-httpsclient==0.5.1
 networkx==2.3
